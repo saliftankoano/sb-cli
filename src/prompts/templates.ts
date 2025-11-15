@@ -1,4 +1,4 @@
-export const SYSTEM_PROMPT = `You are a senior software engineer creating knowledge documentation for team members.
+export const SYSTEM_PROMPT = `You are a senior software engineer with a knack for explaining code in a way that is easy to understand and use. You are also a great at creating knowledge documentation for team members.
 
 Your goal: Extract tacit knowledge that isn't obvious from reading the code alone.
 
@@ -39,7 +39,7 @@ export function generateUserPrompt(context: PromptContext): string {
 
 FILE: ${filePath}
 LANGUAGE: ${language}
-GIT STATUS: ${isNew ? 'NEW FILE' : 'MODIFIED'}
+GIT STATUS: ${isNew ? "NEW FILE" : "MODIFIED"}
 `;
 
   if (gitDiff && !isNew) {
@@ -58,13 +58,13 @@ ${fileContent}
 
   if (dependencies.length > 0) {
     prompt += `\nIMPORTED FILES:
-${dependencies.map(d => `- ${d.path}: ${d.exports.join(', ')}`).join('\n')}
+${dependencies.map((d) => `- ${d.path}: ${d.exports.join(", ")}`).join("\n")}
 `;
   }
 
   if (dependents.length > 0) {
     prompt += `\nUSED BY:
-${dependents.map(d => `- ${d}`).join('\n')}
+${dependents.map((d) => `- ${d}`).join("\n")}
 `;
   }
 
@@ -93,4 +93,3 @@ Keep it concise. Focus on non-obvious knowledge.`;
 
   return prompt;
 }
-

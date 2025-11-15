@@ -1,17 +1,18 @@
-import { analyzeCommit } from '../core/analyzer.js';
+import chalk from "chalk";
+import { analyzeCommit } from "../core/analyzer.js";
 
 /**
  * Command to analyze staged files (called by Husky pre-commit hook)
+ * Exits with code 1 if user aborts or analysis fails, blocking the commit
  */
 export async function analyzeCommitCommand(): Promise<void> {
   try {
     await analyzeCommit();
-    process.exit(0); // Always exit successfully (never block commits)
+    // Exit successfully only if analysis completed and user confirmed
+    process.exit(0);
   } catch (error: any) {
-    // Log error but don't block the commit
-    console.error('Error during analysis:', error.message);
-    console.error('(Commit will proceed anyway)');
-    process.exit(0); // Exit with 0 to allow commit
+    // If user aborted or there was an error, block the commit
+    console.error(chalk.red(`\n❌ Analysis failed: ${error.message}\n`));
+    process.exit(1); // Exit with 1 to block commit
   }
 }
-

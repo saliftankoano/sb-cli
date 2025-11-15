@@ -6,3 +6,8 @@ dist/
 *.tgz
 .npm/
 
+
+# Startblock
+.sb-config.json
+.startblock/.sb-cache/
+.startblock/blame/

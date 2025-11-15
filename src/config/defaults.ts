@@ -19,28 +19,27 @@ export interface SBConfig {
 export const defaultConfig: SBConfig = {
   openai: {
     apiKey: process.env.OPENAI_API_KEY,
-    model: 'gpt-4o-mini',
+    model: "gpt-4o-mini",
     temperature: 0.3,
     maxTokens: 2000,
   },
   analysis: {
     excludePatterns: [
-      'node_modules/**',
-      'dist/**',
-      'build/**',
-      '*.test.ts',
-      '*.test.js',
-      '*.spec.ts',
-      '*.spec.js',
-      '__tests__/**',
-      'coverage/**',
+      "node_modules/**",
+      "dist/**",
+      "build/**",
+      "*.test.ts",
+      "*.test.js",
+      "*.spec.ts",
+      "*.spec.js",
+      "__tests__/**",
+      "coverage/**",
     ],
-    fileExtensions: ['.ts', '.js', '.tsx', '.jsx', '.py', '.go', '.rs'],
+    fileExtensions: [".ts", ".js", ".tsx", ".jsx", ".py", ".go", ".rs"],
     includeDependencies: true,
     maxFilesPerAnalysis: 10,
   },
   output: {
-    knowledgeDir: '.startblock/knowledge',
+    knowledgeDir: ".startblock/knowledge",
   },
 };
-

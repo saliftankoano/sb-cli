@@ -1,4 +1,4 @@
-import simpleGit, { SimpleGit } from 'simple-git';
+import simpleGit, { SimpleGit } from "simple-git";
 
 export interface GitOperations {
   getStagedFiles(): Promise<string[]>;
@@ -10,7 +10,9 @@ export interface GitOperations {
 /**
  * Git operations wrapper using simple-git
  */
-export function createGitOperations(repoPath: string = process.cwd()): GitOperations {
+export function createGitOperations(
+  repoPath: string = process.cwd()
+): GitOperations {
   const git: SimpleGit = simpleGit(repoPath);
 
   return {
@@ -19,12 +21,14 @@ export function createGitOperations(repoPath: string = process.cwd()): GitOperat
      */
     async getStagedFiles(): Promise<string[]> {
       try {
-        const diff = await git.diff(['--cached', '--name-only', '--diff-filter=ACM']);
-        return diff
-          .split('\n')
-          .filter(line => line.trim().length > 0);
+        const diff = await git.diff([
+          "--cached",
+          "--name-only",
+          "--diff-filter=ACM",
+        ]);
+        return diff.split("\n").filter((line) => line.trim().length > 0);
       } catch (error) {
-        console.error('Error getting staged files:', error);
+        console.error("Error getting staged files:", error);
         return [];
       }
     },
@@ -46,7 +50,7 @@ export function createGitOperations(repoPath: string = process.cwd()): GitOperat
      */
     async getFileDiff(filePath: string): Promise<string | null> {
       try {
-        const diff = await git.diff(['--cached', filePath]);
+        const diff = await git.diff(["--cached", filePath]);
         return diff || null;
       } catch {
         return null;
@@ -60,9 +64,8 @@ export function createGitOperations(repoPath: string = process.cwd()): GitOperat
       try {
         await git.add(files);
       } catch (error) {
-        console.error('Error staging files:', error);
+        console.error("Error staging files:", error);
       }
     },
   };
 }
-

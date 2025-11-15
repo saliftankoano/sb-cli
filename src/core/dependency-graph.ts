@@ -1,7 +1,7 @@
-import * as parser from '@babel/parser';
-import traverse from '@babel/traverse';
-import * as path from 'path';
-import { readFileSafe } from '../utils/file-utils.js';
+import * as parser from "@babel/parser";
+import traverse from "@babel/traverse";
+import * as path from "path";
+import { readFileSafe } from "../utils/file-utils.js";
 
 export interface FileNode {
   path: string;
@@ -23,8 +23,8 @@ export async function parseImports(filePath: string): Promise<string[]> {
 
   try {
     const ast = parser.parse(content, {
-      sourceType: 'module',
-      plugins: ['typescript', 'jsx'],
+      sourceType: "module",
+      plugins: ["typescript", "jsx"],
       errorRecovery: true,
     });
 
@@ -38,9 +38,9 @@ export async function parseImports(filePath: string): Promise<string[]> {
       // Also handle require() calls
       CallExpression(path) {
         if (
-          path.node.callee.type === 'Identifier' &&
-          path.node.callee.name === 'require' &&
-          path.node.arguments[0]?.type === 'StringLiteral'
+          path.node.callee.type === "Identifier" &&
+          path.node.callee.name === "require" &&
+          path.node.arguments[0]?.type === "StringLiteral"
         ) {
           imports.push(path.node.arguments[0].value);
         }
@@ -57,9 +57,13 @@ export async function parseImports(filePath: string): Promise<string[]> {
 /**
  * Resolve import path to absolute file path
  */
-export function resolveImportPath(importStr: string, fromFile: string, repoRoot: string): string | null {
+export function resolveImportPath(
+  importStr: string,
+  fromFile: string,
+  repoRoot: string
+): string | null {
   // Skip external packages (node_modules)
-  if (!importStr.startsWith('.') && !importStr.startsWith('/')) {
+  if (!importStr.startsWith(".") && !importStr.startsWith("/")) {
     return null;
   }
 
@@ -67,7 +71,7 @@ export function resolveImportPath(importStr: string, fromFile: string, repoRoot:
   const resolved = path.resolve(repoRoot, fromDir, importStr);
 
   // Try common extensions
-  const extensions = ['.ts', '.tsx', '.js', '.jsx', ''];
+  const extensions = [".ts", ".tsx", ".js", ".jsx", ""];
   for (const ext of extensions) {
     const withExt = resolved + ext;
     return withExt;
@@ -124,11 +128,10 @@ export function getDependencyContext(
   }
 
   return {
-    dependencies: node.imports.map(p => ({
+    dependencies: node.imports.map((p) => ({
       path: p,
       exports: [], // Could parse exports in future
     })),
     dependents: node.importedBy,
   };
 }
-

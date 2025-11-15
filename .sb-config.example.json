@@ -1,0 +1,27 @@
+{
+  "openai": {
+    "apiKey": "YOUR_API_KEY_HERE",
+    "model": "gpt-4o-mini",
+    "temperature": 0.3,
+    "maxTokens": 2000
+  },
+  "analysis": {
+    "excludePatterns": [
+      "node_modules/**",
+      "dist/**",
+      "build/**",
+      "*.test.ts",
+      "*.test.js",
+      "*.spec.ts",
+      "*.spec.js",
+      "__tests__/**",
+      "coverage/**"
+    ],
+    "fileExtensions": [".ts", ".js", ".tsx", ".jsx", ".py", ".go", ".rs"],
+    "includeDependencies": true,
+    "maxFilesPerAnalysis": 10
+  },
+  "output": {
+    "knowledgeDir": ".startblock/knowledge"
+  }
+}

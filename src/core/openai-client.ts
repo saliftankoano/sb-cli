@@ -1,13 +1,17 @@
-import OpenAI from 'openai';
-import { type SBConfig } from '../config/defaults.js';
-import { SYSTEM_PROMPT, generateUserPrompt, type PromptContext } from '../prompts/templates.js';
-import { sleep } from '../utils/sleep.js';
+import OpenAI from "openai";
+import { type SBConfig } from "../config/defaults.js";
+import {
+  SYSTEM_PROMPT,
+  generateUserPrompt,
+  type PromptContext,
+} from "../prompts/templates.js";
+import { sleep } from "../utils/sleep.js";
 
 export interface AnalysisResult {
   markdown: string;
   metadata: {
     tags: string[];
-    importance: 'low' | 'medium' | 'high' | 'critical';
+    importance: "low" | "medium" | "high" | "critical";
   };
 }
 
@@ -37,12 +41,12 @@ export class OpenAIClient {
         temperature: this.config.openai.temperature,
         max_tokens: this.config.openai.maxTokens,
         messages: [
-          { role: 'system', content: SYSTEM_PROMPT },
-          { role: 'user', content: userPrompt },
+          { role: "system", content: SYSTEM_PROMPT },
+          { role: "user", content: userPrompt },
         ],
       });
 
-      const markdown = response.choices[0].message.content || '';
+      const markdown = response.choices[0].message.content || "";
       const tags = this.extractTags(context);
       const importance = this.calculateImportance(context);
 
@@ -53,7 +57,7 @@ export class OpenAIClient {
     } catch (error: any) {
       // Handle rate limiting
       if (error.status === 429) {
-        console.log('Rate limited, waiting 10s...');
+        console.log("Rate limited, waiting 10s...");
         await sleep(10000);
         return this.analyze(context); // Retry
       }
@@ -67,11 +71,11 @@ export class OpenAIClient {
    */
   private extractTags(context: PromptContext): string[] {
     const tags: string[] = [];
-    const parts = context.filePath.split('/');
+    const parts = context.filePath.split("/");
 
     // Add directory-based tags
     if (parts.length > 1) {
-      tags.push(...parts.slice(0, -1).filter(p => p.length > 0));
+      tags.push(...parts.slice(0, -1).filter((p) => p.length > 0));
     }
 
     // Add language tag
@@ -79,7 +83,7 @@ export class OpenAIClient {
 
     // Add status tag
     if (context.isNew) {
-      tags.push('new');
+      tags.push("new");
     }
 
     return [...new Set(tags)]; // Remove duplicates
@@ -88,13 +92,14 @@ export class OpenAIClient {
   /**
    * Calculate importance based on dependencies
    */
-  private calculateImportance(context: PromptContext): 'low' | 'medium' | 'high' | 'critical' {
+  private calculateImportance(
+    context: PromptContext
+  ): "low" | "medium" | "high" | "critical" {
     const dependentCount = context.dependents.length;
 
-    if (dependentCount >= 5) return 'critical';
-    if (dependentCount >= 3) return 'high';
-    if (dependentCount >= 1) return 'medium';
-    return 'low';
+    if (dependentCount >= 5) return "critical";
+    if (dependentCount >= 3) return "high";
+    if (dependentCount >= 1) return "medium";
+    return "low";
   }
 }
-

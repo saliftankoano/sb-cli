@@ -1,8 +1,8 @@
-import * as fs from 'fs/promises';
-import * as path from 'path';
-import matter from 'gray-matter';
-import { ensureDir, fileExists } from '../utils/file-utils.js';
-import type { AnalysisResult } from './openai-client.js';
+import * as fs from "fs/promises";
+import * as path from "path";
+import matter from "gray-matter";
+import { ensureDir, fileExists } from "../utils/file-utils.js";
+import type { AnalysisResult } from "./openai-client.js";
 
 export interface KnowledgeMetadata {
   filePath: string;
@@ -19,9 +19,12 @@ export interface KnowledgeMetadata {
 /**
  * Generate knowledge file path from source file path
  */
-export function getKnowledgeFilePath(sourceFile: string, knowledgeDir: string): string {
+export function getKnowledgeFilePath(
+  sourceFile: string,
+  knowledgeDir: string
+): string {
   // Replace / with _ to create flat structure
-  const fileName = sourceFile.replace(/\//g, '_') + '.md';
+  const fileName = sourceFile.replace(/\//g, "_") + ".md";
   return path.join(knowledgeDir, fileName);
 }
 
@@ -38,19 +41,19 @@ export async function writeKnowledgeFile(
   }
 ): Promise<string> {
   const { knowledgeDir, fileVersion, model } = options;
-  
+
   // Ensure knowledge directory exists
   await ensureDir(knowledgeDir);
 
   const knowledgePath = getKnowledgeFilePath(sourceFilePath, knowledgeDir);
-  
+
   // Check if file exists for incremental updates
   const exists = await fileExists(knowledgePath);
   let existingData: { data?: Partial<KnowledgeMetadata> } = {};
-  
+
   if (exists) {
     try {
-      const existingContent = await fs.readFile(knowledgePath, 'utf-8');
+      const existingContent = await fs.readFile(knowledgePath, "utf-8");
       existingData = matter(existingContent);
     } catch {
       // Ignore errors reading existing file
@@ -61,18 +64,18 @@ export async function writeKnowledgeFile(
     filePath: sourceFilePath,
     fileVersion,
     lastUpdated: new Date().toISOString(),
-    updatedBy: 'sb-cli',
+    updatedBy: "sb-cli",
     tags: analysis.metadata.tags,
     importance: analysis.metadata.importance,
-    extractedBy: 'sb-cli@1.0.0',
+    extractedBy: "sb-cli@1.0.0",
     model,
     humanVerified: existingData.data?.humanVerified || false,
   };
 
   const content = matter.stringify(analysis.markdown, metadata);
-  
-  await fs.writeFile(knowledgePath, content, 'utf-8');
-  
+
+  await fs.writeFile(knowledgePath, content, "utf-8");
+
   return knowledgePath;
 }
 
@@ -84,15 +87,15 @@ export async function readKnowledgeFile(
   knowledgeDir: string
 ): Promise<{ metadata: KnowledgeMetadata; content: string } | null> {
   const knowledgePath = getKnowledgeFilePath(sourceFilePath, knowledgeDir);
-  
+
   if (!(await fileExists(knowledgePath))) {
     return null;
   }
 
   try {
-    const content = await fs.readFile(knowledgePath, 'utf-8');
+    const content = await fs.readFile(knowledgePath, "utf-8");
     const { data, content: markdown } = matter(content);
-    
+
     return {
       metadata: data as KnowledgeMetadata,
       content: markdown,
@@ -101,4 +104,3 @@ export async function readKnowledgeFile(
     return null;
   }
 }
-

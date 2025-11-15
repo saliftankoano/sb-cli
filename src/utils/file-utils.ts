@@ -1,5 +1,5 @@
-import * as fs from 'fs/promises';
-import * as path from 'path';
+import * as fs from "fs/promises";
+import * as path from "path";
 
 /**
  * Check if a file exists
@@ -29,7 +29,7 @@ export async function ensureDir(dirPath: string): Promise<void> {
  */
 export async function readFileSafe(filePath: string): Promise<string | null> {
   try {
-    return await fs.readFile(filePath, 'utf-8');
+    return await fs.readFile(filePath, "utf-8");
   } catch {
     return null;
   }
@@ -45,8 +45,10 @@ export function getFileExtension(filePath: string): string {
 /**
  * Check if file matches extension list
  */
-export function matchesExtensions(filePath: string, extensions: string[]): boolean {
+export function matchesExtensions(
+  filePath: string,
+  extensions: string[]
+): boolean {
   const ext = getFileExtension(filePath);
   return extensions.includes(ext);
 }
-
