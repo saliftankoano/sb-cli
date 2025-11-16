@@ -7,8 +7,9 @@ import gradient from "gradient-string";
  */
 export async function showIntro(): Promise<void> {
   return new Promise((resolve) => {
+    console.log("\n");
     // ASCII art with figlet
-    figlet("StartBlock", { font: "ANSI Shadow" }, (err, data) => {
+    figlet("StartBlock CLI", { font: "ANSI Shadow" }, (err, data) => {
       if (err) {
         // Fallback if figlet fails
         console.log(chalk.bold.cyan("\n╔════════════════════════════════╗"));
@@ -18,34 +19,32 @@ export async function showIntro(): Promise<void> {
         return;
       }
 
-      // Create gradient effect (purple to blue)
-      const purpleBlue = gradient(["#a855f7", "#3b82f6", "#8b5cf6"]);
+      // Create gradient effect (purple to blue, pink)
+      const purpleBluePink = gradient([
+        "#a855f7",
+        "#3b82f6",
+        "#8b5cf6",
+        "#f72585",
+      ]);
 
+      console.log(purpleBluePink.multiline(data || "StartBlock CLI"));
       console.log("\n");
-      console.log(purpleBlue.multiline(data || "StartBlock"));
-      console.log("\n");
 
-      // Tagline with gradient
-      const tagline = purpleBlue("  🚀 Dev Onboarding in hours, not months!");
-      console.log(tagline);
-      console.log(chalk.dim("  ──────────────────────────────────────\n"));
+      // Tagline with figlet for bigger text
+      figlet("Dev insights", { font: "Small" }, (err, taglineData) => {
+        if (!err && taglineData) {
+          const taglineGradient = purpleBluePink.multiline(taglineData);
+          console.log(taglineGradient);
+        }
 
-      // Animated description
-      const description = chalk.white(
-        "  Join a new codebase and become productive in "
-      );
-      const highlight = purpleBlue("hours, not months");
-      const rest = chalk.white(
-        ".\n  Our AI understands your code like a senior developer\n  and guides you through every file, function, and framework.\n"
-      );
+        // Rest of tagline text
+        const taglineText = purpleBluePink(" captured before 💩 hits the fan!");
+        console.log(chalk.bold(taglineText));
+        console.log(chalk.dim("  ──────────────────────────────────────\n"));
 
-      console.log(description + highlight + rest);
-      console.log(
-        chalk.dim("  ════════════════════════════════════════════\n")
-      );
-
-      // Small delay for dramatic effect
-      setTimeout(() => resolve(), 500);
+        // Small delay for dramatic effect
+        setTimeout(() => resolve(), 500);
+      });
     });
   });
 }

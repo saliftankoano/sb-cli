@@ -1,12 +1,11 @@
 ---
 filePath: src/index.ts
-fileVersion: 7e019c662dfbf93f083367ec7fb1cde1a1698639
-lastUpdated: '2025-11-15T19:00:33.361Z'
+fileVersion: 73caec7ca66a98f267aa4ae1de89f334c7f2c911
+lastUpdated: '2025-11-16T03:56:30.602Z'
 updatedBy: sb-cli
 tags:
   - src
   - typescript
-  - new
 importance: low
 extractedBy: sb-cli@1.0.0
 model: gpt-4o-mini
@@ -15,27 +14,35 @@ humanVerified: false
 # Documentation for `src/index.ts`
 
 ## Purpose
-This file serves as the entry point for a command-line interface (CLI) tool designed to facilitate automatic knowledge capture for codebases. It processes user commands to either initialize a repository or analyze commits.
+This file serves as the entry point for a command-line interface (CLI) tool, allowing users to execute various commands related to knowledge capture in codebases, such as initializing the tool and analyzing commits.
 
 ## Key Functionality
-- **main()**: The primary function that handles command execution based on user input. It invokes specific commands or displays help information.
+- **main()**: The primary function that handles command execution based on user input. It utilizes a switch-case structure to determine which command to invoke.
 - **showHelp()**: Displays usage instructions and examples for the CLI commands available to the user.
+- **Commands**:
+  - `init`: Initializes the Startblock in the current repository.
+  - `analyze-commit`: Analyzes staged files, typically used in conjunction with Git hooks.
+  - `sim-intro`: Simulates an introductory animation for the CLI tool.
 
 ## Gotchas
-- **Command Handling**: The command is derived from `process.argv`, which can lead to unexpected behavior if no command is provided. The default case handles this by showing help, but users may overlook this if they are not familiar with CLI conventions.
-- **Error Handling**: The catch block logs errors but does not provide detailed context beyond the error message. This can make debugging difficult if the error is not clear. Consider enhancing error logging for better traceability.
-- **Async/Await Usage**: Both commands are asynchronous. If a command fails, it will throw an error that is caught in the main function. Ensure that any command you add in the future adheres to this pattern to maintain consistency.
+- **Error Handling**: The `main()` function includes a try-catch block to handle errors gracefully. If an error occurs during command execution, it logs the error message and exits the process with a non-zero status. Ensure that any command functions (like `initCommand` or `analyzeCommitCommand`) throw meaningful errors to provide context.
+- **Command Parsing**: The command is derived from `process.argv`, which can lead to unexpected behavior if the input is malformed or if additional arguments are passed. The first argument is expected to be the command; if it's missing or unrecognized, the help message is displayed.
+- **Help Command**: The CLI supports both `--help` and `-h` as aliases for displaying help. Users might overlook this if they are unfamiliar with the CLI's structure.
 
 ## Dependencies
-- **chalk**: This library is used for coloring console output, enhancing user experience by making the CLI output more readable and visually appealing. It is particularly useful for error messages and help text.
+- **chalk**: This library is used for styling console output, enhancing readability and user experience. It allows for colored text, which can help differentiate between commands, errors, and informational messages.
+- **Command Modules**: The commands are imported from separate modules (e.g., `initCommand`, `analyzeCommitCommand`, `simulateIntroCommand`). This modular approach promotes separation of concerns and makes the codebase easier to maintain and extend.
 
 ## Architecture Context
-This file is part of a larger CLI tool that likely includes various commands related to code analysis and repository management. The modular structure (with separate command files) allows for easy extension and maintenance of the CLI functionality.
+This file is part of a larger CLI application designed for automatic knowledge capture in software development. It interacts with various command modules that encapsulate specific functionalities, allowing for easy extension of features without cluttering the main entry point.
 
 ## Implementation Notes
-- **Command Structure**: The switch statement is a straightforward way to handle commands, but consider using a command map or a more scalable approach if additional commands are expected in the future.
-- **Performance Considerations**: The current implementation is efficient for a small number of commands. However, if the number of commands grows significantly, consider optimizing the command resolution process to avoid a long switch statement.
-- **Exit Codes**: The use of `process.exit(1)` indicates an error state. Ensure that all commands follow this pattern for consistency in exit codes, which is crucial for automation scripts that may rely on these codes for success/failure detection.
+- **Asynchronous Execution**: The commands are awaited, which is crucial for ensuring that the CLI does not exit before the command completes. This is particularly important for commands that may involve I/O operations, such as file analysis.
+- **Performance Considerations**: The CLI is designed to be lightweight, but performance can be impacted by the complexity of the commands executed. For example, `analyzeCommitCommand` may involve file system operations that could slow down execution if not optimized.
+- **Common Mistakes**: Developers adding new commands should ensure they are properly registered in the switch-case structure and that they handle errors appropriately. Additionally, they should update the `showHelp()` function to include information about new commands to keep the help documentation in sync with available functionality.
 
-## Developer Notes
+## Developer Insights
 
+Decided to improve the text displayed during the intro, I added a command as well to simulate the intro, you can now trigger it using sb sim-intro. Figlet works well for the nice fonts. Nothing tricky to report.
+
+*Captured during commit: chore: remove deprecated Husky v9 lines from pre-commit hook*

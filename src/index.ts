@@ -3,6 +3,7 @@
 import chalk from "chalk";
 import { initCommand } from "./commands/init.js";
 import { analyzeCommitCommand } from "./commands/analyze-commit.js";
+import { simulateIntroCommand } from "./commands/simulate-intro.js";
 
 const args = process.argv.slice(2);
 const command = args[0];
@@ -16,6 +17,10 @@ async function main() {
 
       case "analyze-commit":
         await analyzeCommitCommand();
+        break;
+
+      case "sim-intro":
+        await simulateIntroCommand();
         break;
 
       case "--help":
@@ -50,6 +55,9 @@ function showHelp() {
     "  " +
       chalk.cyan("sb analyze-commit") +
       "  Analyze staged files (used by Husky hook)"
+  );
+  console.log(
+    "  " + chalk.cyan("sb sim-intro") + "         Simulate the intro animation"
   );
   console.log(
     "  " + chalk.cyan("sb --help") + "          Show this help message\n"
