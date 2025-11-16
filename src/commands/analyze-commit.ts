@@ -2,7 +2,7 @@ import chalk from "chalk";
 import { analyzeCommit } from "../core/analyzer.js";
 
 /**
- * Command to analyze staged files (called by Husky commit-msg hook)
+ * Command to analyze staged files (called by Husky prepare-commit-msg hook)
  * Exits with code 1 if user aborts or analysis fails, blocking the commit
  * @param commitMsgFile - Path to the commit message file (passed by Git hook as $1)
  */

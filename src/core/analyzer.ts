@@ -228,7 +228,7 @@ ${insights}
 
 /**
  * Main analyzer - orchestrates the entire analysis workflow
- * @param commitMsgFile - Optional path to commit message file (provided by commit-msg hook)
+ * @param commitMsgFile - Optional path to commit message file (provided by prepare-commit-msg hook)
  */
 export async function analyzeCommit(commitMsgFile?: string): Promise<void> {
   const repoRoot = process.cwd();

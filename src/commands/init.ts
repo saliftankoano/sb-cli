@@ -73,7 +73,7 @@ function generateConfig(apiKey: string): string {
   return JSON.stringify(config, null, 2);
 }
 
-const HUSKY_COMMIT_MSG = `#!/usr/bin/env sh
+const HUSKY_PREPARE_COMMIT_MSG = `#!/usr/bin/env sh
 # Run sb analyze on staged files (receives commit message file as $1)
 sb analyze-commit "$1"
 `;
@@ -226,16 +226,24 @@ export async function initCommand(): Promise<void> {
         await execAsync("npx husky init", { cwd: repoRoot });
         spinner.success({ text: successMessage("Initialized Husky") });
 
-        // Create commit-msg hook
+        // Create prepare-commit-msg hook
         spinner.start();
-        spinner.update({ text: breathingText("Creating commit-msg hook...") });
+        spinner.update({
+          text: breathingText("Creating prepare-commit-msg hook..."),
+        });
         const huskyDir = path.join(repoRoot, ".husky");
-        const commitMsgPath = path.join(huskyDir, "commit-msg");
+        const prepareCommitMsgPath = path.join(huskyDir, "prepare-commit-msg");
 
-        await fs.writeFile(commitMsgPath, HUSKY_COMMIT_MSG, "utf-8");
-        await fs.chmod(commitMsgPath, 0o755); // Make executable
+        await fs.writeFile(
+          prepareCommitMsgPath,
+          HUSKY_PREPARE_COMMIT_MSG,
+          "utf-8"
+        );
+        await fs.chmod(prepareCommitMsgPath, 0o755); // Make executable
 
-        spinner.success({ text: successMessage("Created commit-msg hook") });
+        spinner.success({
+          text: successMessage("Created prepare-commit-msg hook"),
+        });
       } catch (error: any) {
         spinner.stop();
         console.log(chalk.yellow("⚠ Husky setup failed:"), error.message);

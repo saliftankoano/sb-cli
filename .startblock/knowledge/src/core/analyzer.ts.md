@@ -1,7 +1,7 @@
 ---
 filePath: src/core/analyzer.ts
-fileVersion: 12dc6d2e377d61939e2cf493b9f741e44fc70d3b
-lastUpdated: '2025-11-16T04:14:46.853Z'
+fileVersion: e5f9c30aed9595efa90635f860dee8cb39a86e4d
+lastUpdated: '2025-11-16T21:33:52.203Z'
 updatedBy: sb-cli
 tags:
   - src
@@ -15,38 +15,37 @@ humanVerified: false
 # Documentation for `src/core/analyzer.ts`
 
 ## Purpose
-This file orchestrates the analysis of staged files in a Git commit, leveraging AI to enhance knowledge documentation with developer insights. It ensures that relevant files are analyzed and that valuable contextual information is preserved for future reference.
+The `analyzer.ts` file orchestrates the analysis of staged files in a Git repository, enhancing knowledge documentation with developer insights. It integrates AI analysis to provide contextual information about code changes.
 
 ## Key Functionality
-- **analyzeCommit**: Main function that manages the entire analysis workflow, including fetching staged files, running AI analysis, gathering developer insights, and writing knowledge files.
-- **createReadlineInterface**: Sets up a readline interface for user input, adapting to TTY and non-TTY environments.
-- **askYesNo**: Prompts the user for a yes/no response, handling both TTY and non-TTY contexts.
-- **askMultiLine**: Collects multi-line input from the user, allowing for a "brain dump" of insights.
-- **enhanceWithInsights**: Integrates developer insights into the analysis results, preserving the original wording.
+- **analyzeCommit(commitMsgFile?: string)**: Main function that analyzes staged files, gathers developer insights, and writes enhanced knowledge documentation.
+- **askYesNo(question: string, defaultNo: boolean)**: Prompts the user for a yes/no response, handling both TTY and non-TTY contexts.
+- **askMultiLine(prompt: string)**: Collects multi-line input from the user, allowing for a brain dump of insights.
+- **enhanceWithInsights(analysisResults, insights, commitMessage, openaiClient)**: Enhances existing analysis results with developer insights, preserving the original wording.
 
 ## Gotchas
-- **Commit Message Retrieval**: The method for getting the commit message was changed from `getLastCommitMessage` to `getCurrentCommitMessage`. Ensure that this change is understood, as it now retrieves the message being written rather than the last one.
-- **Input Handling**: The code uses `readline-sync` for non-TTY contexts (like Git hooks) to ensure reliable input. Be cautious when testing in different environments, as the behavior may vary.
-- **Timeouts**: Both `askYesNo` and `askMultiLine` functions implement timeouts (3 minutes and 10 minutes, respectively). If the user does not respond in time, an error is thrown, which can lead to unexpected exits if not handled properly.
-- **File Version Check**: The logic skips files that have not changed (same version). Ensure that this behavior aligns with the intended analysis scope, as it may lead to missed insights on files that have been modified but not updated in the knowledge base.
+- **TTY vs Non-TTY Mode**: The code distinguishes between TTY and non-TTY environments, which is crucial for input handling. Non-TTY mode (e.g., during Git hooks) uses `readline-sync`, which may not provide the same user experience as native readline in TTY mode.
+- **Input Timeouts**: Both `askYesNo` and `askMultiLine` have timeouts (3 minutes and 10 minutes, respectively). If the user does not respond in time, the process will reject the input, which could lead to unexpected behavior if not handled properly.
+- **Exact Preservation of Insights**: Developer insights are treated as sacred and must be preserved verbatim. Any attempt to sanitize or modify the input could lead to loss of valuable context.
+- **Commit Message Handling**: The commit message can be provided via a file when the function is called from a Git hook. If not found, it defaults to "Recent changes," which may not be meaningful.
 
 ## Dependencies
-- **chalk**: Used for colorful console output, enhancing user experience during prompts and messages.
-- **nanospinner**: Provides a lightweight spinner for indicating progress during file analysis and writing operations.
-- **fs/promises**: Utilized for asynchronous file operations, ensuring non-blocking behavior during file reads and writes.
-- **readline** and **readline-sync**: These libraries are crucial for handling user input in both interactive terminal sessions and non-interactive contexts (like Git hooks).
+- **chalk**: Used for colored console output, enhancing user experience during prompts and feedback.
+- **nanospinner**: Provides a lightweight spinner for visual feedback during long-running operations, improving user engagement.
+- **fs/promises**: Utilized for file operations, allowing for asynchronous reading and writing of knowledge files.
+- **OpenAIClient**: Integrates AI capabilities to analyze code, providing insights based on the context of changes.
 
 ## Architecture Context
-This module is part of a larger system that integrates AI capabilities into the software development workflow. It interacts with Git to analyze staged files and enhance documentation with developer insights, contributing to a more informed and maintainable codebase.
+This module fits within a larger system that automates code analysis and documentation. It interacts with Git for file management and uses AI to enhance the understanding of code changes. The insights gathered are intended to improve future development efforts by providing context to other developers.
 
 ## Implementation Notes
-- **AI Analysis**: The integration with OpenAI is critical for generating insights based on file content and context. Ensure that the OpenAI client is properly configured and that API limits are considered during heavy usage.
-- **Performance Considerations**: The analysis loop processes each relevant file sequentially. For large repositories, consider implementing parallel processing to improve performance. However, be mindful of API rate limits when doing so.
-- **User Experience**: The interactive prompts are designed to be user-friendly, but they may require adjustments based on user feedback. Pay attention to how users interact with the prompts and consider adding more guidance if necessary.
-- **Error Handling**: The code includes various try-catch blocks to handle errors gracefully. Ensure that any new features maintain this level of robustness to avoid disrupting the user experience.
+- **Performance Considerations**: The analysis is done sequentially for each relevant file, which may lead to longer processing times if there are many files. Consider parallelizing the analysis if performance becomes an issue.
+- **Error Handling**: The code has robust error handling, particularly around user input and file operations. However, ensure that all potential errors are logged or communicated to the user to avoid silent failures.
+- **User Interaction**: The interactive nature of the tool requires careful consideration of user experience. Ensure prompts are clear and that the user is informed of any timeouts or errors.
+- **Future Enhancements**: The TODO comment in `enhanceWithInsights` indicates a potential area for improvement, where AI could intelligently distribute insights across relevant files. This could enhance the value of the documentation further.
 
 ## Developer Insights
 
-Fixed my mistake of using get last commit message on git instead of using the one the user would currently want to submit. I added a new function to get the current in the ops.ts & updated the analyzer to show files properly. Late night coding mistake 😅.
+Changed the approach for the current commit instead of using the pre-commit now we use the commit-msg from husky to get the current commit message reliably. This had a domino effect on a couple files from operation to analyzer. Then we ran into the issue of permissions when using the sb cli so we added a postbuild script to make the index.js execuatable after each build.
 
-*Captured during commit: migrate knowledge docs into directory style & update knowlege-writer for new knowlege organization*
+*Captured during commit: fix getCurrentCommit & update readme*

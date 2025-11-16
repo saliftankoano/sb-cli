@@ -59,7 +59,7 @@ git commit -m "feat: new feature"
 
 ## How It Works
 
-1. **`sb init`** sets up Husky commit-msg hooks and prompts for your OpenAI API key
+1. **`sb init`** sets up Husky prepare-commit-msg hook and prompts for your OpenAI API key
 2. **You commit** as usual: `git commit -m "your message"`
 3. **AI analyzes** your staged files automatically
 4. **Commit context** displayed in a styled box showing your commit message and file counts
@@ -86,7 +86,7 @@ git commit -m "feat: new feature"
 
 Initialize Startblock in your repository. Sets up:
 
-- Husky commit-msg hook
+- Husky `prepare-commit-msg` hook (runs before commit is finalized, allowing knowledge files to be included)
 - `.sb-config.json` with your OpenAI API key (gitignored)
 - `.sb-config.example.json` template for your team (committable)
 - `.startblock/` directory structure
@@ -167,7 +167,7 @@ Each knowledge file includes:
 ## Troubleshooting
 
 - **Permission errors during install**: See [INSTALL.md](./INSTALL.md)
-- **Hook not running**: Make sure `.husky/commit-msg` exists and is executable
+- **Hook not running**: Make sure `.husky/prepare-commit-msg` exists and is executable
 - **API key issues**: Check `.sb-config.json` exists in your repo root with valid key
 - **Want to test the full flow?**: See [TESTING_GUIDE.md](./TESTING_GUIDE.md)
 
