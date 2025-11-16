@@ -333,14 +333,18 @@ export async function analyzeCommit(): Promise<void> {
       text: chalk.green("✓ AI analysis complete for all files"),
     });
 
-    // Get commit message for context
+    // Get current commit message (the one being written)
     const commitMessage = await git
-      .getLastCommitMessage()
+      .getCurrentCommitMessage()
       .catch(() => "Recent changes");
 
-    // Show commit context
+    // Show commit context with accurate counts
     console.log(chalk.cyan(`\n📝 Commit: "${commitMessage}"`));
-    console.log(chalk.dim(`   ${analysisResults.length} file(s) analyzed\n`));
+    console.log(
+      chalk.dim(
+        `   ${stagedFiles.length} file(s) staged, ${analysisResults.length} source file(s) analyzed\n`
+      )
+    );
 
     // Interactive insight gathering loop
     let continueLoop = true;

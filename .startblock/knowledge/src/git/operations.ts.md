@@ -1,7 +1,7 @@
 ---
 filePath: src/git/operations.ts
-fileVersion: 73caec7ca66a98f267aa4ae1de89f334c7f2c911
-lastUpdated: '2025-11-16T01:35:49.781Z'
+fileVersion: 12dc6d2e377d61939e2cf493b9f741e44fc70d3b
+lastUpdated: '2025-11-16T04:14:46.856Z'
 updatedBy: sb-cli
 tags:
   - src
@@ -15,28 +15,36 @@ humanVerified: false
 # Git Operations Documentation
 
 ## Purpose
-This file provides a wrapper around the `simple-git` library to facilitate common Git operations such as retrieving staged files, file hashes, diffs, and the last commit message.
+This file provides a wrapper around Git operations using the `simple-git` library, enabling asynchronous interactions with a Git repository. It facilitates common tasks such as retrieving staged files, commit messages, and file diffs.
 
 ## Key Functionality
 - **getStagedFiles**: Returns a list of files that are currently staged for commit.
-- **getFileHash**: Retrieves the Git hash of a specified file, returning `null` if the file has no commits.
-- **getFileDiff**: Obtains the diff of a staged file, returning `null` if the file is not staged or an error occurs.
-- **addFiles**: Stages a list of files for commit.
-- **getLastCommitMessage**: Fetches the last commit message, providing a default message if no commits are found or an error occurs.
+- **getFileHash**: Retrieves the latest Git hash for a specified file.
+- **getFileDiff**: Obtains the diff for a staged file.
+- **addFiles**: Stages specified files for commit.
+- **getLastCommitMessage**: Fetches the message of the last commit.
+- **getCurrentCommitMessage**: Reads the current commit message from the `.git/COMMIT_EDITMSG` file, filtering out comments.
 
 ## Gotchas
-- **Error Handling**: The catch blocks in the asynchronous functions return default values (e.g., empty arrays or nulls) without throwing errors. This can mask underlying issues, making debugging difficult. Ensure to log errors for visibility.
-- **Empty Returns**: Functions like `getStagedFiles` and `getFileHash` can return empty or null values, which may lead to unexpected behavior if not handled properly in the calling code.
-- **Default Commit Message**: The `getLastCommitMessage` method returns "Recent changes" if there are no commits or if an error occurs. This could be misleading if the user expects a meaningful message.
+- **Current vs. Last Commit Message**: The `getLastCommitMessage` method retrieves the message of the previous commit, not the one currently being written. This can lead to confusion if users expect it to reflect the current commit.
+- **Error Handling**: Many methods return `null` or fallback values in case of errors. It's crucial to handle these cases in the calling code to avoid unexpected behaviors.
+- **File Path Handling**: The `getCurrentCommitMessage` method relies on the existence of the `.git/COMMIT_EDITMSG` file. If the file is missing or inaccessible, it defaults to the last commit message, which may not be the expected behavior.
 
 ## Dependencies
-- **simple-git**: This library is used for its simplicity and ease of use in executing Git commands programmatically. It abstracts away the complexities of direct Git command-line interactions, making it easier to implement Git functionalities in TypeScript.
+- **simple-git**: This library simplifies Git operations in Node.js, providing a promise-based API that enhances readability and maintainability.
+- **path**: Used for constructing file paths in a cross-platform manner, ensuring compatibility across different operating systems.
+- **fs/promises**: Utilized for asynchronous file operations, allowing non-blocking reads of the commit message file.
 
 ## Architecture Context
-This module is part of a larger system that likely involves version control operations within a development environment. It serves as a utility for other components that require Git functionalities, promoting code reuse and separation of concerns.
+This module is part of a larger system that interacts with Git repositories, likely as part of a version control tool or CI/CD pipeline. It abstracts Git operations to simplify usage across the application, promoting code reuse and reducing complexity in other parts of the system.
 
 ## Implementation Notes
-- **Performance Considerations**: Each method makes asynchronous calls to the Git repository, which can be slow depending on the repository size and the number of files. Consider caching results where applicable to improve performance.
-- **Promise Handling**: All methods return Promises, which allows for asynchronous handling of Git operations. Ensure that the calling code properly awaits these Promises to avoid unhandled rejections.
-- **Extensibility**: The interface can be easily extended to include more Git operations as needed, allowing for future enhancements without significant refactoring.
-- **Default Parameters**: The `createGitOperations` function uses `process.cwd()` as the default repository path, which is a reasonable choice for most use cases but may need to be overridden in specific scenarios (e.g., when working with multiple repositories).
+- **Asynchronous Operations**: All methods are asynchronous, leveraging promises to handle operations that may take time, such as file I/O and Git commands.
+- **Performance Considerations**: The use of `simple-git` is generally efficient for most operations, but care should be taken with methods that may invoke multiple Git commands, as they can introduce latency. For example, `getStagedFiles` executes a diff command which may be slower for large repositories.
+- **Common Mistakes**: Developers should ensure that the repository path provided to `createGitOperations` is valid. Using an incorrect path may lead to errors or unexpected behaviors when performing Git operations.
+
+## Developer Insights
+
+Fixed my mistake of using get last commit message on git instead of using the one the user would currently want to submit. I added a new function to get the current in the ops.ts & updated the analyzer to show files properly. Late night coding mistake 😅.
+
+*Captured during commit: migrate knowledge docs into directory style & update knowlege-writer for new knowlege organization*

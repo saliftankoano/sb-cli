@@ -1,4 +1,6 @@
 import simpleGit, { SimpleGit } from "simple-git";
+import * as path from "path";
+import * as fs from "fs/promises";
 
 export interface GitOperations {
   getStagedFiles(): Promise<string[]>;
@@ -6,6 +8,7 @@ export interface GitOperations {
   getFileDiff(filePath: string): Promise<string | null>;
   addFiles(files: string[]): Promise<void>;
   getLastCommitMessage(): Promise<string>;
+  getCurrentCommitMessage(): Promise<string>;
 }
 
 /**
@@ -71,6 +74,7 @@ export function createGitOperations(
 
     /**
      * Get the last commit message (for context)
+     * NOTE: This gets the PREVIOUS commit, not the current one being written
      */
     async getLastCommitMessage(): Promise<string> {
       try {
@@ -78,6 +82,22 @@ export function createGitOperations(
         return log.latest?.message || "Recent changes";
       } catch {
         return "Recent changes";
+      }
+    },
+
+    async getCurrentCommitMessage(): Promise<string> {
+      try {
+        const commitEditMsgPath = path.join(repoPath, ".git", "COMMIT_EDITMSG");
+        const content = await fs.readFile(commitEditMsgPath, "utf-8");
+        // Remove comments and get first line (subject)
+        const lines = content.split("\n").filter((line) => {
+          const trimmed = line.trim();
+          return trimmed.length > 0 && !trimmed.startsWith("#");
+        });
+        return lines[0] || "Recent changes";
+      } catch {
+        // Fallback to last commit message if we can't read current one
+        return this.getLastCommitMessage();
       }
     },
   };
