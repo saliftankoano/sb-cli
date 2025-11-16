@@ -20,6 +20,21 @@ import type { PromptContext } from "../prompts/templates.js";
 import type { AnalysisResult } from "./openai-client.js";
 
 /**
+ * TTY (Teletypewriter) Context:
+ *
+ * TTY refers to a terminal/console connected to a program. When you run a command
+ * in your terminal, process.stdin.isTTY is true. But when Git runs a hook, it often
+ * pipes stdin, making isTTY false (non-TTY mode).
+ *
+ * Why this matters:
+ * - TTY mode: Use native readline (works great in normal terminals)
+ * - Non-TTY mode: Use readline-sync (needed for Git hooks to work reliably)
+ *
+ * We use readline-sync for Git hook compatibility while falling back
+ * to native readline for better terminal experience when available.
+ */
+
+/**
  * Create readline interface for user input
  */
 function createReadlineInterface() {
@@ -38,108 +53,178 @@ function createReadlineInterface() {
 }
 
 /**
- * Ask a question and get user input
+ * Ask a yes/no question and get user input
  * Works seamlessly in both TTY (normal terminal) and non-TTY (Git hooks) contexts
- * Uses readline-sync for non-TTY mode to ensure reliable input handling
+ * Uses readline-sync for reliable input handling in Git hooks
  */
-async function askQuestion(question: string): Promise<string> {
+async function askYesNo(
+  question: string,
+  defaultNo: boolean = true
+): Promise<boolean> {
+  const isTTY = process.stdin.isTTY && process.stdout.isTTY;
+  const prompt = defaultNo ? `${question} [y/N]` : `${question} [Y/n]`;
+
+  try {
+    // For non-TTY mode (Git hooks), use readline-sync
+    if (!isTTY) {
+      const answer = readlineSync.question(chalk.cyan(`\n${prompt}: `));
+      const normalized = answer.trim().toLowerCase();
+      if (!normalized) return !defaultNo; // Empty = default
+      return normalized === "y" || normalized === "yes";
+    }
+
+    // For TTY mode, use standard readline
+    const rl = createReadlineInterface();
+    return new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        rl.close();
+        reject(new Error("Input timeout"));
+      }, 180000); // 3 minute timeout
+
+      rl.question(chalk.cyan(`\n${prompt}: `), (answer) => {
+        clearTimeout(timeout);
+        rl.close();
+        const normalized = answer.trim().toLowerCase();
+        if (!normalized) resolve(!defaultNo); // Empty = default
+        resolve(normalized === "y" || normalized === "yes");
+      });
+
+      rl.on("error", (err) => {
+        clearTimeout(timeout);
+        rl.close();
+        reject(err);
+      });
+    });
+  } catch (error: any) {
+    throw new Error(`Failed to read input: ${error.message}`);
+  }
+}
+
+/**
+ * Ask for multi-line text input (brain dump)
+ * 3 empty lines = submit
+ */
+async function askMultiLine(prompt: string): Promise<string> {
   const isTTY = process.stdin.isTTY && process.stdout.isTTY;
 
-  // For non-TTY mode (Git hooks), use readline-sync for reliable input handling
-  if (!isTTY) {
-    try {
-      const answer = readlineSync.question(chalk.cyan(`\n${question}\n> `));
-      return answer.trim();
-    } catch (error: any) {
-      throw new Error(`Failed to read input: ${error.message}`);
+  console.log(chalk.cyan(`\n${prompt}`));
+  console.log(chalk.dim("(Press Enter 3 times to submit)\n"));
+  console.log(chalk.cyan("> "));
+
+  try {
+    // For non-TTY mode (Git hooks), use readline-sync
+    if (!isTTY) {
+      const lines: string[] = [];
+      let emptyLineCount = 0;
+
+      while (emptyLineCount < 2) {
+        const line = readlineSync.question("");
+        if (line.trim() === "") {
+          emptyLineCount++;
+        } else {
+          // Add any accumulated empty lines (preserves spacing)
+          for (let i = 0; i < emptyLineCount; i++) {
+            lines.push("");
+          }
+          emptyLineCount = 0;
+          lines.push(line);
+        }
+      }
+
+      const input = lines.join("\n").trim();
+      if (input) {
+        console.log(chalk.dim("\n✓ Got it!\n"));
+      }
+      return input;
     }
+
+    // For TTY mode, use standard readline
+    const rl = createReadlineInterface();
+    return new Promise((resolve, reject) => {
+      const lines: string[] = [];
+      let emptyLineCount = 0;
+
+      const timeout = setTimeout(() => {
+        rl.close();
+        reject(new Error("Input timeout"));
+      }, 600000); // 10 minute timeout
+
+      rl.on("line", (line) => {
+        if (line.trim() === "") {
+          emptyLineCount++;
+          // Two empty lines in a row = submit
+          if (emptyLineCount >= 2) {
+            clearTimeout(timeout);
+            rl.close();
+
+            const input = lines.join("\n").trim();
+            if (input) {
+              console.log(chalk.dim("\n✓ Got it!\n"));
+            }
+            resolve(input);
+          }
+        } else {
+          // Add any accumulated empty lines (preserves spacing)
+          for (let i = 0; i < emptyLineCount; i++) {
+            lines.push("");
+          }
+          emptyLineCount = 0;
+          lines.push(line);
+        }
+      });
+
+      rl.on("error", (err) => {
+        clearTimeout(timeout);
+        rl.close();
+        reject(err);
+      });
+    });
+  } catch (error: any) {
+    throw new Error(`Failed to read input: ${error.message}`);
   }
-
-  // For TTY mode, use standard readline
-  const rl = createReadlineInterface();
-
-  return new Promise((resolve, reject) => {
-    // Set a longer timeout for user input
-    const timeout = setTimeout(() => {
-      rl.close();
-      reject(
-        new Error(
-          "Input timeout - no response received. Skipping interactive Q&A."
-        )
-      );
-    }, 180000); // 3 minute timeout
-
-    rl.question(chalk.cyan(`\n${question}\n> `), (answer) => {
-      clearTimeout(timeout);
-      rl.close();
-      resolve(answer.trim());
-    });
-
-    // Handle stdin errors gracefully
-    rl.on("error", (err) => {
-      clearTimeout(timeout);
-      rl.close();
-      reject(new Error(`Failed to read input: ${err.message}`));
-    });
-  });
 }
 
 /**
- * Generate clarifying questions for a file
+ * Enhance knowledge docs with developer insights
+ *
+ * CRITICAL: Developer's words are SACRED - preserve them EXACTLY as written.
+ * Do NOT sanitize, clean, or filter informal language, slang, or profanity.
+ * The raw, honest context is what makes this valuable.
  */
-function generateQuestionsForFile(filePath: string, isNew: boolean): string[] {
-  const questions = [
-    `What is the main purpose of ${chalk.yellow(filePath)}?`,
-    `What gotchas or non-obvious behaviors should developers know about?`,
-    `How does this file fit into the larger system? What are the critical dependencies?`,
-  ];
-
-  if (isNew) {
-    questions.push(`Why did you create this file? What problem does it solve?`);
-  } else {
-    questions.push(
-      `What changed in this commit? Why did you make these changes?`
-    );
-  }
-
-  return questions;
-}
-
-/**
- * Refine analysis based on user answers
- */
-async function refineAnalysisWithAnswers(
-  initialAnalysis: AnalysisResult,
-  userAnswers: Record<string, string>,
+async function enhanceWithInsights(
+  analysisResults: Array<{
+    file: string;
+    analysis: AnalysisResult;
+    fileVersion: string;
+  }>,
+  insights: string,
+  commitMessage: string,
   openaiClient: OpenAIClient
-): Promise<AnalysisResult> {
-  // Build a refinement prompt
-  const refinementPrompt = `You previously generated this knowledge documentation:
+): Promise<{ updatedResults: typeof analysisResults; updatedFiles: string[] }> {
+  // TODO: Call OpenAI to intelligently distribute insights across relevant files
+  // Must preserve developer's EXACT words verbatim (no cleaning/rephrasing)
 
-${initialAnalysis.markdown}
+  const updatedResults = analysisResults.map((result) => {
+    const enhancedMarkdown = `${result.analysis.markdown}
 
-Now the developer has provided additional context:
+## Developer Insights
 
-${Object.entries(userAnswers)
-  .map(([q, a]) => `Q: ${q}\nA: ${a}`)
-  .join("\n\n")}
+${insights}
 
-Enhance the documentation by incorporating their insights. Keep the same structure but add their tacit knowledge. Be specific and use their own words where appropriate.`;
+*Captured during commit: ${commitMessage}*`;
 
-  // For now, just append the user answers in a "Developer Notes" section
-  // In a full implementation, you'd call OpenAI again to integrate the answers
-  const enhancedMarkdown = `${initialAnalysis.markdown}
+    return {
+      ...result,
+      analysis: {
+        ...result.analysis,
+        markdown: enhancedMarkdown,
+      },
+    };
+  });
 
-## Developer Notes
-
-${Object.entries(userAnswers)
-  .map(([q, a]) => `**${q}**\n\n${a}`)
-  .join("\n\n")}`;
-
-  return {
-    ...initialAnalysis,
-    markdown: enhancedMarkdown,
-  };
+  // Return which files were updated
+  const updatedFiles = analysisResults.map((r) => r.file);
+  return { updatedResults, updatedFiles };
 }
 
 /**
@@ -158,19 +243,16 @@ export async function analyzeCommit(): Promise<void> {
   try {
     // Step 1: Get staged files
     const stagedFiles = await git.getStagedFiles();
-
     if (stagedFiles.length === 0) {
       spinner.success({ text: chalk.dim("No staged files to analyze.") });
       return;
     }
 
-    // Step 2: Filter relevant files
     const relevantFiles = await filterRelevantFiles(
       stagedFiles,
       config,
       repoRoot
     );
-
     if (relevantFiles.length === 0) {
       spinner.success({
         text: chalk.dim("No analyzable source files staged."),
@@ -182,13 +264,12 @@ export async function analyzeCommit(): Promise<void> {
       text: `Found ${relevantFiles.length} file(s) to analyze...`,
     });
 
-    // Step 3: Build dependency graph (optional, can be simplified)
     spinner.update({ text: "Building dependency graph..." });
     const graph = await buildDependencyGraph(relevantFiles, repoRoot);
 
-    // Step 4: Analyze each file with OpenAI and gather developer knowledge
+    spinner.update({ text: "Running AI analysis on all files..." });
     const openaiClient = new OpenAIClient(config);
-    const analysisResults: Array<{
+    let analysisResults: Array<{
       file: string;
       analysis: AnalysisResult;
       fileVersion: string;
@@ -232,75 +313,13 @@ export async function analyzeCommit(): Promise<void> {
         dependents: depContext.dependents,
       };
 
-      // Analyze with OpenAI (initial analysis)
-      const initialAnalysis = await openaiClient.analyze(context);
-
-      spinner.stop();
-
-      // Interactive Q&A session - works in both TTY and non-TTY (Git hooks)
-      // Uses readline-sync for non-TTY mode to ensure reliable input handling
-      let refinedAnalysis: AnalysisResult;
-      const userAnswers: Record<string, string> = {};
-
-      // Always attempt interactive Q&A - works seamlessly in Git hooks
-      try {
-        console.log(
-          chalk.green.bold(
-            `\n✓ Initial analysis complete for ${chalk.yellow(file)}`
-          )
-        );
-        console.log(
-          chalk.dim(
-            "Now let's capture your unique insights about this file...\n"
-          )
-        );
-
-        const questions = generateQuestionsForFile(file, isNew);
-
-        // Ask questions one at a time
-        for (const question of questions) {
-          try {
-            const answer = await askQuestion(question);
-            if (answer) {
-              userAnswers[question] = answer;
-            }
-          } catch (error: any) {
-            // If input fails (shouldn't happen with readline-sync, but handle gracefully)
-            console.log(
-              chalk.yellow(
-                `\n⚠️  Skipping remaining questions (${error.message}). Analysis will continue with AI insights only.\n`
-              )
-            );
-            break;
-          }
-        }
-
-        // Refine analysis with user input
-        refinedAnalysis = await refineAnalysisWithAnswers(
-          initialAnalysis,
-          userAnswers,
-          openaiClient
-        );
-      } catch (error: any) {
-        // If interactive Q&A fails (shouldn't happen with readline-sync, but handle gracefully)
-        console.log(
-          chalk.yellow(
-            `\n⚠️  Interactive Q&A unavailable (${error.message}). Using AI analysis only.\n`
-          )
-        );
-        refinedAnalysis = initialAnalysis;
-      }
-
+      // Analyze with OpenAI
+      const analysis = await openaiClient.analyze(context);
       analysisResults.push({
         file,
-        analysis: refinedAnalysis,
+        analysis,
         fileVersion,
       });
-
-      // Restart spinner for next file
-      if (i < relevantFiles.length - 1) {
-        spinner.start();
-      }
     }
 
     if (analysisResults.length === 0) {
@@ -310,36 +329,142 @@ export async function analyzeCommit(): Promise<void> {
       return;
     }
 
-    // Show recap of what was documented
-    console.log(chalk.cyan.bold("\n📚 Knowledge Documentation Summary:\n"));
-    for (const result of analysisResults) {
-      console.log(chalk.yellow(`  • ${result.file}`));
-    }
+    spinner.success({
+      text: chalk.green("✓ AI analysis complete for all files"),
+    });
 
-    // Get final confirmation - try interactive, fall back if needed
-    try {
-      const confirm = await askQuestion(
-        chalk.green.bold(
-          "\n✅ Ready to finalize and commit this knowledge? (yes/no)"
-        )
-      );
+    // Get commit message for context
+    const commitMessage = await git
+      .getLastCommitMessage()
+      .catch(() => "Recent changes");
 
-      if (confirm.toLowerCase() !== "yes" && confirm.toLowerCase() !== "y") {
-        console.log(chalk.yellow("\n⚠️  Commit aborted by user."));
-        process.exit(1);
+    // Show commit context
+    console.log(chalk.cyan(`\n📝 Commit: "${commitMessage}"`));
+    console.log(chalk.dim(`   ${analysisResults.length} file(s) analyzed\n`));
+
+    // Interactive insight gathering loop
+    let continueLoop = true;
+    while (continueLoop) {
+      // Step 5: Opt-in to add insights
+      let wantsToAddInsights = false;
+      try {
+        wantsToAddInsights = await askYesNo("Want to add your insights?", true);
+      } catch (error: any) {
+        console.log(
+          chalk.yellow(
+            `\n⚠️  Input unavailable (${error.message}). Proceeding with AI analysis only.\n`
+          )
+        );
+        continueLoop = false;
+        break;
       }
-    } catch (error: any) {
-      // If stdin becomes unavailable, proceed anyway (but warn user)
+
+      if (!wantsToAddInsights) {
+        // User skipped, proceed to commit
+        continueLoop = false;
+        break;
+      }
+
+      // Step 6: Get developer insights (one open-ended brain dump)
       console.log(
-        chalk.yellow(
-          `\n⚠️  Skipping confirmation (${error.message}). Proceeding with knowledge generation.\n`
+        chalk.green.bold(
+          "\n✨ Oh great wizard, share your secrets! Any gotchas, "
+        ) + chalk.green.bold("tricky choices, or surprises for future devs?")
+      );
+
+      let insights = "";
+      try {
+        insights = await askMultiLine("");
+      } catch (error: any) {
+        console.log(
+          chalk.yellow(
+            `\n⚠️  Input failed (${error.message}). Skipping insights.\n`
+          )
+        );
+        continueLoop = false;
+        break;
+      }
+
+      if (!insights) {
+        console.log(
+          chalk.dim("\nNo insights provided, skipping enhancement.\n")
+        );
+        continueLoop = false;
+        break;
+      }
+
+      // Step 7: Enhance docs with insights
+      const enhanceSpinner = createSpinner(
+        "Enhancing knowledge docs with your insights..."
+      ).start();
+
+      const { updatedResults, updatedFiles } = await enhanceWithInsights(
+        analysisResults,
+        insights,
+        commitMessage,
+        openaiClient
+      );
+
+      analysisResults = updatedResults;
+
+      enhanceSpinner.success({
+        text: chalk.green("✓ Got it! Enhanced knowledge docs"),
+      });
+
+      // Show what was updated
+      console.log(chalk.cyan("\n✓ Updated files where this is most relevant:"));
+      for (const file of updatedFiles) {
+        console.log(chalk.yellow(`  • ${file}`));
+      }
+
+      // Step 8: Confirmation to commit
+      console.log(
+        chalk.cyan(
+          `\n📚 ${analysisResults.length} knowledge files staged for commit\n`
         )
       );
+
+      let readyToCommit = false;
+      try {
+        readyToCommit = await askYesNo("Ready to commit?", true);
+      } catch (error: any) {
+        console.log(
+          chalk.yellow(
+            `\n⚠️  Input unavailable (${error.message}). Proceeding with commit.\n`
+          )
+        );
+        continueLoop = false;
+        break;
+      }
+
+      if (readyToCommit) {
+        // User confirmed, exit loop
+        continueLoop = false;
+      } else {
+        // User said no, ask if they want to add more
+        let wantsMoreInsights = false;
+        try {
+          wantsMoreInsights = await askYesNo(
+            "Want to add more insights?",
+            true
+          );
+        } catch (error: any) {
+          console.log(chalk.yellow("\n⚠️  Commit aborted by user."));
+          process.exit(1);
+        }
+
+        if (!wantsMoreInsights) {
+          // User doesn't want to add more, abort commit
+          console.log(chalk.yellow("\n⚠️  Commit aborted by user."));
+          process.exit(1);
+        }
+
+        // Loop continues for more insights
+      }
     }
 
-    // Step 5: Write knowledge files and stage them
-    spinner.start();
-    spinner.update({ text: "Writing knowledge files..." });
+    // Step 9: Write knowledge files and stage them
+    const writeSpinner = createSpinner("Writing knowledge files...").start();
 
     const knowledgeFiles: string[] = [];
     for (const result of analysisResults) {
@@ -355,21 +480,21 @@ export async function analyzeCommit(): Promise<void> {
       knowledgeFiles.push(knowledgePath);
     }
 
-    // Step 6: Stage knowledge files
+    // Step 10: Stage knowledge files
     await git.addFiles(knowledgeFiles);
 
-    spinner.success({
+    writeSpinner.success({
       text: chalk.green(
         `✓ ${knowledgeFiles.length} knowledge file(s) ready to commit!`
       ),
     });
 
+    // Final celebratory message
     console.log(
-      chalk.cyan(
-        `\n📚 ${knowledgeFiles.length} knowledge file(s) staged for commit`
+      chalk.cyan.bold(
+        "\n🚀 Your future teammates will thank you! Committing now...\n"
       )
     );
-    console.log(chalk.green.bold("You can now complete your commit! 🚀\n"));
   } catch (error: any) {
     spinner.error({ text: chalk.red(`Error: ${error.message}`) });
     throw error;

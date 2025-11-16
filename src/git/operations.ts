@@ -5,6 +5,7 @@ export interface GitOperations {
   getFileHash(filePath: string): Promise<string | null>;
   getFileDiff(filePath: string): Promise<string | null>;
   addFiles(files: string[]): Promise<void>;
+  getLastCommitMessage(): Promise<string>;
 }
 
 /**
@@ -65,6 +66,18 @@ export function createGitOperations(
         await git.add(files);
       } catch (error) {
         console.error("Error staging files:", error);
+      }
+    },
+
+    /**
+     * Get the last commit message (for context)
+     */
+    async getLastCommitMessage(): Promise<string> {
+      try {
+        const log = await git.log({ maxCount: 1 });
+        return log.latest?.message || "Recent changes";
+      } catch {
+        return "Recent changes";
       }
     },
   };
