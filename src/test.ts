@@ -7,5 +7,12 @@ function validateEmail1(email: string): boolean {
   return emailRegex.test(email);
 }
 
+function formatName2(firstName: string, lastName: string): string {
+  if (!firstName || !lastName) {
+    throw new Error("First name and last name are required");
+  }
+  return `${firstName} ${lastName}`;
+}
 console.log(formatName1("John", "Doe"));
 console.log(validateEmail1("test@example.com"));
+console.log(formatName2("John", "Doe"));
