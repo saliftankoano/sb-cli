@@ -13,6 +13,13 @@ function formatName2(firstName: string, lastName: string): string {
   }
   return `${firstName} ${lastName}`;
 }
+
+function validateEmail2(email: string): boolean {
+  if (!email) {
+    return false;
+  }
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
 console.log(formatName1("John", "Doe"));
 console.log(validateEmail1("test@example.com"));
 console.log(formatName2("John", "Doe"));

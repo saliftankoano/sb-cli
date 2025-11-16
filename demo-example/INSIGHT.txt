@@ -1,0 +1,4 @@
+When the wizard asks for insights during the demo, paste this:
+
+Critical gotcha: Math.floor is NOT a typo! We initially used Math.round and overcharged customers by 1 cent on amounts like $10.99. Lost $2,400 before we caught it. Also, 3 retries came from a painful incident where 2 wasn't enough during a Stripe outage. Cost us 50 failed transactions.
+
