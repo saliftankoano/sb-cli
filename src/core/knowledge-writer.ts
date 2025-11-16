@@ -18,14 +18,14 @@ export interface KnowledgeMetadata {
 
 /**
  * Generate knowledge file path from source file path
+ * Mirrors the source directory structure in the knowledge directory
  */
 export function getKnowledgeFilePath(
   sourceFile: string,
   knowledgeDir: string
 ): string {
-  // Replace / with _ to create flat structure
-  const fileName = sourceFile.replace(/\//g, "_") + ".md";
-  return path.join(knowledgeDir, fileName);
+  // Mirror the directory structure: src/utils/intro.ts -> knowledge/src/utils/intro.ts.md
+  return path.join(knowledgeDir, sourceFile + ".md");
 }
 
 /**
@@ -42,10 +42,10 @@ export async function writeKnowledgeFile(
 ): Promise<string> {
   const { knowledgeDir, fileVersion, model } = options;
 
-  // Ensure knowledge directory exists
-  await ensureDir(knowledgeDir);
-
   const knowledgePath = getKnowledgeFilePath(sourceFilePath, knowledgeDir);
+
+  // Ensure the full directory structure exists (mirrors source structure)
+  await ensureDir(path.dirname(knowledgePath));
 
   // Check if file exists for incremental updates
   const exists = await fileExists(knowledgePath);
