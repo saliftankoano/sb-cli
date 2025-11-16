@@ -1,7 +1,7 @@
 ---
 filePath: src/core/analyzer.ts
-fileVersion: e5f9c30aed9595efa90635f860dee8cb39a86e4d
-lastUpdated: '2025-11-16T21:33:52.203Z'
+fileVersion: bca7a57c90c5a2434483050c74be521fbca67f30
+lastUpdated: '2025-11-16T21:50:03.663Z'
 updatedBy: sb-cli
 tags:
   - src
@@ -15,37 +15,31 @@ humanVerified: false
 # Documentation for `src/core/analyzer.ts`
 
 ## Purpose
-The `analyzer.ts` file orchestrates the analysis of staged files in a Git repository, enhancing knowledge documentation with developer insights. It integrates AI analysis to provide contextual information about code changes.
+This file orchestrates the analysis workflow for staged files in a Git repository, leveraging AI to enhance developer insights and generate knowledge documentation.
 
 ## Key Functionality
-- **analyzeCommit(commitMsgFile?: string)**: Main function that analyzes staged files, gathers developer insights, and writes enhanced knowledge documentation.
-- **askYesNo(question: string, defaultNo: boolean)**: Prompts the user for a yes/no response, handling both TTY and non-TTY contexts.
-- **askMultiLine(prompt: string)**: Collects multi-line input from the user, allowing for a brain dump of insights.
-- **enhanceWithInsights(analysisResults, insights, commitMessage, openaiClient)**: Enhances existing analysis results with developer insights, preserving the original wording.
+- **analyzeCommit():** Main function that analyzes staged files, gathers developer insights, and writes knowledge documentation.
+- **askYesNo():** Prompts the user for a yes/no response, handling both TTY and non-TTY contexts.
+- **askMultiLine():** Collects multi-line input from the user, allowing for a "brain dump" of insights.
+- **enhanceWithInsights():** Integrates developer insights into the analysis results, preserving the original wording.
 
 ## Gotchas
-- **TTY vs Non-TTY Mode**: The code distinguishes between TTY and non-TTY environments, which is crucial for input handling. Non-TTY mode (e.g., during Git hooks) uses `readline-sync`, which may not provide the same user experience as native readline in TTY mode.
-- **Input Timeouts**: Both `askYesNo` and `askMultiLine` have timeouts (3 minutes and 10 minutes, respectively). If the user does not respond in time, the process will reject the input, which could lead to unexpected behavior if not handled properly.
-- **Exact Preservation of Insights**: Developer insights are treated as sacred and must be preserved verbatim. Any attempt to sanitize or modify the input could lead to loss of valuable context.
-- **Commit Message Handling**: The commit message can be provided via a file when the function is called from a Git hook. If not found, it defaults to "Recent changes," which may not be meaningful.
+- **Commit Message Handling:** The commit message is hardcoded as "Preparing commit..." when running in a pre-commit hook context, which may lead to confusion if users expect the actual commit message to be analyzed.
+- **Input Handling in Non-TTY Contexts:** The use of `readline-sync` for non-TTY contexts is crucial for compatibility with Git hooks. Ensure that any interactive prompts are tested in both terminal and hook environments to avoid unexpected failures.
+- **Timeouts:** Input prompts have timeouts (3 minutes for yes/no and 10 minutes for multi-line input). If the user exceeds these limits, the process will reject the input, potentially leading to an aborted commit.
+- **File Versioning:** The logic to skip unchanged files relies on comparing file versions. If the knowledge file is not updated correctly, it may lead to stale analysis results.
 
 ## Dependencies
-- **chalk**: Used for colored console output, enhancing user experience during prompts and feedback.
-- **nanospinner**: Provides a lightweight spinner for visual feedback during long-running operations, improving user engagement.
-- **fs/promises**: Utilized for file operations, allowing for asynchronous reading and writing of knowledge files.
-- **OpenAIClient**: Integrates AI capabilities to analyze code, providing insights based on the context of changes.
+- **chalk:** Used for colored console output, enhancing user experience and readability.
+- **nanospinner:** Provides a lightweight spinner for indicating ongoing processes, improving user feedback during long-running tasks.
+- **fs/promises:** Utilized for file operations, allowing for asynchronous reading and writing of knowledge files.
+- **readline and readline-sync:** These libraries handle user input in both TTY and non-TTY contexts, ensuring compatibility with Git hooks.
 
 ## Architecture Context
-This module fits within a larger system that automates code analysis and documentation. It interacts with Git for file management and uses AI to enhance the understanding of code changes. The insights gathered are intended to improve future development efforts by providing context to other developers.
+This module is part of a larger system designed to improve code quality and documentation through automated analysis and developer insights. It interacts with Git operations, configuration management, and AI services to provide a seamless experience for developers during the commit process.
 
 ## Implementation Notes
-- **Performance Considerations**: The analysis is done sequentially for each relevant file, which may lead to longer processing times if there are many files. Consider parallelizing the analysis if performance becomes an issue.
-- **Error Handling**: The code has robust error handling, particularly around user input and file operations. However, ensure that all potential errors are logged or communicated to the user to avoid silent failures.
-- **User Interaction**: The interactive nature of the tool requires careful consideration of user experience. Ensure prompts are clear and that the user is informed of any timeouts or errors.
-- **Future Enhancements**: The TODO comment in `enhanceWithInsights` indicates a potential area for improvement, where AI could intelligently distribute insights across relevant files. This could enhance the value of the documentation further.
-
-## Developer Insights
-
-Changed the approach for the current commit instead of using the pre-commit now we use the commit-msg from husky to get the current commit message reliably. This had a domino effect on a couple files from operation to analyzer. Then we ran into the issue of permissions when using the sb cli so we added a postbuild script to make the index.js execuatable after each build.
-
-*Captured during commit: fix getCurrentCommit & update readme*
+- **Asynchronous Operations:** The use of `async/await` throughout the file ensures that operations are handled in a non-blocking manner, which is crucial for maintaining responsiveness during user interactions.
+- **Error Handling:** The code includes robust error handling, particularly around user input and file operations. This is essential to prevent unexpected crashes and provide meaningful feedback to users.
+- **Performance Considerations:** The analysis process is designed to be efficient by skipping unchanged files and only analyzing relevant staged files. However, the performance may degrade with a large number of files due to the sequential nature of the analysis loop.
+- **User Experience:** The design prioritizes user experience by providing clear prompts and feedback, but care should be taken to ensure that the hardcoded commit message does not mislead users regarding the analysis context.

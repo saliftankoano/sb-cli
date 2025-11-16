@@ -73,9 +73,9 @@ function generateConfig(apiKey: string): string {
   return JSON.stringify(config, null, 2);
 }
 
-const HUSKY_PREPARE_COMMIT_MSG = `#!/usr/bin/env sh
-# Run sb analyze on staged files (receives commit message file as $1)
-sb analyze-commit "$1"
+const HUSKY_PRE_COMMIT = `#!/usr/bin/env sh
+# Run sb analyze on staged files
+sb analyze-commit
 `;
 
 /**
@@ -226,23 +226,19 @@ export async function initCommand(): Promise<void> {
         await execAsync("npx husky init", { cwd: repoRoot });
         spinner.success({ text: successMessage("Initialized Husky") });
 
-        // Create prepare-commit-msg hook
+        // Create pre-commit hook
         spinner.start();
         spinner.update({
-          text: breathingText("Creating prepare-commit-msg hook..."),
+          text: breathingText("Creating pre-commit hook..."),
         });
         const huskyDir = path.join(repoRoot, ".husky");
-        const prepareCommitMsgPath = path.join(huskyDir, "prepare-commit-msg");
+        const preCommitPath = path.join(huskyDir, "pre-commit");
 
-        await fs.writeFile(
-          prepareCommitMsgPath,
-          HUSKY_PREPARE_COMMIT_MSG,
-          "utf-8"
-        );
-        await fs.chmod(prepareCommitMsgPath, 0o755); // Make executable
+        await fs.writeFile(preCommitPath, HUSKY_PRE_COMMIT, "utf-8");
+        await fs.chmod(preCommitPath, 0o755); // Make executable
 
         spinner.success({
-          text: successMessage("Created prepare-commit-msg hook"),
+          text: successMessage("Created pre-commit hook"),
         });
       } catch (error: any) {
         spinner.stop();

@@ -1,7 +1,7 @@
 ---
 filePath: src/index.ts
-fileVersion: f6c8261bf0d12bd7bbaedab1d580a29191da7a30
-lastUpdated: '2025-11-16T21:33:52.204Z'
+fileVersion: 01e483e18209114aa06826fff365db6ae0de0554
+lastUpdated: '2025-11-16T21:50:03.664Z'
 updatedBy: sb-cli
 tags:
   - src
@@ -14,34 +14,25 @@ humanVerified: false
 # Documentation for `src/index.ts`
 
 ## Purpose
-This file serves as the entry point for a command-line interface (CLI) tool designed to facilitate automatic knowledge capture for codebases. It processes user commands and delegates tasks to specific command modules.
+This file serves as the entry point for a command-line interface (CLI) tool that automates knowledge capture for codebases, allowing users to initialize the tool, analyze commit messages, and simulate an introductory animation.
 
 ## Key Functionality
-- **main()**: The main function that orchestrates command execution based on user input. It handles errors and displays help messages.
-- **showHelp()**: Displays usage instructions and examples for the CLI commands available.
-- **Command Handling**:
-  - `init`: Initializes the tool in the current repository.
-  - `analyze-commit`: Analyzes the commit message, expecting a file path as an argument (passed by Git hooks).
-  - `sim-intro`: Simulates an introductory animation.
+- **main()**: The primary function that orchestrates command execution based on user input.
+- **showHelp()**: Displays usage instructions and examples for the CLI commands.
+- **analyzeCommitCommand()**: Analyzes staged files when invoked, particularly useful in a pre-commit hook context.
 
 ## Gotchas
-- **Argument Handling**: The `analyze-commit` command expects a second argument (`args[1]`), which is the path to the commit message file. If this argument is not provided (e.g., if the command is run manually without a Git hook), it may lead to unexpected behavior or errors.
-- **Error Handling**: The catch block captures any error thrown during command execution and logs it. However, it does not differentiate between types of errors, which may obscure the root cause during debugging.
-- **Unknown Commands**: If an unknown command is provided, the CLI will display an error message and show the help text. This behavior is crucial for user experience but can lead to confusion if users expect a different response.
+- **Argument Handling**: The `analyze-commit` command previously expected a file path as an argument, but the recent change indicates that it now operates without any arguments when invoked as a pre-commit hook. Ensure that the `analyzeCommitCommand` function is capable of handling this scenario correctly.
+- **Error Handling**: Any unhandled exceptions in the `main` function will result in a non-zero exit code, which is standard for CLI applications but can lead to confusion if not documented. Ensure that all potential errors are caught and logged appropriately.
+- **Command Recognition**: The CLI will exit with an error message if an unrecognized command is provided. Users should be aware that commands are case-sensitive.
 
 ## Dependencies
-- **chalk**: This library is used for styling console output, enhancing readability and user experience. It provides colored text for error messages and help instructions, making it easier for users to identify important information.
+- **chalk**: This library is used for styling console output, enhancing user experience by making error messages and help text more readable. It is crucial for providing clear feedback to the user.
 
 ## Architecture Context
-This file is part of a larger CLI tool that likely interacts with Git and other development processes. It is designed to be extensible, allowing additional commands to be added easily. The modular command structure (e.g., `initCommand`, `analyzeCommitCommand`) suggests a focus on separation of concerns, where each command handles its specific functionality.
+This file is part of a larger CLI tool designed to integrate with Git workflows, specifically targeting developers who want to automate knowledge capture during code changes. The modular command structure allows for easy expansion and maintenance of additional commands in the future.
 
 ## Implementation Notes
-- **Asynchronous Execution**: The use of `async/await` allows for non-blocking command execution, which is essential for maintaining responsiveness in CLI applications. However, developers should be cautious about unhandled promise rejections that could crash the application.
-- **Performance Considerations**: The CLI's performance is generally acceptable for typical use cases, but if the `analyze-commit` command processes large files or numerous files, performance may degrade. It is advisable to implement optimizations or feedback mechanisms for long-running processes.
-- **Common Mistakes to Avoid**: Developers should ensure that the correct number of arguments is passed to commands, particularly for `analyze-commit`. Additionally, they should be aware of the context in which the CLI is executed (e.g., within Git hooks) to avoid confusion regarding expected inputs.
-
-## Developer Insights
-
-Changed the approach for the current commit instead of using the pre-commit now we use the commit-msg from husky to get the current commit message reliably. This had a domino effect on a couple files from operation to analyzer. Then we ran into the issue of permissions when using the sb cli so we added a postbuild script to make the index.js execuatable after each build.
-
-*Captured during commit: fix getCurrentCommit & update readme*
+- **Command Structure**: The switch-case structure in the `main` function allows for easy addition of new commands. When adding new commands, ensure that they are registered in the command list and that any necessary error handling is implemented.
+- **Performance Considerations**: The CLI tool is designed to be lightweight and efficient. However, if the `analyzeCommitCommand` function performs extensive file I/O or complex analysis, it may introduce latency. Consider optimizing file access patterns or using asynchronous processing where applicable.
+- **Common Mistakes**: When modifying command behaviors, ensure that any changes to argument expectations are reflected in both the implementation and the documentation. This prevents discrepancies that can lead to user errors.

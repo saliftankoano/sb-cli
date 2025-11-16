@@ -1,7 +1,7 @@
 ---
 filePath: src/git/operations.ts
-fileVersion: e5f9c30aed9595efa90635f860dee8cb39a86e4d
-lastUpdated: '2025-11-16T21:33:52.204Z'
+fileVersion: 01e483e18209114aa06826fff365db6ae0de0554
+lastUpdated: '2025-11-16T21:50:03.663Z'
 updatedBy: sb-cli
 tags:
   - src
@@ -15,35 +15,28 @@ humanVerified: false
 # Git Operations Documentation
 
 ## Purpose
-This file provides a wrapper around Git operations using the `simple-git` library, enabling asynchronous interactions with a Git repository. It allows for operations such as retrieving staged files, commit messages, and file diffs.
+This file provides a wrapper around Git operations using the `simple-git` library, allowing for asynchronous interactions with a Git repository, such as retrieving staged files, file diffs, and commit messages.
 
 ## Key Functionality
-- **getStagedFiles**: Returns a list of files that are currently staged for commit.
-- **getFileHash**: Retrieves the latest commit hash for a specified file.
-- **getFileDiff**: Obtains the diff for a staged file.
-- **addFiles**: Stages specified files for commit.
-- **getLastCommitMessage**: Fetches the message of the last commit.
-- **getCurrentCommitMessage**: Retrieves the current commit message, with an option to specify a custom message file path.
+- **getStagedFiles**: Retrieves a list of currently staged files in the Git repository.
+- **getFileHash**: Returns the latest commit hash for a specified file, useful for version tracking.
+- **getFileDiff**: Obtains the diff for a staged file, returning changes that are ready to be committed.
+- **addFiles**: Stages specified files for commit in the Git repository.
+- **getLastCommitMessage**: Fetches the last commit message, providing context for the current changes.
 
 ## Gotchas
-- **Fallback Logic**: The `getCurrentCommitMessage` method falls back to the last commit message if the current message is empty or if reading the message file fails. This behavior might lead to confusion if users expect an error when the message is not available.
-- **Path Handling**: The method accepts an optional `msgFilePath`. If a relative path is provided, it is resolved against the repository path. Users must ensure the path is correct to avoid unexpected results.
-- **Error Handling**: Many methods catch errors silently and return default values. This can mask issues during development. Consider logging errors for better debugging.
+- **Error Handling**: Many methods catch errors and return default values (e.g., empty arrays or fallback messages). This can mask underlying issues in the Git operations, so it’s essential to log errors for debugging.
+- **Last Commit Message**: The `getLastCommitMessage` method retrieves the last commit message, which may not be relevant if the user is expecting the current commit message being written. This behavior is crucial to understand to avoid confusion.
+- **File Path Handling**: The original implementation of `getCurrentCommitMessage` was removed. If similar functionality is needed, ensure that file paths are correctly resolved, especially when dealing with relative paths.
 
 ## Dependencies
-- **simple-git**: This library simplifies Git operations in Node.js, providing a promise-based interface that is easy to use for asynchronous operations.
-- **fs/promises**: Used for file system operations, allowing for reading files asynchronously. This is crucial for handling commit messages without blocking the event loop.
+- **simple-git**: This library simplifies Git operations in Node.js, providing a promise-based API that allows for cleaner asynchronous code. It abstracts away the complexities of direct Git command usage.
+- **fs/promises**: Used for file system operations, enabling asynchronous file reading without blocking the event loop.
 
 ## Architecture Context
-This module fits into a larger system that likely involves version control operations within a development environment. It abstracts Git interactions, making it easier for other components to perform Git-related tasks without dealing directly with command-line intricacies.
+This module is part of a larger system that likely involves version control management, possibly integrated into a development tool or CI/CD pipeline. It allows developers to interact with Git repositories programmatically, enhancing automation and workflow efficiency.
 
 ## Implementation Notes
-- **Performance Considerations**: The use of asynchronous methods ensures that file I/O and Git operations do not block the main thread, which is essential for maintaining application responsiveness.
-- **Message Validation**: The `getCurrentCommitMessage` method includes validation to ensure that the retrieved message is not just whitespace. This prevents empty commit messages, which can lead to confusion in version history.
-- **Default Values**: The use of sensible defaults (like the `.git/COMMIT_EDITMSG` path) helps streamline operations, but developers should be aware of this behavior when customizing paths.
-
-## Developer Insights
-
-Changed the approach for the current commit instead of using the pre-commit now we use the commit-msg from husky to get the current commit message reliably. This had a domino effect on a couple files from operation to analyzer. Then we ran into the issue of permissions when using the sb cli so we added a postbuild script to make the index.js execuatable after each build.
-
-*Captured during commit: fix getCurrentCommit & update readme*
+- **Performance Considerations**: Asynchronous methods are employed to prevent blocking the main thread, which is crucial for maintaining responsiveness in applications that may perform multiple Git operations concurrently.
+- **Removal of getCurrentCommitMessage**: The decision to remove this method may have been influenced by its complexity and the potential for confusion regarding its output. If similar functionality is required in the future, consider implementing a more robust solution that handles various edge cases and provides clear documentation.
+- **Default Values**: The use of default return values (like "Recent changes") ensures that the application remains functional even in error scenarios, but developers should be cautious about relying on these defaults without understanding the underlying issues.

@@ -228,9 +228,8 @@ ${insights}
 
 /**
  * Main analyzer - orchestrates the entire analysis workflow
- * @param commitMsgFile - Optional path to commit message file (provided by prepare-commit-msg hook)
  */
-export async function analyzeCommit(commitMsgFile?: string): Promise<void> {
+export async function analyzeCommit(): Promise<void> {
   const repoRoot = process.cwd();
 
   // Load and validate configuration (explicitly search from repo root)
@@ -333,10 +332,8 @@ export async function analyzeCommit(commitMsgFile?: string): Promise<void> {
       text: chalk.green("✓ AI analysis complete for all files"),
     });
 
-    // Get current commit message (the one being written)
-    const commitMessage = await git
-      .getCurrentCommitMessage(commitMsgFile)
-      .catch(() => "Recent changes");
+    // Get current commit message - in pre-commit hook, this won't be available yet
+    const commitMessage = "Preparing commit...";
 
     // Show commit context with accurate counts
     console.log(
