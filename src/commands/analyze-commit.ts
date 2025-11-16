@@ -2,12 +2,15 @@ import chalk from "chalk";
 import { analyzeCommit } from "../core/analyzer.js";
 
 /**
- * Command to analyze staged files (called by Husky pre-commit hook)
+ * Command to analyze staged files (called by Husky commit-msg hook)
  * Exits with code 1 if user aborts or analysis fails, blocking the commit
+ * @param commitMsgFile - Path to the commit message file (passed by Git hook as $1)
  */
-export async function analyzeCommitCommand(): Promise<void> {
+export async function analyzeCommitCommand(
+  commitMsgFile?: string
+): Promise<void> {
   try {
-    await analyzeCommit();
+    await analyzeCommit(commitMsgFile);
     // Exit successfully only if analysis completed and user confirmed
     process.exit(0);
   } catch (error: any) {

@@ -18,6 +18,11 @@ import { OpenAIClient } from "./openai-client.js";
 import { writeKnowledgeFile, readKnowledgeFile } from "./knowledge-writer.js";
 import type { PromptContext } from "../prompts/templates.js";
 import type { AnalysisResult } from "./openai-client.js";
+import {
+  analysisContextBox,
+  wizardPromptBox,
+  readyToCommitBox,
+} from "../utils/boxes.js";
 
 /**
  * TTY (Teletypewriter) Context:
@@ -108,8 +113,8 @@ async function askMultiLine(prompt: string): Promise<string> {
   const isTTY = process.stdin.isTTY && process.stdout.isTTY;
 
   console.log(chalk.cyan(`\n${prompt}`));
-  console.log(chalk.dim("(Press Enter 3 times to submit)\n"));
-  console.log(chalk.cyan("> "));
+  console.log(chalk.dim("(Press Enter 3 times to submit)"));
+  process.stdout.write(chalk.cyan("\n> "));
 
   try {
     // For non-TTY mode (Git hooks), use readline-sync
@@ -132,9 +137,6 @@ async function askMultiLine(prompt: string): Promise<string> {
       }
 
       const input = lines.join("\n").trim();
-      if (input) {
-        console.log(chalk.dim("\n✓ Got it!\n"));
-      }
       return input;
     }
 
@@ -158,9 +160,6 @@ async function askMultiLine(prompt: string): Promise<string> {
             rl.close();
 
             const input = lines.join("\n").trim();
-            if (input) {
-              console.log(chalk.dim("\n✓ Got it!\n"));
-            }
             resolve(input);
           }
         } else {
@@ -229,8 +228,9 @@ ${insights}
 
 /**
  * Main analyzer - orchestrates the entire analysis workflow
+ * @param commitMsgFile - Optional path to commit message file (provided by commit-msg hook)
  */
-export async function analyzeCommit(): Promise<void> {
+export async function analyzeCommit(commitMsgFile?: string): Promise<void> {
   const repoRoot = process.cwd();
 
   // Load and validate configuration (explicitly search from repo root)
@@ -335,14 +335,15 @@ export async function analyzeCommit(): Promise<void> {
 
     // Get current commit message (the one being written)
     const commitMessage = await git
-      .getCurrentCommitMessage()
+      .getCurrentCommitMessage(commitMsgFile)
       .catch(() => "Recent changes");
 
     // Show commit context with accurate counts
-    console.log(chalk.cyan(`\n📝 Commit: "${commitMessage}"`));
     console.log(
-      chalk.dim(
-        `   ${stagedFiles.length} file(s) staged, ${analysisResults.length} source file(s) analyzed\n`
+      analysisContextBox(
+        commitMessage,
+        stagedFiles.length,
+        analysisResults.length
       )
     );
 
@@ -370,11 +371,7 @@ export async function analyzeCommit(): Promise<void> {
       }
 
       // Step 6: Get developer insights (one open-ended brain dump)
-      console.log(
-        chalk.green.bold(
-          "\n✨ Oh great wizard, share your secrets! Any gotchas, "
-        ) + chalk.green.bold("tricky choices, or surprises for future devs?")
-      );
+      console.log(wizardPromptBox());
 
       let insights = "";
       try {
@@ -412,21 +409,17 @@ export async function analyzeCommit(): Promise<void> {
       analysisResults = updatedResults;
 
       enhanceSpinner.success({
-        text: chalk.green("✓ Got it! Enhanced knowledge docs"),
+        text: chalk.green("Enhanced knowledge docs with your insights"),
       });
 
       // Show what was updated
-      console.log(chalk.cyan("\n✓ Updated files where this is most relevant:"));
+      console.log(chalk.cyan("\nUpdated files where this is most relevant:"));
       for (const file of updatedFiles) {
         console.log(chalk.yellow(`  • ${file}`));
       }
 
       // Step 8: Confirmation to commit
-      console.log(
-        chalk.cyan(
-          `\n📚 ${analysisResults.length} knowledge files staged for commit\n`
-        )
-      );
+      console.log(readyToCommitBox(analysisResults.length));
 
       let readyToCommit = false;
       try {

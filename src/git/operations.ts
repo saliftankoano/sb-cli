@@ -8,7 +8,7 @@ export interface GitOperations {
   getFileDiff(filePath: string): Promise<string | null>;
   addFiles(files: string[]): Promise<void>;
   getLastCommitMessage(): Promise<string>;
-  getCurrentCommitMessage(): Promise<string>;
+  getCurrentCommitMessage(msgFilePath?: string): Promise<string>;
 }
 
 /**
@@ -85,18 +85,33 @@ export function createGitOperations(
       }
     },
 
-    async getCurrentCommitMessage(): Promise<string> {
+    async getCurrentCommitMessage(msgFilePath?: string): Promise<string> {
+      // Use provided path or default to COMMIT_EDITMSG
+      const commitMsgPath = msgFilePath
+        ? path.isAbsolute(msgFilePath)
+          ? msgFilePath
+          : path.join(repoPath, msgFilePath)
+        : path.join(repoPath, ".git", "COMMIT_EDITMSG");
+
       try {
-        const commitEditMsgPath = path.join(repoPath, ".git", "COMMIT_EDITMSG");
-        const content = await fs.readFile(commitEditMsgPath, "utf-8");
+        const content = await fs.readFile(commitMsgPath, "utf-8");
         // Remove comments and get first line (subject)
         const lines = content.split("\n").filter((line) => {
           const trimmed = line.trim();
           return trimmed.length > 0 && !trimmed.startsWith("#");
         });
-        return lines[0] || "Recent changes";
-      } catch {
-        // Fallback to last commit message if we can't read current one
+
+        const message = lines[0] || "";
+
+        // Validate we got a message (not empty and not just whitespace)
+        if (message.trim().length > 0) {
+          return message;
+        }
+
+        // Fallback to last commit message if message is empty
+        return this.getLastCommitMessage();
+      } catch (error) {
+        // If we can't read the file, fall back to last commit message
         return this.getLastCommitMessage();
       }
     },

@@ -16,7 +16,8 @@ async function main() {
         break;
 
       case "analyze-commit":
-        await analyzeCommitCommand();
+        // Git hook passes commit message file path as first argument
+        await analyzeCommitCommand(args[1]);
         break;
 
       case "sim-intro":
