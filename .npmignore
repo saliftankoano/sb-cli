@@ -1,11 +1,27 @@
+# Sensitive config files
+.sb-config.json
+*.env
+.env*
+
+# Development files
+.startblock/
 src/
 tsconfig.json
-.gitignore
-*.log
-node_modules/
-.env
-.DS_Store
-tests/
-*.test.ts
-*.test.js
+.husky/
 
+# Git files
+.git/
+.gitignore
+
+# Demo files
+DEMO.md
+TESTING_GUIDE.md
+demo-example/
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+npm-debug.log*
