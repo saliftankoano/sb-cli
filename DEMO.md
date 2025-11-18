@@ -69,6 +69,7 @@ git commit -m "feat: add payment processing with retry logic"
 ```
 
 **Show:**
+
 1. ✅ AI analyzes the file automatically
 2. 📦 Styled box shows "Preparing commit..." with file count
 3. ❓ "Want to add your insights? [y/N]:" → Type `y`
@@ -77,18 +78,15 @@ git commit -m "feat: add payment processing with retry logic"
 **Type this insight when prompted:**
 
 ```
-Critical gotcha: Math.floor is NOT a typo! We initially used Math.round and 
-overcharged customers by 1 cent on amounts like $10.99. Lost $2,400 before 
-we caught it. Also, 3 retries came from a painful incident where 2 wasn't 
+Critical gotcha: Math.floor is NOT a typo! We initially used Math.round and
+overcharged customers by 1 cent on amounts like $10.99. Lost $2,400 before
+we caught it. Also, 3 retries came from a painful incident where 2 wasn't
 enough during a Stripe outage. Cost us 50 failed transactions.
 ```
 
 Press Enter twice to submit.
 
-**Show:**
-5. ✅ AI enhances knowledge docs with your insights
-6. 📚 "3 knowledge file(s) ready to commit!"
-7. 🚀 Confirm with `y` - everything commits together
+**Show:** 5. ✅ AI enhances knowledge docs with your insights 6. 📚 "3 knowledge file(s) ready to commit!" 7. 🚀 Confirm with `y` - everything commits together
 
 ### 4. Show the Knowledge File (1 minute)
 
@@ -97,6 +95,7 @@ cat .startblock/knowledge/src/payment-processor.js.md
 ```
 
 **Point out:**
+
 - 📝 AI generated: purpose, dependencies, functions
 - 💡 **Your insights**: The Math.floor gotcha and retry count reasoning
 - 🏷️ Metadata: tags, importance, version
@@ -117,7 +116,8 @@ tree .startblock/knowledge/
     └── payment-processor.js.md
 ```
 
-**Say:** 
+**Say:**
+
 - ✨ "Knowledge mirrors your code structure - easy to find"
 - 🔄 "Updates automatically on every commit"
 - 🚀 "No meetings, no Notion docs to maintain"
@@ -166,4 +166,3 @@ sb --help
 **Demo Time**: ~5 minutes  
 **Questions**: ~5 minutes  
 **Total**: ~10 minutes
-

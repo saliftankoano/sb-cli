@@ -9,12 +9,11 @@ import boxen from "boxen";
  * Analysis context box - shows commit info and file counts
  */
 export function analysisContextBox(
-  commitMessage: string,
   stagedCount: number,
   analyzedCount: number
 ): string {
   return boxen(
-    `📝 Commit: "${commitMessage}"\n\n${stagedCount} file(s) staged, ${analyzedCount} source file(s) analyzed`,
+    `⏳ Preparing commit...\n\n${stagedCount} file(s) staged, ${analyzedCount} source file(s) analyzed`,
     {
       padding: 1,
       margin: { top: 1, bottom: 1 },

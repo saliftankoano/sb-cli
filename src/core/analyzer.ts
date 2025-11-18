@@ -197,7 +197,6 @@ async function enhanceWithInsights(
     fileVersion: string;
   }>,
   insights: string,
-  commitMessage: string,
   openaiClient: OpenAIClient
 ): Promise<{ updatedResults: typeof analysisResults; updatedFiles: string[] }> {
   // TODO: Call OpenAI to intelligently distribute insights across relevant files
@@ -208,9 +207,7 @@ async function enhanceWithInsights(
 
 ## Developer Insights
 
-${insights}
-
-*Captured during commit: ${commitMessage}*`;
+${insights}`;
 
     return {
       ...result,
@@ -332,17 +329,8 @@ export async function analyzeCommit(): Promise<void> {
       text: chalk.green("✓ AI analysis complete for all files"),
     });
 
-    // Get current commit message - in pre-commit hook, this won't be available yet
-    const commitMessage = "Preparing commit...";
-
     // Show commit context with accurate counts
-    console.log(
-      analysisContextBox(
-        commitMessage,
-        stagedFiles.length,
-        analysisResults.length
-      )
-    );
+    console.log(analysisContextBox(stagedFiles.length, analysisResults.length));
 
     // Interactive insight gathering loop
     let continueLoop = true;
@@ -399,7 +387,6 @@ export async function analyzeCommit(): Promise<void> {
       const { updatedResults, updatedFiles } = await enhanceWithInsights(
         analysisResults,
         insights,
-        commitMessage,
         openaiClient
       );
 

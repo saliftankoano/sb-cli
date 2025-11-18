@@ -1,0 +1,48 @@
+{
+  "baseCommit": "c9195ce7c6fa8898eeb1c76c09b9707b7b1346f2",
+  "generatedAt": "2025-11-16T22:04:14.774Z",
+  "hashAlgo": "sha256",
+  "saltId": "v1",
+  "segments": [
+    {
+      "start": 1,
+      "end": 13,
+      "commit": "01e483e18209114aa06826fff365db6ae0de0554",
+      "authorName": "salif",
+      "authorEmailHmac": "bcf18a069827a40af14d81210a6892602039faf07aec8591ce9048d30b83b604",
+      "authorTime": "2025-11-16T21:28:34.000Z"
+    },
+    {
+      "start": 14,
+      "end": 18,
+      "commit": "0000000000000000000000000000000000000000",
+      "authorName": "Not Committed Yet",
+      "authorEmailHmac": "7003142bc06664159030c7b09b1f8843bafce073c211f194974e4ccb3e3fe438",
+      "authorTime": "2025-11-16T22:04:14.000Z"
+    },
+    {
+      "start": 19,
+      "end": 19,
+      "commit": "01e483e18209114aa06826fff365db6ae0de0554",
+      "authorName": "salif",
+      "authorEmailHmac": "bcf18a069827a40af14d81210a6892602039faf07aec8591ce9048d30b83b604",
+      "authorTime": "2025-11-16T21:28:34.000Z"
+    },
+    {
+      "start": 20,
+      "end": 20,
+      "commit": "0000000000000000000000000000000000000000",
+      "authorName": "Not Committed Yet",
+      "authorEmailHmac": "7003142bc06664159030c7b09b1f8843bafce073c211f194974e4ccb3e3fe438",
+      "authorTime": "2025-11-16T22:04:14.000Z"
+    },
+    {
+      "start": 21,
+      "end": 57,
+      "commit": "01e483e18209114aa06826fff365db6ae0de0554",
+      "authorName": "salif",
+      "authorEmailHmac": "bcf18a069827a40af14d81210a6892602039faf07aec8591ce9048d30b83b604",
+      "authorTime": "2025-11-16T21:28:34.000Z"
+    }
+  ]
+}
