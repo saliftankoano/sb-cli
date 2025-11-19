@@ -9,7 +9,7 @@ Automatic knowledge capture for codebases via Husky hooks and OpenAI.
 ## Installation
 
 ```bash
-npm install -g @startblock/cli
+npm install -g @startblock-ai/cli
 ```
 
 **Having permission issues?** See our [**Installation Guide**](./INSTALL.md) for detailed setup instructions.
@@ -21,7 +21,7 @@ npm install -g @startblock/cli
 mkdir -p ~/.npm-global && npm config set prefix '~/.npm-global'
 echo 'export PATH=~/.npm-global/bin:$PATH' >> ~/.zshrc
 source ~/.zshrc  # or open a new terminal
-npm install -g @startblock/cli
+npm install -g @startblock-ai/cli
 ```
 
 ### Option 2: Development Install (for contributors)
@@ -40,6 +40,18 @@ sb --help
 ```
 
 You should see the StartBlock CLI help message with ASCII art! 🎨
+
+**Update to latest version:**
+
+```bash
+npm install -g @startblock-ai/cli@latest
+```
+
+Or simply:
+
+```bash
+npm update -g @startblock-ai/cli
+```
 
 > 📖 **Need detailed installation help?** Check out [INSTALL.md](./INSTALL.md) for troubleshooting and setup instructions.
 

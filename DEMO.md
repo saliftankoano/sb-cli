@@ -11,7 +11,7 @@ git init
 npm init -y
 
 # Install and initialize sb-cli
-npm install -g @startblock/cli
+npm install -g @startblock-ai/cli
 sb init
 # Enter your OpenAI API key when prompted
 ```

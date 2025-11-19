@@ -3,7 +3,7 @@
 ## Quick Install
 
 ```bash
-npm install -g @startblock/cli
+npm install -g @startblock-ai/cli
 ```
 
 ## Avoiding Permission Issues
@@ -32,7 +32,7 @@ source ~/.bashrc
 ### Then Install
 
 ```bash
-npm install -g @startblock/cli
+npm install -g @startblock-ai/cli
 ```
 
 ## Verify Installation
@@ -42,6 +42,26 @@ sb --help
 ```
 
 You should see the StartBlock CLI help with ASCII art! 🎨
+
+## Update to Latest Version
+
+When a new version is published to npm, update your global installation:
+
+```bash
+npm install -g @startblock-ai/cli@latest
+```
+
+Or use the shorter command:
+
+```bash
+npm update -g @startblock-ai/cli
+```
+
+**Check your current version:**
+
+```bash
+npm list -g @startblock-ai/cli
+```
 
 ## Troubleshooting
 

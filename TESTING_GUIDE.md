@@ -41,7 +41,7 @@ npm link
 ### For Production Use:
 
 ```bash
-npm install -g @startblock/cli
+npm install -g @startblock-ai/cli
 ```
 
 **Verify installation:**
@@ -433,7 +433,7 @@ Every commit now automatically captures **WHY** you built what you built - knowl
 
 ## Next Steps
 
-1. **Share with your team:** They can install via `npm install -g @startblock/cli`
+1. **Share with your team:** They can install via `npm install -g @startblock-ai/cli`
 2. **Customize prompts:** Edit `src/prompts/templates.ts` to ask different questions
 3. **Fine-tune models:** Train custom models on your repo's knowledge base (coming soon!)
 
