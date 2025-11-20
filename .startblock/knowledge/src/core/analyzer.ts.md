@@ -1,7 +1,7 @@
 ---
 filePath: src/core/analyzer.ts
-fileVersion: 08cc52b1dfb725ea758537cdb64876d71d13fdd3
-lastUpdated: '2025-11-18T00:44:27.728Z'
+fileVersion: 3ec7e5530a22ff129e5af4b75ca0724e4f9f56f0
+lastUpdated: '2025-11-20T22:01:30.794Z'
 updatedBy: sb-cli
 tags:
   - src
@@ -15,32 +15,31 @@ humanVerified: false
 # Documentation for `src/core/analyzer.ts`
 
 ## Purpose
-This file orchestrates the analysis of staged files in a Git repository, leveraging AI to generate insights and enhance knowledge documentation based on developer input.
+This file orchestrates the analysis of staged files in a Git repository, leveraging AI insights to enhance developer documentation and facilitate better code understanding before commits.
 
 ## Key Functionality
-- **analyzeCommit**: The main function that coordinates the analysis workflow, including gathering staged files, running AI analysis, collecting developer insights, and writing knowledge files.
-- **enhanceWithInsights**: Enhances analysis results with developer insights while preserving the original wording.
-- **askYesNo**: Prompts the user for a yes/no response, handling both TTY and non-TTY contexts.
-- **askMultiLine**: Collects multi-line input from the user, allowing for informal insights or comments.
+- **analyzeCommit**: Main entry point that manages the entire analysis workflow, from loading configuration to finalizing insights and writing knowledge files.
+- **askYesNo**: Prompts the user for a yes/no response, supporting both TTY and non-TTY contexts for compatibility with Git hooks.
+- **askMultiLine**: Collects multi-line input from the user, allowing for a brain dump of insights, with specific handling for empty lines.
+- **enhanceWithInsights**: Integrates developer insights into the analysis results, ensuring that the original wording is preserved.
 
 ## Gotchas
-- **Commit Message Removal**: The recent change removed the commit message parameter from `enhanceWithInsights`. This means that any context related to the commit message is now lost during the enhancement process. Ensure that relevant insights are captured in the `insights` parameter instead.
-- **TTY vs Non-TTY Handling**: The code differentiates between TTY (interactive terminal) and non-TTY (Git hook) modes. If running in a non-TTY context, input handling relies on `readline-sync`, which may not support all features of standard readline (e.g., line editing).
-- **Timeouts**: Both `askYesNo` and `askMultiLine` have timeouts (3 and 10 minutes, respectively). If the user does not respond in time, the process will throw an error, which may lead to an abrupt termination of the analysis workflow.
-- **Empty Insights Handling**: If no insights are provided, the process will skip the enhancement step, which could result in less informative knowledge files. Developers should be encouraged to provide insights.
+- **Input Handling**: The code uses different input methods based on whether it is running in a TTY or non-TTY context. Failing to account for this can lead to unexpected behavior, especially in Git hooks.
+- **File Versioning**: The analysis skips files that have not changed (same version) based on a hash check. This could lead to missed insights if a developer expects a file to be analyzed regardless of its version.
+- **Timeouts**: Input prompts have timeouts (3 minutes for yes/no and 10 minutes for multi-line input). If the timeout is reached, it will throw an error and may abort the analysis unexpectedly.
+- **Error Handling**: Errors during user input are caught and logged, but they can lead to premature termination of the analysis loop if not handled correctly.
 
 ## Dependencies
-- **chalk**: Used for colorful console output, enhancing user experience during prompts and feedback.
-- **nanospinner**: Provides a lightweight spinner for indicating progress during asynchronous operations.
-- **fs/promises**: Used for file operations, enabling asynchronous reading and writing of files.
-- **readline** and **readline-sync**: Facilitate user input handling in both interactive and non-interactive environments.
-- **OpenAIClient**: Central to the AI analysis process, this client interfaces with OpenAI's API to generate insights based on file content.
+- **chalk**: Used for colorful console output, enhancing user experience during prompts and status updates.
+- **nanospinner**: Provides a lightweight spinner for indicating ongoing processes, improving user feedback during long-running tasks.
+- **fs/promises**: Utilized for file operations, allowing asynchronous reading and writing of files.
+- **readline** and **readline-sync**: Used for handling user input, with a fallback mechanism for compatibility with Git hooks.
 
 ## Architecture Context
-This module is part of a larger system aimed at improving code quality and documentation through AI-driven analysis. It interacts with Git operations, configuration management, and knowledge file writing, forming a cohesive workflow that enhances developer productivity and knowledge sharing.
+This module is part of a larger system that integrates AI capabilities into the software development workflow. It interacts with Git operations, configuration management, and knowledge documentation, forming a bridge between code changes and developer insights.
 
 ## Implementation Notes
-- **Preservation of Developer Insights**: The function `enhanceWithInsights` emphasizes that developer insights should remain unaltered. This decision is crucial for maintaining the authenticity and context of the insights provided.
-- **Performance Considerations**: The analysis process is asynchronous and can handle multiple files in sequence. However, if a large number of files are staged, the analysis could take considerable time. Consider implementing parallel processing for file analysis to improve performance.
-- **Error Handling**: The code includes error handling for user input and file operations, but developers should ensure that all potential failure points are adequately covered, especially when dealing with external APIs like OpenAI.
-- **User Experience**: The interactive prompts are designed to be user-friendly, but developers should be aware of the limitations in non-TTY contexts, which may affect usability in automated environments.
+- **Critical Design Decision**: The choice to preserve developer insights verbatim is crucial for maintaining authenticity and value in documentation. This requires careful handling of input to avoid sanitization.
+- **Performance Considerations**: The analysis is performed sequentially for each relevant file, which may lead to longer processing times for large commits. Consider parallelizing the analysis if performance becomes an issue.
+- **User Experience**: The interactive prompts are designed to be user-friendly, but care must be taken to ensure that they do not block the workflow unnecessarily. The use of timeouts helps mitigate this risk.
+- **Future Improvements**: The TODO comment in `enhanceWithInsights` indicates a potential area for enhancement by intelligently distributing insights across relevant files, which could improve the documentation process further.

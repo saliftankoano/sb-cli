@@ -332,6 +332,19 @@ export async function analyzeCommit(): Promise<void> {
     // Show commit context with accurate counts
     console.log(analysisContextBox(stagedFiles.length, analysisResults.length));
 
+    // Show AI Insights Summary
+    console.log(chalk.cyan.bold("Code Insights Summary:\n"));
+    analysisResults.forEach((result, fileIndex) => {
+      console.log(chalk.white(`${chalk.bold(result.file)}:`));
+      result.analysis.insights.forEach((insight, insightIndex) => {
+        console.log(chalk.dim(`  ${insightIndex + 1}. ${insight}`));
+      });
+      if (fileIndex < analysisResults.length - 1) {
+        console.log(""); // Add spacing between files
+      }
+    });
+    console.log(""); // Add spacing before next section
+
     // Interactive insight gathering loop
     let continueLoop = true;
     while (continueLoop) {

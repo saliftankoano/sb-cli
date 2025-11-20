@@ -1,13 +1,12 @@
 ---
 filePath: src/prompts/templates.ts
-fileVersion: 7e019c662dfbf93f083367ec7fb1cde1a1698639
-lastUpdated: '2025-11-15T19:00:33.361Z'
+fileVersion: 73caec7ca66a98f267aa4ae1de89f334c7f2c911
+lastUpdated: '2025-11-20T22:01:30.799Z'
 updatedBy: sb-cli
 tags:
   - src
   - prompts
   - typescript
-  - new
 importance: low
 extractedBy: sb-cli@1.0.0
 model: gpt-4o-mini
@@ -16,38 +15,30 @@ humanVerified: false
 # Knowledge Documentation for `src/prompts/templates.ts`
 
 ## Purpose
-This file defines a system prompt template for generating user prompts for OpenAI analysis of TypeScript files. It encapsulates the context of the file being analyzed, including its path, language, status, content, and dependencies.
+This file defines a function to generate a user prompt for analyzing TypeScript files using OpenAI's API. It structures the prompt to include file metadata, code content, and dependencies, guiding the AI to produce insightful documentation.
 
 ## Key Functionality
-- **`SYSTEM_PROMPT`**: A constant string that serves as a template for guiding the AI in generating documentation. It outlines the expectations for the analysis, emphasizing the extraction of tacit knowledge.
-  
-- **`PromptContext` Interface**: Defines the structure of the context object passed to the `generateUserPrompt` function. It includes properties such as `filePath`, `language`, `isNew`, `fileContent`, `gitDiff`, `dependencies`, and `dependents`.
-
-- **`generateUserPrompt(context: PromptContext): string`**: A function that constructs a prompt string based on the provided `PromptContext`. It formats the information into a structured prompt for OpenAI, including sections for changes, code, dependencies, and documentation structure.
+- **`SYSTEM_PROMPT`**: A constant string that sets the context for the AI, specifying the goals and focus areas for the analysis.
+- **`PromptContext` Interface**: Defines the structure of the context object passed to the `generateUserPrompt` function, encapsulating file metadata, content, and dependencies.
+- **`generateUserPrompt` Function**: Constructs a prompt string based on the provided `PromptContext`. It formats the prompt to include:
+  - File path, language, and status (new or modified)
+  - Git diff if applicable
+  - Code content
+  - Imported files and their exports
+  - Dependent files that use this file
 
 ## Gotchas
-- **Handling of `gitDiff`**: The `gitDiff` is only included in the prompt if the file is not new. This can lead to confusion if users expect to see diffs for new files. Ensure that users understand this behavior when utilizing the function.
-
-- **Empty Dependencies and Dependents**: If there are no dependencies or dependents, the prompt will simply omit those sections. This could lead to a lack of context for the AI if the user is unaware of the file's relationships. Consider adding a note in the documentation to clarify this behavior.
-
-- **Markdown Formatting**: The prompt is designed to generate markdown documentation, but if the AI does not adhere to the specified sections, the output may lack clarity. Users should verify the AI's output against the expected structure.
+- **Git Diff Handling**: The function only includes the git diff if the file is modified. If the file is new, the `gitDiff` will be ignored. Ensure that the context accurately reflects the file status to avoid confusion in the generated prompt.
+- **Empty Dependencies/Dependents**: If there are no dependencies or dependents, the prompt will simply omit those sections. This is intentional but could lead to a lack of context if users expect those sections to always appear.
+- **Prompt Length**: The generated prompt can become lengthy if the file has many dependencies or a large codebase. Be mindful of the token limits when sending the prompt to the AI, as exceeding limits may lead to incomplete responses.
 
 ## Dependencies
-- The `dependencies` array in the `PromptContext` allows for tracking of imported files and their exports. This is crucial for understanding the context of the file being analyzed, as it provides insight into external dependencies that may affect functionality.
-
-- The `dependents` array helps identify which files rely on the current file, facilitating a better understanding of the impact of changes made to this file.
+- The file does not explicitly import any dependencies but relies on TypeScript's built-in types and constructs. The `PromptContext` interface is crucial for maintaining type safety and clarity in the context object, ensuring that all necessary information is available for prompt generation.
 
 ## Architecture Context
-This file is part of a larger system designed to automate the documentation process for codebases. By providing structured prompts to an AI model, it aims to enhance the quality and comprehensiveness of documentation generated for various code files, thereby improving maintainability and knowledge sharing within development teams.
+This file fits into a larger system where automated code analysis and documentation generation are required. It serves as a bridge between code and AI, enabling developers to extract meaningful insights from their codebases efficiently. The structured prompt helps the AI understand the context better, leading to more relevant and useful outputs.
 
 ## Implementation Notes
-- **Conciseness and Clarity**: The design emphasizes concise and clear documentation. The AI is instructed to focus on non-obvious knowledge, which can be critical for new team members or when revisiting code after some time.
-
-- **Performance Considerations**: The function constructs the prompt string using template literals, which is efficient for string concatenation in modern JavaScript/TypeScript. However, if the file content or dependencies are large, consider the potential performance impact on the prompt generation time.
-
-- **Common Mistakes to Avoid**: 
-  - Ensure that the `PromptContext` is fully populated before passing it to `generateUserPrompt`. Missing fields can lead to incomplete prompts.
-  - Be cautious when interpreting the AI's output; it may not always align perfectly with the expected documentation structure. Regular review and iteration on the prompt template may be necessary to improve results.
-
-## Developer Notes
-
+- **Technical Decisions**: The choice to use a structured prompt with clear sections allows for targeted responses from the AI. This design decision enhances the quality of the insights generated.
+- **Performance Considerations**: The function constructs the prompt in a straightforward manner, but be cautious with large files as they may lead to performance issues when generating or processing the prompt. Consider implementing pagination or chunking for very large codebases.
+- **Common Mistakes**: A common mistake is to overlook the importance of accurately populating the `PromptContext`. Ensure that all fields are filled correctly to avoid generating misleading or incomplete prompts. Additionally, be cautious with the formatting of the code block to prevent syntax errors in the generated prompt.

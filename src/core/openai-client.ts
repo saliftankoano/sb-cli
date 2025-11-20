@@ -8,6 +8,7 @@ import {
 import { sleep } from "../utils/sleep.js";
 
 export interface AnalysisResult {
+  insights: string[]; // Key insights as numbered list for terminal display
   markdown: string;
   metadata: {
     tags: string[];
@@ -30,7 +31,7 @@ export class OpenAIClient {
   }
 
   /**
-   * Analyze a file with OpenAI
+   * Analyze a file with OpenAI using structured JSON output
    */
   async analyze(context: PromptContext): Promise<AnalysisResult> {
     const userPrompt = generateUserPrompt(context);
@@ -44,14 +45,43 @@ export class OpenAIClient {
           { role: "system", content: SYSTEM_PROMPT },
           { role: "user", content: userPrompt },
         ],
+        response_format: {
+          type: "json_schema",
+          json_schema: {
+            name: "code_analysis",
+            strict: true,
+            schema: {
+              type: "object",
+              properties: {
+                insights: {
+                  type: "array",
+                  description:
+                    "Array of 3-5 key insights about this file (purpose, gotchas, critical details)",
+                  items: {
+                    type: "string",
+                  },
+                },
+                markdown: {
+                  type: "string",
+                  description: "Full markdown documentation with all sections",
+                },
+              },
+              required: ["insights", "markdown"],
+              additionalProperties: false,
+            },
+          },
+        },
       });
 
-      const markdown = response.choices[0].message.content || "";
+      const content = response.choices[0].message.content || "{}";
+      const parsed = JSON.parse(content);
+
       const tags = this.extractTags(context);
       const importance = this.calculateImportance(context);
 
       return {
-        markdown,
+        insights: parsed.insights || ["No insights available"],
+        markdown: parsed.markdown || "",
         metadata: { tags, importance },
       };
     } catch (error: any) {

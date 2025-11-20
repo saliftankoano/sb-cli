@@ -69,7 +69,14 @@ ${dependents.map((d) => `- ${d}`).join("\n")}
   }
 
   prompt += `
-Generate markdown documentation with these sections:
+Return a JSON response with two fields:
+1. "insights": An array of 3-5 key insights about this file as concise bullet points:
+   - What this file does (purpose in one sentence)
+   - Critical gotchas or non-obvious behaviors
+   - Important performance considerations or edge cases
+   - How it fits in the larger system
+   - Key decisions or patterns worth noting
+2. "markdown": Full markdown documentation with these sections:
 
 ## Purpose
 [What this file does - 1-2 sentences]
