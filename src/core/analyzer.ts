@@ -333,11 +333,11 @@ export async function analyzeCommit(): Promise<void> {
     console.log(analysisContextBox(stagedFiles.length, analysisResults.length));
 
     // Show AI Insights Summary
-    console.log(chalk.cyan.bold("Code Insights Summary:\n"));
+    console.log(chalk.magenta.bold("Code Insights Summary:\n"));
     analysisResults.forEach((result, fileIndex) => {
-      console.log(chalk.white(`${chalk.bold(result.file)}:`));
+      console.log(chalk.magenta(`${chalk.bold(result.file)}:`));
       result.analysis.insights.forEach((insight, insightIndex) => {
-        console.log(chalk.dim(`  ${insightIndex + 1}. ${insight}`));
+        console.log(chalk.white(`  ${insightIndex + 1}. ${insight}`));
       });
       if (fileIndex < analysisResults.length - 1) {
         console.log(""); // Add spacing between files
