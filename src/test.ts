@@ -28,6 +28,15 @@ function validateEmail3(email: string): boolean {
 
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
+
+function validateEmail4(email: string): boolean {
+  if (!email || typeof email !== "string" || email.length === 0) {
+    return false;
+  }
+
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
 console.log(formatName1("John", "Doe"));
 console.log(validateEmail1("test@example.com"));
 console.log(formatName2("John", "Doe"));
