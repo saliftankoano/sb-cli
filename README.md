@@ -34,6 +34,7 @@ npm install -g @startblock-ai/cli
 
 ```bash
 sb --help
+sb --version  # Check installed version
 ```
 
 ---
@@ -42,7 +43,19 @@ sb --help
 
 Get up and running in seconds.
 
-1.  **Initialize in your repository:**
+### For New Repositories
+
+1.  **Clone and install:**
+
+    ```bash
+    git clone your-repo
+    cd your-repo
+    npm install
+    ```
+
+    _If the repo has Startblock configured, onboarding runs automatically after `npm install`!_
+
+2.  **Or initialize manually:**
 
     ```bash
     cd your-project
@@ -50,6 +63,16 @@ Get up and running in seconds.
     ```
 
     _This sets up the git hooks and prompts you for your OpenAI API key._
+
+### For Existing Repositories
+
+1.  **Run onboarding:**
+
+    ```bash
+    sb onboard
+    ```
+
+    _This analyzes key files and generates onboarding documentation._
 
 2.  **Commit code as usual:**
 
@@ -67,6 +90,25 @@ Get up and running in seconds.
 
 ## 🛠️ How It Works
 
+### Automatic Onboarding
+
+When you clone a repository with Startblock enabled and run `npm install`, the `postinstall` script automatically invites you to run `sb onboard`. This:
+
+1.  **Collects your goals** - What are you trying to accomplish? What's your experience level?
+2.  **AI selects best files** - Intelligently chooses ~5 files most relevant to your goal
+3.  **Analyzes and documents** - Generates knowledge files for those selected files
+4.  **Creates onboarding docs** - Living documentation in `.startblock/onboarding/` (INDEX.md, SETUP.md, ARCHITECTURE.md, etc.)
+5.  **Saves session** - Stores your onboarding context in `.startblock/sessions/` (never committed)
+6.  **Continue in Cursor** - Use Startblock's MCP in Cursor chat for personalized, conversational onboarding
+
+**The onboarding experience:**
+
+- **CLI**: Run `sb onboard` to get started with personalized file selection and analysis
+- **Cursor Chat**: Continue onboarding conversationally - Startblock uses your session data to guide you through the codebase
+- **Living Docs**: Onboarding docs evolve as you learn - they're never overwritten, only refined
+
+### Commit-Time Analysis
+
 1.  **You Commit**: `git commit -m "..."`
 2.  **Analysis**: AI scans your staged files to understand purpose and dependencies.
 3.  **Context**: You see a summary of what's changing.
@@ -81,6 +123,23 @@ Get up and running in seconds.
 - "Lazy" developers who hate writing documentation manually (we got you!).
 
 ---
+
+## 📋 Commands
+
+- `sb init` - Initialize Startblock in current repository
+- `sb onboard` - Run personalized onboarding (collects your goals, AI-selects files, generates docs)
+- `sb onboard --postinstall` - Non-blocking onboarding invitation after npm install (used automatically)
+- `sb analyze-commit` - Analyze staged files (used by Husky hook)
+- `sb setup-onboarding` - Configure automatic onboarding for maintainers (adds postinstall script)
+- `sb --version` or `sb -v` - Show CLI version
+- `sb --help` or `sb -h` - Show help message
+
+**Onboarding Flow:**
+
+1. Run `sb onboard` - Answer a few questions about your goals and experience
+2. CLI analyzes AI-selected files and generates knowledge docs
+3. Continue in Cursor chat - Startblock's MCP uses your session to guide personalized onboarding
+4. Docs evolve - Onboarding documentation improves with each session
 
 ## ⚙️ Configuration
 

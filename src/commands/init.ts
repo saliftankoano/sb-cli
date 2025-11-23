@@ -13,6 +13,7 @@ import {
   infoMessage,
   promptMessage,
 } from "../utils/intro.js";
+import { setupOnboardingCommand } from "./setup-onboarding.js";
 
 const execAsync = promisify(exec);
 
@@ -280,6 +281,20 @@ export async function initCommand(): Promise<void> {
         "# Startblock\n.sb-config.json\n.startblock/.sb-cache/\n"
       );
       spinner.success({ text: successMessage("Created .gitignore") });
+    }
+
+    // Setup automatic onboarding if package.json exists
+    if (hasPackageJson) {
+      spinner.stop();
+      try {
+        await setupOnboardingCommand();
+      } catch (error: any) {
+        console.log(chalk.yellow("⚠ Onboarding setup skipped:"), error.message);
+        console.log(
+          chalk.dim("  You can run 'sb setup-onboarding' manually later.")
+        );
+      }
+      spinner.start();
     }
 
     // Success message

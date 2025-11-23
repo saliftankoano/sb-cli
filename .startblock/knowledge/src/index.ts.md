@@ -1,7 +1,7 @@
 ---
 filePath: src/index.ts
-fileVersion: 01e483e18209114aa06826fff365db6ae0de0554
-lastUpdated: '2025-11-16T21:50:03.664Z'
+fileVersion: 08cc52b1dfb725ea758537cdb64876d71d13fdd3
+lastUpdated: '2025-11-23T21:59:29.463Z'
 updatedBy: sb-cli
 tags:
   - src
@@ -11,28 +11,26 @@ extractedBy: sb-cli@1.0.0
 model: gpt-4o-mini
 humanVerified: false
 ---
-# Documentation for `src/index.ts`
-
 ## Purpose
-This file serves as the entry point for a command-line interface (CLI) tool that automates knowledge capture for codebases, allowing users to initialize the tool, analyze commit messages, and simulate an introductory animation.
+This file serves as the entry point for a command-line interface (CLI) tool that facilitates onboarding and knowledge capture for codebases.
 
 ## Key Functionality
-- **main()**: The primary function that orchestrates command execution based on user input.
-- **showHelp()**: Displays usage instructions and examples for the CLI commands.
-- **analyzeCommitCommand()**: Analyzes staged files when invoked, particularly useful in a pre-commit hook context.
+- `main()`: The main function that processes command-line arguments and executes the corresponding command.
+- `getVersion()`: Retrieves the version of the CLI from the `package.json` file.
+- `showHelp()`: Displays help information and usage examples for the CLI commands.
 
 ## Gotchas
-- **Argument Handling**: The `analyze-commit` command previously expected a file path as an argument, but the recent change indicates that it now operates without any arguments when invoked as a pre-commit hook. Ensure that the `analyzeCommitCommand` function is capable of handling this scenario correctly.
-- **Error Handling**: Any unhandled exceptions in the `main` function will result in a non-zero exit code, which is standard for CLI applications but can lead to confusion if not documented. Ensure that all potential errors are caught and logged appropriately.
-- **Command Recognition**: The CLI will exit with an error message if an unrecognized command is provided. Users should be aware that commands are case-sensitive.
+- The `--postinstall` flag in the `onboard` command can lead to unexpected behavior if not documented properly, as it alters the command's execution context.
+- Error handling in the `main` function catches all errors generically, which may obscure specific issues; consider more granular error handling for better debugging.
+- The command parsing logic is simplistic; adding more robust validation could prevent runtime errors due to typos or unsupported commands.
 
 ## Dependencies
-- **chalk**: This library is used for styling console output, enhancing user experience by making error messages and help text more readable. It is crucial for providing clear feedback to the user.
+- `chalk`: Used for styling console output, enhancing readability and user experience.
+- `fs`, `url`, and `path`: Node.js core modules used for file system operations and path manipulations, essential for reading the `package.json` file and determining the CLI's directory context.
 
 ## Architecture Context
-This file is part of a larger CLI tool designed to integrate with Git workflows, specifically targeting developers who want to automate knowledge capture during code changes. The modular command structure allows for easy expansion and maintenance of additional commands in the future.
+This file is part of a larger CLI tool designed to automate onboarding processes and knowledge capture in software projects. It integrates various commands that interact with the codebase, providing a cohesive user experience for developers.
 
 ## Implementation Notes
-- **Command Structure**: The switch-case structure in the `main` function allows for easy addition of new commands. When adding new commands, ensure that they are registered in the command list and that any necessary error handling is implemented.
-- **Performance Considerations**: The CLI tool is designed to be lightweight and efficient. However, if the `analyzeCommitCommand` function performs extensive file I/O or complex analysis, it may introduce latency. Consider optimizing file access patterns or using asynchronous processing where applicable.
-- **Common Mistakes**: When modifying command behaviors, ensure that any changes to argument expectations are reflected in both the implementation and the documentation. This prevents discrepancies that can lead to user errors.
+- The `getVersion` function reads the `package.json` synchronously, which can block the event loop; consider using asynchronous file reading for improved performance in larger applications.
+- The switch-case structure in `main()` allows for easy expansion of commands, but careful attention should be paid to maintainability as more commands are added.

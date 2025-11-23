@@ -78,3 +78,10 @@ export function infoMessage(text: string): string {
 export function promptMessage(text: string): string {
   return gradient(["#a855f7", "#3b82f6"])(`\n${text}`);
 }
+
+/**
+ * Brand color gradient helper - use instead of chalk.cyan for consistency
+ */
+export function brandColor(text: string): string {
+  return gradient(["#a855f7", "#3b82f6"])(text);
+}

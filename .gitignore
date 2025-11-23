@@ -10,3 +10,4 @@ dist/
 # Startblock
 .sb-config.json
 .startblock/.sb-cache/
+.startblock/sessions/

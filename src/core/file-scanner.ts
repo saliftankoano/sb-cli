@@ -34,19 +34,31 @@ export async function filterRelevantFiles(
   // Add config exclude patterns
   ig.add(config.analysis.excludePatterns);
 
-  return files.filter((file) => {
+  // Check each file exists and matches criteria
+  const validFiles: string[] = [];
+
+  for (const file of files) {
     // Check ignore patterns
     if (ig.ignores(file)) {
-      return false;
+      continue;
     }
 
     // Check file extension
     if (!matchesExtensions(file, config.analysis.fileExtensions)) {
-      return false;
+      continue;
     }
 
-    return true;
-  });
+    // Check file actually exists
+    const fullPath = path.join(repoRoot, file);
+    if (!(await fileExists(fullPath))) {
+      console.warn(`⚠️  File selected by AI does not exist: ${file}`);
+      continue;
+    }
+
+    validFiles.push(file);
+  }
+
+  return validFiles;
 }
 
 /**

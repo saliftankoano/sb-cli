@@ -1,12 +1,30 @@
 #!/usr/bin/env node
 
 import chalk from "chalk";
+import { readFileSync } from "fs";
+import { fileURLToPath } from "url";
+import { dirname, join } from "path";
 import { initCommand } from "./commands/init.js";
 import { analyzeCommitCommand } from "./commands/analyze-commit.js";
 import { simulateIntroCommand } from "./commands/simulate-intro.js";
+import { onboardCommand } from "./commands/onboard.js";
+import { setupOnboardingCommand } from "./commands/setup-onboarding.js";
 
 const args = process.argv.slice(2);
 const command = args[0];
+
+// Get version from package.json
+function getVersion(): string {
+  try {
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = dirname(__filename);
+    const packagePath = join(__dirname, "..", "package.json");
+    const packageJson = JSON.parse(readFileSync(packagePath, "utf-8"));
+    return packageJson.version;
+  } catch {
+    return "unknown";
+  }
+}
 
 async function main() {
   try {
@@ -22,6 +40,21 @@ async function main() {
 
       case "sim-intro":
         await simulateIntroCommand();
+        break;
+
+      case "onboard":
+        // Check if --postinstall flag is present
+        const isPostinstall = args.includes("--postinstall");
+        await onboardCommand(isPostinstall);
+        break;
+
+      case "setup-onboarding":
+        await setupOnboardingCommand();
+        break;
+
+      case "--version":
+      case "-v":
+        console.log(`v${getVersion()}`);
         break;
 
       case "--help":
@@ -54,6 +87,16 @@ function showHelp() {
   );
   console.log(
     "  " +
+      chalk.cyan("sb onboard") +
+      "          Run onboarding (analyzes repo and generates docs)"
+  );
+  console.log(
+    "  " +
+      chalk.cyan("sb setup-onboarding") +
+      "  Configure automatic onboarding via npm postinstall"
+  );
+  console.log(
+    "  " +
       chalk.cyan("sb analyze-commit") +
       "  Analyze staged files (used by Husky hook)"
   );
@@ -61,13 +104,19 @@ function showHelp() {
     "  " + chalk.cyan("sb sim-intro") + "         Simulate the intro animation"
   );
   console.log(
-    "  " + chalk.cyan("sb --help") + "          Show this help message\n"
+    "  " + chalk.cyan("sb --help") + "          Show this help message"
   );
+  console.log("  " + chalk.cyan("sb --version") + "       Show CLI version\n");
   console.log("Examples:");
   console.log("  " + chalk.dim("cd your-project"));
   console.log("  " + chalk.dim("sb init"));
   console.log(
     "  " + chalk.dim('git commit -m "feat: new feature"  # Auto-analyzes!')
+  );
+  console.log("  " + chalk.dim("sb onboard  # Start personalized onboarding"));
+  console.log(
+    "  " +
+      chalk.dim("npm install  # Auto-onboards after install (if configured)")
   );
   console.log();
 }
