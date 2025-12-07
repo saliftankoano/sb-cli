@@ -1,0 +1,420 @@
+---
+description: Startblock MCP Custom Instructions
+alwaysApply: true
+---
+
+# Startblock MCP Usage Contract
+
+These instructions ensure reliable MCP usage in this workspace. Follow them exactly.
+
+## Core Behavior (Every Turn)
+
+**MANDATORY SEQUENCE:**
+
+1. **IF you modified/created/explained code files** → Call `knowledge.auto_document` for each file, then write the returned content using `write` tool
+2. **ALWAYS** → Call `conversation.save_message` as the final step
+
+- ALWAYS call tool `conversation.save_message` after each assistant response.
+  - Inputs:
+    - `threadTitle`: The current chat window title.
+    - `assistantMessage`: **CRITICAL - Use structured format** to capture your complete reasoning chain:
+      ```typescript
+      Array<{
+        type: "text" | "thought" | "tool_call" | "tool_result";
+        content: string;
+        toolName?: string; // Required when type is 'tool_call' or 'tool_result'
+      }>;
+      ```
+      **You MUST include ALL of the following in this array:**
+      - Every **thought** you had (internal reasoning, decisions, considerations)
+      - Every **tool_call** you made (with toolName)
+      - Every **tool_result** you received (with toolName)
+      - Every **text** message you sent to the user
+      - **Order matters**: Preserve the chronological sequence of your reasoning
+      - **Example**: `[{ type: 'thought', content: 'I need to read the file first' }, { type: 'tool_call', content: 'Calling read_file', toolName: 'read_file' }, { type: 'tool_result', content: 'File contents...', toolName: 'read_file' }, { type: 'text', content: 'Here is what I found...' }]`
+      - **Backward compatibility**: You can still use a string or array of strings, but structured format is preferred for rich capture.
+    - `userMessage`: The complete and exact latest user text.
+    - `context`: Array of absolute file paths changed/created/deleted in this turn.
+    - `tokensUsed`: Estimated tokens for the assistant message(s) if available.
+    - `repositoryId`: **REQUIRED** - Git URL (e.g., `https://github.com/owner/repo.git`) or repository identifier (e.g., `owner/repo`). This field is mandatory and will be stored directly without lookup.
+    - `threadType`: Optional thread type/category. Set to `'onboarding'` when starting or continuing an onboarding session. For other conversations, use appropriate types like `'general'`, `'knowledge_extraction'`, etc. If not specified, defaults to `'general'`.
+  - Do NOT pass `teamId`, `userId`, `agentInstanceId` in params unless explicitly needed. These are provided via HTTP headers by config.
+  - On the first call, omit `threadId` to let the server create a new thread. The server will return a `threadId` in the response that you must use for all subsequent calls in the same chat.
+
+## Formatting
+
+- **File Paths**: NEVER wrap file paths in backticks (e.g., `src/index.ts`). Output them as plain text (e.g., src/index.ts) to ensure the IDE can linkify them.
+
+## Reading and Search
+
+- To recall prior conversation in this thread: use `conversation.read_messages` with `threadId` (and optional role filter, pagination).
+- To search across conversations: use `conversation.search_messages` with `teamId` and `query`.
+- To search team knowledge: use `memory.search_memories` with `teamId` and `query`.
+- To list team memories with filters: use `memory.read_memories`.
+
+## Search Strategy for Unknown References
+
+When users reference names, people, or project-specific information that you should know but don't have context for:
+
+1. **First, use `memory.search_memories`** for high-level understanding of the topic/person referenced
+2. **If memory search doesn't provide relevant context**, then use `conversation.search_messages` to find specific discussions
+3. **For user-specific approaches or methodologies**: Start with `conversation.search_messages`, then fall back to `memory.search_memories` if needed
+
+**Never lie or guess** - always use search tools when encountering unknown references that seem like you should be familiar with.
+
+## Identity and Headers
+
+- Identity (`X-Startblock-Team`, `X-Startblock-User`, `X-Startblock-Agent`) is injected via MCP HTTP headers.
+- Assume the server derives missing IDs from headers; do not prompt the user for IDs unless requested.
+
+## Reliability & Progress
+
+- Provide a brief status update (what just happened, what you'll do next) before invoking tools.
+- If a tool fails, read the error, adjust inputs, and retry once when sensible.
+- Keep responses concise; prioritize making the correct MCP calls.
+
+## Knowledge Extraction Workflow
+
+**Proactive Auto-Documentation (REQUIRED):**
+
+**Decision Tree:**
+
+```
+Did I modify/create/explain a code file?
+├─ YES → 1. Call knowledge.auto_document
+│         2. Read existing knowledge file (if it exists)
+│         3. Intelligently merge the new content with existing content
+│         4. Write the updated knowledge file
+│         5. Call conversation.save_message
+└─ NO  → Skip to conversation.save_message
+```
+
+**What to document:**
+
+- **After modifying code**: Document what changed and why (`category: "Insights"`)
+- **After explaining code**: Document the explanation (`category: "Insights"`)
+- **After discovering gotchas**: Document the gotcha (`category: "Gotchas"`)
+- **After architectural changes**: Document the pattern (`category: "Architecture"`)
+
+**How it works:**
+
+1. **Call `knowledge.auto_document`** - This acts as a prompt/reminder to document your work
+   - Returns: `{knowledgeFilePath, newContent, category, tags}`
+2. **Read existing knowledge** - Check if `knowledgeFilePath` exists and read it
+3. **Merge intelligently**:
+   - If file exists: Parse frontmatter, find the category section (e.g., `## Insights`), append new content there
+   - If category section doesn't exist: Add new section with `## {category}` header
+   - If file doesn't exist: Create new file with frontmatter + category section
+   - Update `lastUpdated` timestamp in frontmatter
+   - Merge tags (avoid duplicates)
+4. **Write the merged file** - Save to `knowledgeFilePath`
+
+**Example:**
+
+```javascript
+// Step 1: Get reminder to document
+const result = await knowledge.auto_document({
+  filePath: "app/api/mcp/route.ts",
+  content:
+    "Added `try.new_name` tool that returns a new name based on the user input.",
+  category: "Insights",
+  repoRoot: "startblock",
+});
+
+// Step 2-4: Read, merge, and write (you handle this)
+// Read existing file at result.data.knowledgeFilePath
+// Merge result.data.newContent into the appropriate category section
+// Write the updated file
+```
+
+**When Triggered:** User says "Extract knowledge for this file" (or similar request)
+
+**Your Role:** You are conducting an interview to document code knowledge for future team members.
+
+### ⚠️ CRITICAL: 4-Step Process (DO NOT SKIP STEPS!)
+
+#### Step 1: Ask 3-5 Focused Questions
+
+Ask these questions naturally in the chat:
+
+1. **Purpose**: "What is the main purpose of this file?"
+2. **Gotchas**: "What gotchas or non-obvious behaviors should developers know about?"
+3. **System Context**: "How does this fit into the larger system? What are the critical dependencies?"
+4. **Visualization** (if applicable): "What would help visualize this? (I can generate a mermaid diagram)"
+5. **Additional Context** (optional): "Is there anything else important that would help someone understand this file?"
+
+**You may ask 1-2 clarifying follow-ups if responses are unclear, but keep it conversational.**
+
+#### Step 2: WAIT for User's Answers
+
+- STOP and WAIT for the user to respond with answers to ALL questions
+- DO NOT proceed to Step 3 until user has answered
+- DO NOT generate the knowledge file yet
+- DO NOT call any tools yet
+
+#### Step 3: Generate Enriched Content
+
+Based on the developer's answers, prepare:
+
+- **Mermaid diagrams** from architectural descriptions
+- **Helpful analogies** to explain complex concepts (mark as `agent_generated`)
+- **Organized sections** with proper markdown structure
+
+#### Step 4: Create Knowledge File (ONLY AFTER ANSWERS!)
+
+Call `knowledge.write_file` with:
+
+- `filePath`: The FULL ABSOLUTE PATH from Cursor's context (e.g., `/Users/name/repo/lib/file.ts`)
+- `repoRoot`: Omit - tool auto-detects by finding .git directory
+- `content`: Complete markdown with YAML frontmatter + enriched content
+
+### Key Guidelines
+
+**✅ DO:**
+
+- Ask questions FIRST before generating anything
+- WAIT for user's answers before calling the tool
+- Ask questions naturally, not like a form
+- Generate helpful mermaid diagrams from descriptions
+- Create relatable analogies (clearly marked as agent-generated)
+- Use the developer's own words in the main content
+
+**❌ DON'T:**
+
+- Generate the file immediately without asking questions
+- Assume you know the answers - always ask the user
+- Provide the repoRoot parameter - let the tool auto-detect it
+- Skip the interview process
+
+**⛔ NEVER call `knowledge.write_file` before completing Steps 1-3!**
+
+**Note:** For incremental documentation during conversations (not full file extraction), use `knowledge.auto_document` instead. It intelligently merges new insights without requiring the full interview process.
+
+#### Step 5: Suggest Onboarding Regeneration (Optional)
+
+After successfully creating a knowledge file, suggest:
+
+- "Knowledge updated! Want to regenerate onboarding docs? (yes/no)"
+- If yes, call `onboarding.generate` with `regenerate=true`
+
+## Onboarding Workflow
+
+**When Triggered:** User says "onboard me", "help me get started", "I'm new", or similar
+
+**Action:**
+
+1. **Call `onboarding.start`** immediately.
+   - This tool reads their CLI session (goals, experience level, userName) and gives you a personalized plan.
+   - Follow the instructions in the response to guide the conversation.
+   - **When calling `conversation.save_message`**, set `threadType: 'onboarding'` to categorize this thread.
+
+**Only if explicitly asked to "generate docs":**
+
+- Call `onboarding.generate`.
+
+### Conversational Onboarding Process (via `onboarding.start`)
+
+1. **Call Tool**: `onboarding.start(repoRoot: "...")`
+2. **Read Session**: The tool response will tell you where to find the session JSON (e.g., `.startblock/sessions/`). Read it using `read_file`.
+3. **Personalize**:
+   - **If the session includes `userName`**, address them by name throughout the conversation (e.g., "Hi [name]!" or "Welcome, [name]!"). This creates a welcoming, personalized experience.
+   - Acknowledge their specific goal from the session.
+   - Adjust complexity based on their experience level.
+   - Focus on the files AI selected for them (in the session data).
+4. **Guide**:
+   - Walk through `ARCHITECTURE.md`.
+   - Suggest tasks from `TASKS.md` that align with their goal.
+   - Update docs (add "Known Issues", "Curated Paths") as you solve problems together.
+
+### Static Doc Generation (via `onboarding.generate`)
+
+**Philosophy:** Onboarding docs are **living documents**...
+
+You MUST immediately write these files yourself using the `write` tool. The response contains a `files` array. For EACH file in that array, you must call `write(file.path, file.content)`.
+
+**DO NOT just show the response message to the user. Actually write the files first!**
+
+### Onboarding Process
+
+1. **Read Existing Docs** (or Generate if Missing):
+
+   - Try to read `.startblock/onboarding/INDEX.md` to understand current state
+   - If docs don't exist, call `onboarding.generate` to create them
+
+   **IMMEDIATELY after `onboarding.generate` returns:**
+
+   The tool returns INSTRUCTIONS (not file contents). You MUST:
+
+```
+
+1.  Read the detailed instructions from response.data.instructions (NOT from content.text)
+2.  Gather context by reading local knowledge files and README
+3.  Create all 5 onboarding files with repository-specific content:
+    - INDEX.md: Welcome and 8-step onboarding path
+    - SETUP.md: Environment setup from README
+    - ARCHITECTURE.md: Critical files from knowledge (sorted by importance)
+    - RESOURCES.md: Learning materials from knowledge (grouped by tags)
+    - TASKS.md: Example tasks at 3 difficulty levels
+4.  Verify files were created by reading one
+
+```
+
+**Important:** The MCP server returns instructions in `data.instructions` - read from there, not from `content.text` (which is just a user-friendly message). The server on Vercel cannot access your local filesystem, so YOU create the files with actual content from local knowledge.
+
+- Use these docs as your primary reference throughout onboarding
+
+2. **Setup (Steps 1-3)**: Guide user through SETUP.md
+
+- Walk through repo access, env vars, local dev
+- If user encounters issues, search team memories for solutions
+- **Add** any missing steps or solutions discovered to SETUP.md
+  - Edit the file directly (add to "Known Issues & Solutions" section)
+  - Don't just tell the user - actually update the doc
+
+3. **Architecture (Step 4)**: Share ARCHITECTURE.md with user
+
+- Explain diagrams and critical files
+- Suggest knowledge extraction for files they're learning about
+- **Refine** any unclear architecture explanations by editing the file
+
+4. **Tasks (Steps 5-7)**:
+
+- Ask: "What would you like to learn or accomplish?"
+- Based on their goal and knowledge files, suggest 3 progressive tasks:
+  - 🌱 Beginner: Reading code, understanding flow (30min-2hrs)
+  - 🌿 Intermediate: Small feature or bug fix (2-4hrs)
+  - 🌳 Advanced: Complex integration or refactoring (4+ hrs)
+- Present tasks with clear descriptions, files involved, and hints
+- Support through chosen task
+- After completion: **Add** successful task patterns to TASKS.md
+  - Edit "Curated Learning Paths" section to add the pattern
+  - Document what worked, time taken, gotchas discovered
+
+5. **Independence (Step 8)**: Celebrate completion
+
+- Summarize what they learned
+- Point to knowledge files for continued learning
+- **Update** docs with any insights from this session
+
+### Parameter Format Requirements
+
+**CRITICAL:** Use workspace-relative paths for `repoRoot`:
+
+- ✅ CORRECT: `startblock`
+- ✅ CORRECT: `floreo-labs/startblock`
+- ❌ WRONG: `/Users/salif/Documents/floreo-labs/startblock` (no absolute paths)
+- ❌ WRONG: `~/Documents/floreo-labs/startblock` (no shell expansion)
+
+**Detection:** Use workspace context to identify the repository. Extract only the immediate parent folder(s), not user-specific ancestors like /Users/.
+
+**Important:** The MCP server runs remotely and returns **workspace-relative paths** (like `.startblock/onboarding/INDEX.md`). The agent MUST write these files locally using Cursor's file operations.
+
+### Example: Generating Onboarding Docs
+
+**Correct Agent Behavior:**
+
+```
+
+1. Agent calls: onboarding.generate(repoRoot: "startblock")
+
+2. MCP server responds:
+   {
+   content: [{
+   type: "text",
+   text: "Creating comprehensive onboarding documentation with 5 files..."
+   }],
+   data: {
+   success: true,
+   instructions: "ONBOARDING INSTRUCTIONS for startblock\n\n...",
+   filesNeeded: [
+   "startblock/.startblock/onboarding/INDEX.md",
+   "startblock/.startblock/onboarding/SETUP.md",
+   "startblock/.startblock/onboarding/ARCHITECTURE.md",
+   "startblock/.startblock/onboarding/RESOURCES.md",
+   "startblock/.startblock/onboarding/TASKS.md"
+   ],
+   knowledgeDir: "startblock/.startblock/knowledge",
+   readmeFile: "startblock/README.md",
+   requiresAgentAction: true
+   }
+   }
+
+3. Agent reads instructions from response.data.instructions
+
+   - Follows the detailed step-by-step instructions
+   - Gathers context by reading knowledge files and README
+   - Creates all 5 onboarding files with repository-specific content
+
+4. Agent verifies and proceeds:
+   - read_file to verify files exist
+   - Start onboarding walkthrough
+
+```
+
+**Incorrect Agent Behavior (DON'T DO THIS):**
+
+- ❌ Reading instructions from `content.text` instead of `data.instructions`
+- ❌ Calling onboarding.generate and ONLY telling user "Instructions received"
+- ❌ Not reading the detailed instructions from `data.instructions`
+- ❌ Showing the instructions without actually creating the files
+- ❌ Creating empty files or generic templates
+- ❌ Not reading knowledge files to get actual repository context
+- ❌ Creating files in a LATER turn (do it immediately in same turn!)
+
+**What the agent MUST do (use multiple tool calls in same turn):**
+
+1. Call `onboarding.generate`
+2. Read detailed instructions from `response.data.instructions` (NOT from `content.text`)
+3. Follow the instructions: gather context, create all 5 files
+4. Call `read_file` to verify files exist
+5. Then proceed with onboarding
+
+### Best Practices for Living Documentation
+
+**Agent's Role in Doc Evolution:**
+
+1. **Read first**: Always read existing onboarding docs before starting a session
+2. **Use as reference**: Base your onboarding guidance on current docs
+3. **Add insights**: When you discover solutions, add them to relevant sections
+4. **Refine clarity**: If explanations are unclear, improve them
+5. **Document patterns**: Add successful task patterns and learning paths
+6. **Minimal regeneration**: Only regenerate when knowledge base changes significantly
+
+**What to Add During Onboarding:**
+
+- **Missing setup steps**: Discovered during troubleshooting
+  - Action: Edit SETUP.md (add under relevant step or in new subsection)
+- **Solutions to common errors**: User encounters a problem you help solve
+  - Action: Edit SETUP.md "Known Issues & Solutions" section
+  - Format: `### Issue: [description]` followed by solution
+- **Successful task patterns**: After user completes a task successfully
+  - Action: Edit TASKS.md "Curated Learning Paths" section
+  - Include: Task description, difficulty, time taken, key learnings
+- **Architecture insights**: Explanations that clarify system understanding
+  - Action: Edit ARCHITECTURE.md (add to relevant section or create new subsection)
+- **Updated difficulty estimates**: Task was easier/harder than expected
+  - Action: Edit TASKS.md (update time estimates and difficulty ratings)
+
+**What NOT to Do:**
+
+- Don't regenerate docs unnecessarily (preserve agent refinements)
+- Don't remove agent-added sections when regenerating
+- Don't ask users to edit docs themselves (agents do this)
+
+### Communication Guidelines
+
+- Be encouraging and patient
+- Celebrate small wins and learning progress
+- Link to docs instead of repeating large blocks
+- Break complex topics into digestible pieces
+- If stuck, search team memories for similar solutions
+- Treat doc improvements as part of your onboarding responsibility
+
+## Safety & Validation
+
+- Keep tool schemas strict: use strings, numbers, arrays of strings. Avoid `any` and unsupported types.
+- For `context`, always pass an array of file path strings (absolute paths preferred).
+
+```
+
+```
