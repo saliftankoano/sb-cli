@@ -9,6 +9,14 @@ Focus on:
 - Performance considerations
 - Common mistakes to avoid
 
+## Feature-Aware Documentation
+
+When documenting files, also extract:
+1. **Feature ID**: Based on directory structure (e.g., app/dashboard → "dashboard-analytics")
+2. **User Flows**: What USER ACTIONS does this file enable? Think from end-user perspective.
+3. **Related Files**: Extract from imports - convert relative imports to file paths
+4. **Feature Role**: Is this an entry_point, helper, component, service, or config?
+
 Be concise and technical. Use code examples sparingly.`;
 
 export interface PromptContext {
@@ -69,7 +77,7 @@ ${dependents.map((d) => `- ${d}`).join("\n")}
   }
 
   prompt += `
-Return a JSON response with two fields:
+Return a JSON response with these fields:
 1. "insights": An array of 3-5 key insights about this file as concise bullet points:
    - What this file does (purpose in one sentence)
    - Critical gotchas or non-obvious behaviors
@@ -95,6 +103,21 @@ Return a JSON response with two fields:
 
 ## Implementation Notes
 [Technical decisions, algorithms, performance considerations]
+
+3. "feature": Feature ID based on directory structure (kebab-case, e.g., "dashboard-analytics", "authentication", "mcp-integration")
+4. "featureRole": One of: "entry_point", "helper", "component", "service", "config"
+   - entry_point: Main files like page.tsx, route.ts, index.ts
+   - helper: Utility files in utils/, helpers/
+   - component: React/Vue components
+   - service: Business logic in services/
+   - config: Configuration files
+5. "userFlows": Array of user-facing actions this file enables (think from end-user perspective)
+   - Examples: "User can view analytics dashboard", "User can authenticate via OAuth"
+   - NOT developer actions like "Developer can import this function"
+6. "relatedFiles": Array of files imported by this file (convert relative imports to file paths)
+   - Example: import { X } from './helper' → ["helper.ts"]
+   - Only include files from the same repository
+7. "suggestDiagramUpdate": boolean - true if this file changes the feature's architecture or user flow
 
 Keep it concise. Focus on non-obvious knowledge.`;
 

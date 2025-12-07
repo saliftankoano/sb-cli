@@ -16,6 +16,16 @@ import {
 } from "./dependency-graph.js";
 import { OpenAIClient } from "./openai-client.js";
 import { writeKnowledgeFile, readKnowledgeFile } from "./knowledge-writer.js";
+import {
+  featureIdToName,
+  inferFeatureCategory,
+  updateFeatureEntry,
+} from "./features.js";
+import {
+  generateMermaidFromUserFlows,
+  generateMermaidJourney,
+  generateMermaidSequence,
+} from "./mermaid-generator.js";
 import type { PromptContext } from "../prompts/templates.js";
 import type { AnalysisResult } from "./openai-client.js";
 import {
@@ -457,10 +467,12 @@ export async function analyzeCommit(): Promise<void> {
       }
     }
 
-    // Step 9: Write knowledge files and stage them
+    // Step 9: Write knowledge files, update features.json, and stage them
     const writeSpinner = createSpinner("Writing knowledge files...").start();
 
     const knowledgeFiles: string[] = [];
+    const featuresPath = path.join(repoRoot, ".startblock", "features.json");
+
     for (const result of analysisResults) {
       const knowledgePath = await writeKnowledgeFile(
         result.file,
@@ -472,10 +484,85 @@ export async function analyzeCommit(): Promise<void> {
         }
       );
       knowledgeFiles.push(knowledgePath);
+
+      // Update features.json if feature metadata is present
+      if (result.analysis.feature) {
+        try {
+          const userFlows = result.analysis.userFlows || [];
+          const relatedFiles = result.analysis.relatedFiles || [];
+
+          // Build filesByAction: map each user flow to files involved
+          // For now, each flow maps to the current file + its related files
+          // Future: AI could provide more granular mapping
+          const filesByAction: Record<string, string[]> = {};
+          const allFiles = [result.file, ...relatedFiles];
+
+          userFlows.forEach((flow) => {
+            filesByAction[flow] = allFiles;
+          });
+
+          // Generate diagrams only if we have userFlows and filesByAction
+          let mermaidDiagram: string | undefined;
+          let mermaidJourney: string | undefined;
+          let mermaidSequence: string | undefined;
+
+          if (userFlows.length > 0 && Object.keys(filesByAction).length > 0) {
+            const featureName = featureIdToName(result.analysis.feature);
+            mermaidJourney = generateMermaidJourney(featureName, userFlows);
+            mermaidSequence = generateMermaidSequence(
+              featureName,
+              userFlows,
+              filesByAction,
+              result.analysis.featureRole === "entry_point"
+                ? result.file
+                : undefined
+            );
+            // Keep legacy flowchart for backward compatibility
+            mermaidDiagram = generateMermaidFromUserFlows(
+              featureName,
+              userFlows,
+              allFiles
+            );
+          }
+
+          await updateFeatureEntry(repoRoot, {
+            id: result.analysis.feature,
+            name: featureIdToName(result.analysis.feature),
+            category: inferFeatureCategory(
+              result.file,
+              result.analysis.metadata.tags
+            ),
+            files: allFiles,
+            userFlows,
+            filesByAction,
+            mermaidDiagram,
+            mermaidJourney,
+            mermaidSequence,
+            tags: result.analysis.metadata.tags,
+            entryPoint:
+              result.analysis.featureRole === "entry_point"
+                ? result.file
+                : undefined,
+            // If the AI suggests an update, we should probably flag it or handle it.
+            // For now, we just ensure the file is linked to the feature.
+          });
+        } catch (err) {
+          // Don't fail the whole process if feature update fails
+          // But maybe log a warning if in debug mode
+        }
+      }
     }
 
-    // Step 10: Stage knowledge files
+    // Step 10: Stage knowledge files and features.json
     await git.addFiles(knowledgeFiles);
+
+    // Check if features.json exists before adding
+    try {
+      await fs.access(featuresPath);
+      await git.addFiles([featuresPath]);
+    } catch {
+      // features.json might not have been created if no features were found
+    }
 
     writeSpinner.success({
       text: chalk.green(

@@ -14,6 +14,11 @@ export interface SBConfig {
   output: {
     knowledgeDir: string;
   };
+  livekit?: {
+    url?: string;
+    apiKey?: string;
+    apiSecret?: string;
+  };
 }
 
 export const defaultConfig: SBConfig = {

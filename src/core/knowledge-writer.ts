@@ -14,6 +14,11 @@ export interface KnowledgeMetadata {
   extractedBy: string;
   model: string;
   humanVerified: boolean;
+  // Feature-aware fields
+  feature?: string;
+  featureRole?: "entry_point" | "helper" | "component" | "service" | "config";
+  userFlows?: string[];
+  relatedFiles?: string[];
 }
 
 /**
@@ -70,6 +75,11 @@ export async function writeKnowledgeFile(
     extractedBy: "sb-cli@1.0.0",
     model,
     humanVerified: existingData.data?.humanVerified || false,
+    // Feature-aware fields
+    feature: analysis.feature,
+    featureRole: analysis.featureRole,
+    userFlows: analysis.userFlows,
+    relatedFiles: analysis.relatedFiles,
   };
 
   const content = matter.stringify(analysis.markdown, metadata);

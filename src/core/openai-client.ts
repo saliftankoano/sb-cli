@@ -14,6 +14,12 @@ export interface AnalysisResult {
     tags: string[];
     importance: "low" | "medium" | "high" | "critical";
   };
+  // Feature-aware fields
+  feature?: string;
+  featureRole?: "entry_point" | "helper" | "component" | "service" | "config";
+  userFlows?: string[];
+  relatedFiles?: string[];
+  suggestDiagramUpdate?: boolean;
 }
 
 /**
@@ -65,8 +71,51 @@ export class OpenAIClient {
                   type: "string",
                   description: "Full markdown documentation with all sections",
                 },
+                feature: {
+                  type: "string",
+                  description:
+                    "Feature ID based on directory structure (kebab-case)",
+                },
+                featureRole: {
+                  type: "string",
+                  enum: [
+                    "entry_point",
+                    "helper",
+                    "component",
+                    "service",
+                    "config",
+                  ],
+                  description: "Role of this file in the feature",
+                },
+                userFlows: {
+                  type: "array",
+                  description: "User-facing actions this file enables",
+                  items: {
+                    type: "string",
+                  },
+                },
+                relatedFiles: {
+                  type: "array",
+                  description: "Files imported by this file",
+                  items: {
+                    type: "string",
+                  },
+                },
+                suggestDiagramUpdate: {
+                  type: "boolean",
+                  description:
+                    "True if this file changes the feature's architecture",
+                },
               },
-              required: ["insights", "markdown"],
+              required: [
+                "insights",
+                "markdown",
+                "feature",
+                "featureRole",
+                "userFlows",
+                "relatedFiles",
+                "suggestDiagramUpdate",
+              ],
               additionalProperties: false,
             },
           },
@@ -83,6 +132,11 @@ export class OpenAIClient {
         insights: parsed.insights || ["No insights available"],
         markdown: parsed.markdown || "",
         metadata: { tags, importance },
+        feature: parsed.feature,
+        featureRole: parsed.featureRole,
+        userFlows: parsed.userFlows || [],
+        relatedFiles: parsed.relatedFiles || [],
+        suggestDiagramUpdate: parsed.suggestDiagramUpdate || false,
       };
     } catch (error: any) {
       // Handle rate limiting
@@ -696,6 +750,123 @@ Return JSON with beginner, intermediate, and advanced arrays, each containing ob
         return this.chat(messages); // Retry
       }
       throw new Error(`OpenAI API error: ${error.message}`);
+    }
+  }
+
+  /**
+   * Rank features by relevance to user's goal
+   * Returns feature IDs sorted by relevance with reasoning
+   */
+  async rankFeatures(
+    goal: string,
+    features: Array<{
+      id: string;
+      name: string;
+      description: string;
+      category: string;
+      userFlows: string[];
+      tags: string[];
+    }>,
+    maxResults: number = 5
+  ): Promise<Array<{ id: string; reason: string }>> {
+    if (features.length === 0) {
+      return [];
+    }
+
+    const featuresSummary = features
+      .map(
+        (f) =>
+          `- ID: "${f.id}", Name: "${f.name}", Category: ${f.category}${
+            f.description ? `, Description: ${f.description}` : ""
+          }${
+            f.userFlows.length > 0
+              ? `, User Flows: [${f.userFlows.join(", ")}]`
+              : ""
+          }${f.tags.length > 0 ? `, Tags: [${f.tags.join(", ")}]` : ""}`
+      )
+      .join("\n");
+
+    const prompt = `You are helping a developer find the most relevant parts of a codebase.
+
+USER'S GOAL: "${goal}"
+
+AVAILABLE FEATURES:
+${featuresSummary}
+
+Select the ${Math.min(
+      maxResults,
+      features.length
+    )} most relevant features for achieving this goal.
+Consider:
+- Semantic similarity (e.g., "payment" relates to "billing")
+- User flows that match the goal
+- Tags and category relevance
+- Features the user would need to understand or modify
+
+Return the feature IDs in order of relevance, with a brief reason for each.`;
+
+    try {
+      const response = await this.client.chat.completions.create({
+        model: this.config.openai.model,
+        temperature: 0.3, // Lower temperature for more consistent ranking
+        max_tokens: 500,
+        messages: [
+          {
+            role: "system",
+            content:
+              "You are an expert at understanding developer intent and matching it to code features. Return only valid feature IDs from the provided list.",
+          },
+          { role: "user", content: prompt },
+        ],
+        response_format: {
+          type: "json_schema",
+          json_schema: {
+            name: "feature_ranking",
+            strict: true,
+            schema: {
+              type: "object",
+              properties: {
+                ranked: {
+                  type: "array",
+                  description: "Features ranked by relevance to the goal",
+                  items: {
+                    type: "object",
+                    properties: {
+                      id: {
+                        type: "string",
+                        description: "Feature ID from the provided list",
+                      },
+                      reason: {
+                        type: "string",
+                        description: "Brief reason for relevance",
+                      },
+                    },
+                    required: ["id", "reason"],
+                    additionalProperties: false,
+                  },
+                },
+              },
+              required: ["ranked"],
+              additionalProperties: false,
+            },
+          },
+        },
+      });
+
+      const content = response.choices[0]?.message?.content;
+      if (!content) {
+        return [];
+      }
+
+      const parsed = JSON.parse(content);
+      // Validate that returned IDs actually exist in features list
+      const validIds = new Set(features.map((f) => f.id));
+      return (parsed.ranked || []).filter((r: { id: string }) =>
+        validIds.has(r.id)
+      );
+    } catch (error: any) {
+      console.warn(`AI feature ranking failed: ${error.message}`);
+      return [];
     }
   }
 }
