@@ -124,11 +124,28 @@ When you clone a repository with Startblock enabled and run `npm install`, the `
 
 ---
 
+### 🖥️ Visual Onboarding Server
+
+Want a more interactive experience? Startblock includes a built-in visual server that turns your knowledge files into a rich, animated dashboard.
+
+1.  **Run Server:**
+    ```bash
+    sb serve
+    ```
+    _Starts a local server at http://localhost:3939_
+
+2.  **Features:**
+    -   **Interactive File Tree:** Explore your project structure with knowledge status indicators.
+    -   **Voice Narration:** AI guide walks you through file purpose and insights (powered by OpenAI TTS).
+    -   **Dynamic UI:** Smooth animations, expandable dossiers, and "Dynamic Island" player controls.
+    -   **Dark Mode:** Optimized for developers with a sleek, high-contrast theme.
+
 ## 📋 Commands
 
 - `sb init` - Initialize Startblock in current repository
 - `sb onboard` - Run personalized onboarding (collects your goals, AI-selects files, generates docs)
 - `sb onboard --postinstall` - Non-blocking onboarding invitation after npm install (used automatically)
+- `sb serve` - Start the visual onboarding server (interactive web UI)
 - `sb analyze-commit` - Analyze staged files (used by Husky hook)
 - `sb setup-onboarding` - Configure automatic onboarding for maintainers (adds postinstall script)
 - `sb --version` or `sb -v` - Show CLI version
@@ -155,11 +172,42 @@ After running `sb init`, you can customize behavior in `.sb-config.json`:
   "analysis": {
     "excludePatterns": ["*.test.ts", "dist/**"],
     "maxFilesPerAnalysis": 10
+  },
+  "livekit": {
+    "url": "wss://your-project.livekit.cloud",
+    "apiKey": "AP...",
+    "apiSecret": "your-secret-here"
   }
 }
 ```
 
-> 🔒 **Security**: Your API key is stored locally in `.sb-config.json` which is automatically added to `.gitignore`.
+> 🔒 **Security**: Your API keys are stored locally in `.sb-config.json` which is automatically added to `.gitignore`.
+
+### Voice Onboarding Setup
+
+To enable voice-first onboarding with LiveKit:
+
+1. **Get LiveKit Cloud credentials** (free tier available):
+   - Sign up at https://cloud.livekit.io
+   - Create a project and get API credentials
+
+2. **Add to `.sb-config.json`** (see example above)
+
+3. **Set up the agent**:
+   ```bash
+   cd agent
+   pip install -r requirements.txt
+   export LIVEKIT_URL="wss://your-project.livekit.cloud"
+   export LIVEKIT_API_KEY="AP..."
+   export LIVEKIT_API_SECRET="your-secret"
+   export OPENAI_API_KEY="sk-..."
+   export REPO_ROOT="/path/to/repo"
+   python main.py dev
+   ```
+
+4. **Start the server**: `sb serve`
+
+See [LIVEKIT_SETUP.md](./LIVEKIT_SETUP.md) for detailed setup instructions.
 
 ---
 

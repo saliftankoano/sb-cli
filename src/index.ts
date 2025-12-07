@@ -9,6 +9,7 @@ import { analyzeCommitCommand } from "./commands/analyze-commit.js";
 import { simulateIntroCommand } from "./commands/simulate-intro.js";
 import { onboardCommand } from "./commands/onboard.js";
 import { setupOnboardingCommand } from "./commands/setup-onboarding.js";
+import { migrateFeaturesCommand } from "./commands/migrate-features.js";
 
 const args = process.argv.slice(2);
 const command = args[0];
@@ -50,6 +51,15 @@ async function main() {
 
       case "setup-onboarding":
         await setupOnboardingCommand();
+        break;
+
+      case "serve":
+        const { serveCommand } = await import("./commands/serve.js");
+        await serveCommand();
+        break;
+
+      case "migrate-features":
+        await migrateFeaturesCommand();
         break;
 
       case "--version":
@@ -102,6 +112,14 @@ function showHelp() {
   );
   console.log(
     "  " + chalk.cyan("sb sim-intro") + "         Simulate the intro animation"
+  );
+  console.log(
+    "  " + chalk.cyan("sb serve") + "            Start visual onboarding server"
+  );
+  console.log(
+    "  " +
+      chalk.cyan("sb migrate-features") +
+      " Migrate existing knowledge files to feature-based format"
   );
   console.log(
     "  " + chalk.cyan("sb --help") + "          Show this help message"

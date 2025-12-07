@@ -23,5 +23,10 @@
   },
   "output": {
     "knowledgeDir": ".startblock/knowledge"
+  },
+  "livekit": {
+    "url": "wss://your-project.livekit.cloud",
+    "apiKey": "YOUR_LIVEKIT_API_KEY",
+    "apiSecret": "YOUR_LIVEKIT_API_SECRET"
   }
 }

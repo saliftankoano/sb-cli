@@ -1,15 +1,18 @@
 {
   "name": "@startblock-ai/cli",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Automatic knowledge capture for codebases, allowing you to capture knowledge before it's lost.",
   "type": "module",
   "bin": {
     "sb": "./dist/index.js"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "npm run build:cli && npm run build:ui",
+    "build:cli": "tsc",
+    "build:ui": "cd ui && npm run build",
     "postbuild": "chmod +x dist/index.js",
     "dev": "tsc --watch",
+    "dev:ui": "cd ui && npm run dev",
     "prepare": "husky",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -30,11 +33,14 @@
     "chalk": "^5.3.0",
     "chalk-animation": "^2.0.3",
     "cosmiconfig": "^9.0.0",
+    "express": "^4.18.2",
     "figlet": "^1.9.3",
     "gradient-string": "^2.0.2",
     "gray-matter": "^4.0.3",
     "ignore": "^6.0.2",
+    "livekit-server-sdk": "^2.14.2",
     "nanospinner": "^1.1.0",
+    "open": "^10.0.0",
     "openai": "^4.73.0",
     "ora": "^9.0.0",
     "readline-sync": "^1.4.10",
@@ -42,10 +48,16 @@
   },
   "devDependencies": {
     "@types/babel__traverse": "^7.20.6",
+    "@types/express": "^4.17.21",
     "@types/figlet": "^1.7.0",
     "@types/node": "^22.10.2",
     "@types/readline-sync": "^1.4.8",
+    "clsx": "^2.1.1",
+    "framer-motion": "^12.23.24",
     "husky": "^9.1.7",
+    "shadcn": "^3.5.1",
+    "tailwind-merge": "^3.4.0",
+    "tailwindcss": "^4.1.17",
     "typescript": "^5.7.2"
   },
   "engines": {
