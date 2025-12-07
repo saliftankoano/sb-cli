@@ -19,6 +19,17 @@ import {
   writeKnowledgeFile,
   readKnowledgeFile,
 } from "../core/knowledge-writer.js";
+import {
+  readFeaturesManifest,
+  writeFeaturesManifest,
+  type Feature,
+} from "../core/features.js";
+import {
+  generateMermaidFromUserFlows,
+  generateArchitectureMermaid,
+  generateMermaidJourney,
+  generateMermaidSequence,
+} from "../core/mermaid-generator.js";
 import type { PromptContext } from "../prompts/templates.js";
 import type { AnalysisResult } from "../core/openai-client.js";
 import { isOnboarded, markOnboarded } from "../utils/onboarding.js";
@@ -310,7 +321,7 @@ function extractProjectDescription(readme: string): string {
 
 /**
  * Generate onboarding documentation files
- * Uses repository summary and knowledge files to create comprehensive docs
+ * Uses repository summary, knowledge files, and features.json to create comprehensive docs
  * Now supports "living" docs - merges/updates instead of overwriting
  */
 async function generateOnboardingDocs(
@@ -358,6 +369,73 @@ async function generateOnboardingDocs(
   const onboardingDir = path.join(repoRoot, ".startblock", "onboarding");
   await fs.mkdir(onboardingDir, { recursive: true });
 
+  // Load features
+  let featuresManifest = await readFeaturesManifest(repoRoot);
+  let features = featuresManifest?.features || [];
+
+  // Generate/update Mermaid diagrams for features that have userFlows but missing diagrams
+  let featuresUpdated = false;
+  for (const feature of features) {
+    if (feature.userFlows && feature.userFlows.length > 0) {
+      // Ensure filesByAction exists for all userFlows
+      let needsUpdate = false;
+      const filesByAction = feature.filesByAction || {};
+
+      // Check if any userFlow is missing filesByAction
+      const missingActions = feature.userFlows.filter(
+        (flow) => !filesByAction[flow] || filesByAction[flow].length === 0
+      );
+
+      if (missingActions.length > 0) {
+        // Populate missing actions with all feature files
+        missingActions.forEach((flow) => {
+          filesByAction[flow] = feature.files;
+        });
+        feature.filesByAction = filesByAction;
+        needsUpdate = true;
+      }
+
+      // Generate diagrams if missing
+      if (!feature.mermaidJourney) {
+        feature.mermaidJourney = generateMermaidJourney(
+          feature.name,
+          feature.userFlows
+        );
+        needsUpdate = true;
+      }
+
+      if (!feature.mermaidSequence && Object.keys(filesByAction).length > 0) {
+        feature.mermaidSequence = generateMermaidSequence(
+          feature.name,
+          feature.userFlows,
+          filesByAction,
+          feature.entryPoint
+        );
+        needsUpdate = true;
+      }
+
+      // Keep legacy flowchart for backward compatibility
+      if (!feature.mermaidDiagram) {
+        feature.mermaidDiagram = generateMermaidFromUserFlows(
+          feature.name,
+          feature.userFlows,
+          feature.files
+        );
+        needsUpdate = true;
+      }
+
+      if (needsUpdate) {
+        featuresUpdated = true;
+      }
+    }
+  }
+
+  // Save updated features.json if diagrams were generated
+  if (featuresUpdated && featuresManifest) {
+    featuresManifest.features = features;
+    await writeFeaturesManifest(repoRoot, featuresManifest);
+  }
+
   const readmeContent = repoSummary.documentation.readme || "";
   const knowledgeFiles = repoSummary.knowledgeFiles;
   const packageJson = repoSummary.packageJson || {};
@@ -384,23 +462,53 @@ async function generateOnboardingDocs(
 
   // Only update if file doesn't exist or is very basic
   if (!existingIndex || existingIndex.length < 200) {
-    const sessionSummary = sessionContext
-      ? `\n## Your Session Summary\n\n- **Goal**: ${
-          sessionContext.goal
-        }\n- **Experience Level**: ${sessionContext.experienceLevel}${
-          sessionContext.timebox
-            ? `\n- **Time Available**: ${sessionContext.timebox}`
-            : ""
-        }\n- **Files Analyzed**: ${selectedFiles.length} file(s)${
-          selectedFiles.length > 0
-            ? ` (including ${selectedFiles.slice(0, 3).join(", ")}${
-                selectedFiles.length > 3
-                  ? `, and ${selectedFiles.length - 3} more`
-                  : ""
-              })`
-            : ""
-        }\n`
-      : "";
+    let sessionSummary = "";
+    if (sessionContext && openaiClient) {
+      // Use LLM to rank features by relevance to goal
+      const rankedFeatures = await openaiClient.rankFeatures(
+        sessionContext.goal,
+        features.map((f) => ({
+          id: f.id,
+          name: f.name,
+          description: f.description,
+          category: f.category,
+          userFlows: f.userFlows,
+          tags: f.tags,
+        }))
+      );
+
+      const rankedIds = new Set(rankedFeatures.map((r) => r.id));
+      const relevantFeatures = features.filter((f) => rankedIds.has(f.id));
+
+      sessionSummary = `\n## Your Session Summary\n\n- **Goal**: ${
+        sessionContext.goal
+      }\n- **Experience Level**: ${sessionContext.experienceLevel}${
+        sessionContext.timebox
+          ? `\n- **Time Available**: ${sessionContext.timebox}`
+          : ""
+      }\n- **Files Analyzed**: ${selectedFiles.length} file(s)${
+        selectedFiles.length > 0
+          ? ` (including ${selectedFiles.slice(0, 3).join(", ")}${
+              selectedFiles.length > 3
+                ? `, and ${selectedFiles.length - 3} more`
+                : ""
+            })`
+          : ""
+      }\n`;
+
+      if (relevantFeatures.length > 0) {
+        sessionSummary += `\n### Recommended Features for Your Goal\n\n${rankedFeatures
+          .slice(0, 3)
+          .map((r) => {
+            const feature = features.find((f) => f.id === r.id);
+            return feature
+              ? `- **${feature.name}** (${feature.category}): ${r.reason}`
+              : null;
+          })
+          .filter(Boolean)
+          .join("\n")}\n`;
+      }
+    }
 
     const indexContent = `# Welcome to ${projectName}
 
@@ -568,8 +676,59 @@ _This section will be updated as issues are discovered and resolved._
 
   // Only update if file doesn't exist or is very basic
   if (!existingArch || existingArch.length < 200) {
-    const architectureContent = `# Architecture Overview
+    let architectureContent = `# Architecture Overview
+`;
 
+    // Add high-level architecture Mermaid diagram at the top if we have features
+    if (features.length > 0) {
+      const architectureDiagram = generateArchitectureMermaid(features);
+      if (architectureDiagram) {
+        architectureContent += `## System Overview
+
+\`\`\`mermaid
+${architectureDiagram}
+\`\`\`
+
+`;
+      }
+    }
+
+    // Add Feature Map if available
+    if (features.length > 0) {
+      architectureContent += `\n## System Features\n\nThe codebase is organized into the following key features:\n\n`;
+
+      // Group by category
+      const featuresByCategory: Record<string, Feature[]> = {};
+      features.forEach((f) => {
+        if (!featuresByCategory[f.category])
+          featuresByCategory[f.category] = [];
+        featuresByCategory[f.category].push(f);
+      });
+
+      for (const [category, categoryFeatures] of Object.entries(
+        featuresByCategory
+      )) {
+        architectureContent += `### ${category}\n\n`;
+        for (const feature of categoryFeatures) {
+          architectureContent += `- **${feature.name}**\n`;
+          if (feature.description)
+            architectureContent += `  - ${feature.description}\n`;
+          if (feature.entryPoint)
+            architectureContent += `  - Entry: \`${feature.entryPoint}\`\n`;
+          if (feature.userFlows.length > 0) {
+            architectureContent += `  - User Flows:\n${feature.userFlows
+              .map((flow) => `    - ${flow}`)
+              .join("\n")}\n`;
+          }
+          if (feature.mermaidDiagram) {
+            architectureContent += `\n  <details><summary>View Flow Diagram</summary>\n\n  \`\`\`mermaid\n${feature.mermaidDiagram}\n  \`\`\`\n  </details>\n`;
+          }
+          architectureContent += "\n";
+        }
+      }
+    }
+
+    architectureContent += `
 ## Directory Tree
 
 ${generateDirectoryTree(repoSummary.allSourceFiles, 5, true)}
@@ -629,52 +788,107 @@ ${
   }
 
   if (!existingResources || existingResources.length < 200) {
-    // Group knowledge files by tags
-    const knowledgeByTag: Record<
-      string,
-      Array<(typeof knowledgeFiles)[0]>
-    > = {};
-    const untagged: Array<(typeof knowledgeFiles)[0]> = [];
-
-    for (const kf of knowledgeFiles) {
-      if (kf.tags && kf.tags.length > 0) {
-        for (const tag of kf.tags) {
-          if (!knowledgeByTag[tag]) {
-            knowledgeByTag[tag] = [];
-          }
-          knowledgeByTag[tag].push(kf);
-        }
-      } else {
-        untagged.push(kf);
-      }
-    }
-
-    // Build knowledge files section
     let knowledgeSection = "";
-    if (Object.keys(knowledgeByTag).length > 0) {
-      for (const [tag, files] of Object.entries(knowledgeByTag)) {
-        const uniqueFiles = Array.from(new Set(files.map((f) => f.sourceFile)));
-        knowledgeSection += `**${
-          tag.charAt(0).toUpperCase() + tag.slice(1)
-        }** [${tag} - ${uniqueFiles.length} file(s)]\n\n`;
-        knowledgeSection += uniqueFiles
-          .map((file) => {
-            const kf = files.find((f) => f.sourceFile === file);
-            return `- ${file}${kf?.importance ? ` (${kf.importance})` : ""}`;
-          })
+
+    // Group knowledge files by Feature if available
+    if (features.length > 0) {
+      knowledgeSection += `_Knowledge files grouped by Feature._\n\n`;
+
+      // Create a map of files to features
+      const fileToFeatureMap = new Map<string, Feature>();
+      features.forEach((f) =>
+        f.files.forEach((file) => fileToFeatureMap.set(file, f))
+      );
+
+      const knowledgeByFeature: Record<string, typeof knowledgeFiles> = {};
+      const unassignedKnowledge: typeof knowledgeFiles = [];
+
+      for (const kf of knowledgeFiles) {
+        const feature = fileToFeatureMap.get(kf.sourceFile);
+        if (feature) {
+          if (!knowledgeByFeature[feature.name])
+            knowledgeByFeature[feature.name] = [];
+          knowledgeByFeature[feature.name].push(kf);
+        } else {
+          unassignedKnowledge.push(kf);
+        }
+      }
+
+      for (const [featureName, files] of Object.entries(knowledgeByFeature)) {
+        knowledgeSection += `### ${featureName}\n\n`;
+        knowledgeSection += files
+          .map(
+            (kf) =>
+              `- [${path.basename(kf.sourceFile)}](${path.relative(
+                onboardingDir,
+                kf.path
+              )})${kf.importance ? ` (**${kf.importance}**)` : ""}`
+          )
           .join("\n");
         knowledgeSection += "\n\n";
       }
-    }
-    if (untagged.length > 0) {
-      knowledgeSection += `**Other** [${untagged.length} file(s)]\n\n`;
-      knowledgeSection += untagged
-        .map(
-          (kf) =>
-            `- ${kf.sourceFile}${kf.importance ? ` (${kf.importance})` : ""}`
-        )
-        .join("\n");
-      knowledgeSection += "\n\n";
+
+      if (unassignedKnowledge.length > 0) {
+        knowledgeSection += `### General / Utilities\n\n`;
+        knowledgeSection += unassignedKnowledge
+          .map(
+            (kf) =>
+              `- [${path.basename(kf.sourceFile)}](${path.relative(
+                onboardingDir,
+                kf.path
+              )})${kf.importance ? ` (**${kf.importance}**)` : ""}`
+          )
+          .join("\n");
+        knowledgeSection += "\n\n";
+      }
+    } else {
+      // Fallback to Tag-based grouping
+      const knowledgeByTag: Record<
+        string,
+        Array<(typeof knowledgeFiles)[0]>
+      > = {};
+      const untagged: Array<(typeof knowledgeFiles)[0]> = [];
+
+      for (const kf of knowledgeFiles) {
+        if (kf.tags && kf.tags.length > 0) {
+          for (const tag of kf.tags) {
+            if (!knowledgeByTag[tag]) {
+              knowledgeByTag[tag] = [];
+            }
+            knowledgeByTag[tag].push(kf);
+          }
+        } else {
+          untagged.push(kf);
+        }
+      }
+
+      if (Object.keys(knowledgeByTag).length > 0) {
+        for (const [tag, files] of Object.entries(knowledgeByTag)) {
+          const uniqueFiles = Array.from(
+            new Set(files.map((f) => f.sourceFile))
+          );
+          knowledgeSection += `**${
+            tag.charAt(0).toUpperCase() + tag.slice(1)
+          }** [${tag} - ${uniqueFiles.length} file(s)]\n\n`;
+          knowledgeSection += uniqueFiles
+            .map((file) => {
+              const kf = files.find((f) => f.sourceFile === file);
+              return `- ${file}${kf?.importance ? ` (${kf.importance})` : ""}`;
+            })
+            .join("\n");
+          knowledgeSection += "\n\n";
+        }
+      }
+      if (untagged.length > 0) {
+        knowledgeSection += `**Other** [${untagged.length} file(s)]\n\n`;
+        knowledgeSection += untagged
+          .map(
+            (kf) =>
+              `- ${kf.sourceFile}${kf.importance ? ` (${kf.importance})` : ""}`
+          )
+          .join("\n");
+        knowledgeSection += "\n\n";
+      }
     }
 
     const resourcesContent = `# Learning Resources
@@ -807,13 +1021,57 @@ ${
         })\n   - ${task.description}\n   - Files: ${task.files.join(", ")}\n\n`;
       });
     } else {
-      // Fallback to generic tasks
+      // Fallback to feature-based or generic tasks
+      let recommendedTasks: string[] = [];
+      if (sessionContext && openaiClient && features.length > 0) {
+        try {
+          const rankedFeatures = await openaiClient.rankFeatures(
+            sessionContext.goal,
+            features.map((f) => ({
+              id: f.id,
+              name: f.name,
+              description: f.description,
+              category: f.category,
+              userFlows: f.userFlows,
+              tags: f.tags,
+            })),
+            3
+          );
+
+          if (rankedFeatures.length > 0) {
+            const topRanked = rankedFeatures[0];
+            const topFeature = features.find((f) => f.id === topRanked.id);
+            if (topFeature) {
+              recommendedTasks.push(
+                `1. **Explore ${topFeature.name}** - Read \`${
+                  topFeature.entryPoint || topFeature.files[0]
+                }\` to understand how this feature works.`
+              );
+              if (topFeature.userFlows.length > 0) {
+                recommendedTasks.push(
+                  `2. **Trace a User Flow** - Follow the code for: "${topFeature.userFlows[0]}"`
+                );
+              }
+              recommendedTasks.push(
+                `3. **Extend ${topFeature.name}** - Add a small enhancement to this feature.`
+              );
+            }
+          }
+        } catch {
+          // AI ranking failed, will fall through to generic tasks
+        }
+      }
+
       tasksContent += `\n## Beginner Tasks\n\n`;
-      tasksContent += `1. **Read Key Files** - Read ${selectedFiles
-        .slice(0, 2)
-        .join(" and ")} to understand the core structure\n`;
-      tasksContent += `2. **Run the Project** - Get the development environment running\n`;
-      tasksContent += `3. **Make a Small Change** - Modify a non-critical file to understand the workflow\n\n`;
+      if (recommendedTasks.length > 0) {
+        tasksContent += recommendedTasks.join("\n") + "\n\n";
+      } else {
+        tasksContent += `1. **Read Key Files** - Read ${selectedFiles
+          .slice(0, 2)
+          .join(" and ")} to understand the core structure\n`;
+        tasksContent += `2. **Run the Project** - Get the development environment running\n`;
+        tasksContent += `3. **Make a Small Change** - Modify a non-critical file to understand the workflow\n\n`;
+      }
 
       tasksContent += `## Intermediate Tasks\n\n`;
       tasksContent += `1. **Modify a Feature** - Make a small change to ${
