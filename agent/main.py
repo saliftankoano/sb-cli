@@ -375,14 +375,6 @@ Important: If the user says something like "let's go" but follows with a questio
 
 
 if __name__ == "__main__":
-    # Set default LiveKit credentials for testing phase if not present
-    if not os.getenv("LIVEKIT_URL"):
-        os.environ["LIVEKIT_URL"] = "wss://startblock-sncm0o91.livekit.cloud"
-    if not os.getenv("LIVEKIT_API_KEY"):
-        os.environ["LIVEKIT_API_KEY"] = "APIoCuSsjC9ddep"
-    if not os.getenv("LIVEKIT_API_SECRET"):
-        os.environ["LIVEKIT_API_SECRET"] = "3dWlyYTjkhzj5CQ8Aeftd53h2iLeA7iSCFFuBW3euAWD"
-
     cli.run_app(
         WorkerOptions(
             entrypoint_fnc=entrypoint,

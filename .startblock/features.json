@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2025-12-16T01:02:43.094Z",
+  "lastUpdated": "2025-12-16T01:14:10.239Z",
   "features": [
     {
       "id": "startblock-onboarding",
@@ -57,11 +57,13 @@
       "entryPoint": "src/server/api/livekit.ts",
       "userFlows": [
         "User can generate a LiveKit token for real-time communication",
-        "User can create or join a LiveKit room for onboarding sessions"
+        "User can create or join a LiveKit room for onboarding sessions",
+        "User can generate a LiveKit token for video sessions",
+        "User can join a video room based on session ID"
       ],
-      "mermaidDiagram": "flowchart TD\n  Start([Livekit Integration])\n  livekit_integration_1[User can generate a LiveKit token for real-time...]\n  livekit_integration_2[User can create or join a LiveKit room for onbo...]\n  Start --> livekit_integration_1\n  livekit_integration_1 --> livekit_integration_2\n  livekit_integration_2 --> End([Complete])\n",
-      "mermaidJourney": "journey\n  title Livekit Integration\n  section User Actions\n    User can generate a LiveKit token for...: 3: User\n    User can create or join a LiveKit roo...: 3: User\n",
-      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant src/server/api/livekit.ts as src/server/api/livekit.ts\n    participant ../../config/loader.js as ../../config/loader.js\n    User->>src/server/api/livekit.ts: User can generate a LiveKit token for real-time...\n    src/server/api/livekit.ts->>../../config/loader.js: process\n    src/server/api/livekit.ts->>../../config/loader.js: process\n",
+      "mermaidDiagram": "flowchart TD\n  Start([Livekit Integration])\n  livekit_integration_1[User can generate a LiveKit token for video ses...]\n  livekit_integration_2[User can join a video room based on session ID]\n  Start --> livekit_integration_1\n  livekit_integration_1 --> livekit_integration_2\n  livekit_integration_2 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title Livekit Integration\n  section User Actions\n    User can generate a LiveKit token for...: 3: User\n    User can join a video room based on s...: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant src/server/api/livekit.ts as src/server/api/livekit.ts\n    participant ../../config/loader.js as ../../config/loader.js\n    User->>src/server/api/livekit.ts: User can generate a LiveKit token for video ses...\n    src/server/api/livekit.ts->>../../config/loader.js: process\n    src/server/api/livekit.ts->>../../config/loader.js: process\n",
       "files": [
         "src/server/api/livekit.ts",
         "../../config/loader.js"
@@ -74,6 +76,14 @@
         "User can create or join a LiveKit room for onboarding sessions": [
           "src/server/api/livekit.ts",
           "../../config/loader.js"
+        ],
+        "User can generate a LiveKit token for video sessions": [
+          "src/server/api/livekit.ts",
+          "../../config/loader.js"
+        ],
+        "User can join a video room based on session ID": [
+          "src/server/api/livekit.ts",
+          "../../config/loader.js"
         ]
       },
       "dependencies": [],
@@ -83,6 +93,52 @@
         "api",
         "typescript",
         "new"
+      ]
+    },
+    {
+      "id": "onboarding-agent",
+      "name": "Onboarding Agent",
+      "description": "",
+      "category": "Services",
+      "entryPoint": "agent/main.py",
+      "userFlows": [
+        "User can navigate through the codebase using voice commands",
+        "User can ask questions about the codebase and receive explanations",
+        "User can receive personalized onboarding guidance based on their session data"
+      ],
+      "mermaidDiagram": "flowchart TD\n  Start([Onboarding Agent])\n  onboarding_agent_1[User can navigate through the codebase using vo...]\n  onboarding_agent_2[User can ask questions about the codebase and r...]\n  onboarding_agent_3[User can receive personalized onboarding guidan...]\n  Start --> onboarding_agent_1\n  onboarding_agent_1 --> onboarding_agent_2\n  onboarding_agent_2 --> onboarding_agent_3\n  onboarding_agent_3 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title Onboarding Agent\n  section User Actions\n    User can navigate through the codebas...: 3: User\n    User can ask questions about the code...: 3: User\n    User can receive personalized onboard...: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant agent/main.py as agent/main.py\n    participant knowledge_loader.py as knowledge_loader.py\n    participant prompts.py as prompts.py\n    participant commands.py as commands.py\n    User->>agent/main.py: User can navigate through the codebase using vo...\n    agent/main.py->>knowledge_loader.py: process\n    knowledge_loader.py->>prompts.py: process\n    prompts.py->>commands.py: process\n    agent/main.py->>knowledge_loader.py: process\n    knowledge_loader.py->>prompts.py: process\n    prompts.py->>commands.py: process\n    agent/main.py->>knowledge_loader.py: process\n    knowledge_loader.py->>prompts.py: process\n    prompts.py->>commands.py: process\n",
+      "files": [
+        "agent/main.py",
+        "knowledge_loader.py",
+        "prompts.py",
+        "commands.py"
+      ],
+      "filesByAction": {
+        "User can navigate through the codebase using voice commands": [
+          "agent/main.py",
+          "knowledge_loader.py",
+          "prompts.py",
+          "commands.py"
+        ],
+        "User can ask questions about the codebase and receive explanations": [
+          "agent/main.py",
+          "knowledge_loader.py",
+          "prompts.py",
+          "commands.py"
+        ],
+        "User can receive personalized onboarding guidance based on their session data": [
+          "agent/main.py",
+          "knowledge_loader.py",
+          "prompts.py",
+          "commands.py"
+        ]
+      },
+      "dependencies": [],
+      "tags": [
+        "agent",
+        "python"
       ]
     }
   ]

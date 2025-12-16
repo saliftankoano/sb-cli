@@ -7,11 +7,6 @@ interface LiveKitTokenRequest {
   sessionId?: string;
 }
 
-// Default LiveKit credentials for testing phase
-const DEFAULT_LIVEKIT_URL = "wss://startblock-sncm0o91.livekit.cloud";
-const DEFAULT_LIVEKIT_API_KEY = "APIoCuSsjC9ddep";
-const DEFAULT_LIVEKIT_API_SECRET = "3dWlyYTjkhzj5CQ8Aeftd53h2iLeA7iSCFFuBW3euAWD";
-
 export function setupLiveKitRoutes(repoRoot: string): Router {
   const router = Router();
 
@@ -19,17 +14,12 @@ export function setupLiveKitRoutes(repoRoot: string): Router {
     try {
       const config = await loadConfig(repoRoot);
 
-      // Check for LiveKit config, fallback to defaults
-      const livekitUrl =
-        process.env.LIVEKIT_URL || config.livekit?.url || DEFAULT_LIVEKIT_URL;
+      // Check for LiveKit config
+      const livekitUrl = process.env.LIVEKIT_URL || config.livekit?.url;
       const livekitApiKey =
-        process.env.LIVEKIT_API_KEY ||
-        config.livekit?.apiKey ||
-        DEFAULT_LIVEKIT_API_KEY;
+        process.env.LIVEKIT_API_KEY || config.livekit?.apiKey;
       const livekitApiSecret =
-        process.env.LIVEKIT_API_SECRET ||
-        config.livekit?.apiSecret ||
-        DEFAULT_LIVEKIT_API_SECRET;
+        process.env.LIVEKIT_API_SECRET || config.livekit?.apiSecret;
 
       if (!livekitUrl || !livekitApiKey || !livekitApiSecret) {
         return res.status(400).json({

@@ -129,16 +129,18 @@ When you clone a repository with Startblock enabled and run `npm install`, the `
 Want a more interactive experience? Startblock includes a built-in visual server that turns your knowledge files into a rich, animated dashboard.
 
 1.  **Run Server:**
+
     ```bash
     sb serve
     ```
+
     _Starts a local server at http://localhost:3939_
 
 2.  **Features:**
-    -   **Interactive File Tree:** Explore your project structure with knowledge status indicators.
-    -   **Voice Narration:** AI guide walks you through file purpose and insights (powered by OpenAI TTS).
-    -   **Dynamic UI:** Smooth animations, expandable dossiers, and "Dynamic Island" player controls.
-    -   **Dark Mode:** Optimized for developers with a sleek, high-contrast theme.
+    - **Interactive File Tree:** Explore your project structure with knowledge status indicators.
+    - **Voice Narration:** AI guide walks you through file purpose and insights (powered by OpenAI TTS).
+    - **Dynamic UI:** Smooth animations, expandable dossiers, and "Dynamic Island" player controls.
+    - **Dark Mode:** Optimized for developers with a sleek, high-contrast theme.
 
 ## 📋 Commands
 
@@ -173,7 +175,7 @@ After running `sb init`, you can customize behavior in `.sb-config.json`:
     "excludePatterns": ["*.test.ts", "dist/**"],
     "maxFilesPerAnalysis": 10
   },
-  "livekit": { // Optional: Override default LiveKit for testing
+  "livekit": {
     "url": "wss://your-project.livekit.cloud",
     "apiKey": "AP...",
     "apiSecret": "your-secret-here"
@@ -185,21 +187,29 @@ After running `sb init`, you can customize behavior in `.sb-config.json`:
 
 ### Voice Onboarding Setup
 
-Voice onboarding is pre-configured with a default LiveKit project for testing. You can skip credential setup and jump straight to running the agent.
+To enable voice-first onboarding with LiveKit:
 
-1. **Set up the agent**:
+1. **Get LiveKit Cloud credentials** (free tier available):
+   - Sign up at https://cloud.livekit.io
+   - Create a project and get API credentials
+
+2. **Add to `.sb-config.json`** (see example above)
+
+3. **Set up the agent**:
    ```bash
    cd agent
    pip install -r requirements.txt
-   # Use default LiveKit keys (pre-configured)
+   export LIVEKIT_URL="wss://your-project.livekit.cloud"
+   export LIVEKIT_API_KEY="AP..."
+   export LIVEKIT_API_SECRET="your-secret"
    export OPENAI_API_KEY="sk-..."
    export REPO_ROOT="/path/to/repo"
    python main.py dev
    ```
 
-2. **Start the server**: `sb serve`
+4. **Start the server**: `sb serve`
 
-For custom LiveKit setup, see [LIVEKIT_SETUP.md](./LIVEKIT_SETUP.md).
+See [LIVEKIT_SETUP.md](./LIVEKIT_SETUP.md) for detailed setup instructions.
 
 ---
 

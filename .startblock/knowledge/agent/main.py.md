@@ -1,47 +1,49 @@
 ---
 filePath: agent/main.py
-fileVersion: 58f84348b1e49d79670af734ad811a0504f9e922
-lastUpdated: '2025-12-16T01:02:43.091Z'
+fileVersion: 57491bcac0bca1c30b9bc5ae0d853f915763fc4e
+lastUpdated: '2025-12-16T01:14:10.235Z'
 updatedBy: sb-cli
 tags:
   - agent
   - python
-  - new
 importance: low
 extractedBy: sb-cli@1.0.0
 model: gpt-4o-mini
 humanVerified: false
-feature: startblock-onboarding
+feature: onboarding-agent
 featureRole: entry_point
 userFlows:
-  - User can navigate through codebase files using voice commands
-  - User can receive personalized greetings and guidance during onboarding
-  - User can ask questions and get responses about the codebase
+  - User can navigate through the codebase using voice commands
+  - User can ask questions about the codebase and receive explanations
+  - >-
+    User can receive personalized onboarding guidance based on their session
+    data
 relatedFiles:
   - knowledge_loader.py
   - prompts.py
   - commands.py
 ---
-# Purpose
-This file implements the LiveKit Agent for Startblock Onboarding, which manages voice conversations with users during their onboarding process with a codebase.
+## Purpose
+This file implements a voice agent for onboarding users through a codebase, facilitating interactive voice conversations during the onboarding process.
 
-# Key Functionality
-- `OnboardingAgent`: Main class that guides users through the onboarding process, managing the conversation flow and context.
+## Key Functionality
+- `OnboardingAgent`: Main class that manages the onboarding process and user interactions.
 - `get_repo_root_from_room`: Extracts the repository root from room metadata or falls back to an environment variable.
-- `_advance_to_next_file`: Advances the onboarding session to the next file, updating the UI accordingly.
-- `on_enter`: Initializes the session and generates a personalized greeting for the user.
+- `entrypoint`: The entry point for the agent job, setting up the agent and handling user input.
 
-# Gotchas
-- If the onboarding session is not initialized correctly, many functionalities will fail without clear error messages, leading to a poor user experience.
-- The `_advance_to_next_file` method must ensure that the current file index does not exceed the bounds of the selected files list, or it may result in an index error.
-- The classification of user intent can be inaccurate if the user's input does not fit expected patterns, especially for medium-length messages.
+## Gotchas
+- The removal of default LiveKit credentials means that users must set the `LIVEKIT_URL`, `LIVEKIT_API_KEY`, and `LIVEKIT_API_SECRET` environment variables; failure to do so will result in the agent not functioning properly.
+- The `_advance_to_next_file` method depends on the integrity of the onboarding session; if `selectedFiles` is empty or the index is out of bounds, it may lead to errors.
+- The intent classification logic may misinterpret user input if the input is ambiguous or if the user provides a mix of commands and questions.
 
-# Dependencies
-- The file uses various LiveKit plugins and external services (like OpenAI) to handle voice interactions, which are crucial for providing a seamless onboarding experience through voice commands.
+## Dependencies
+- The file imports various modules from `livekit.agents` and `livekit.plugins`, which are essential for handling voice interactions and managing the agent's state during onboarding.
+- Custom functions from `knowledge_loader` and `prompts` are used to load context and build prompts, ensuring that the agent has the necessary information to assist users effectively.
 
-# Architecture Context
-This file serves as a core component of the onboarding system, interfacing with both the user and the backend services to facilitate real-time interactions and context-aware guidance through the codebase.
+## Architecture Context
+This file is part of a larger system that integrates voice interactions into the onboarding process, allowing users to navigate and learn about a codebase through conversational AI. It connects to the LiveKit service for real-time communication and relies on a structured onboarding session to guide user interactions.
 
-# Implementation Notes
-- The agent employs a combination of STT, LLM, and TTS, which may introduce latency; careful management of these services is essential for maintaining a responsive user experience.
-- The design pattern emphasizes the use of asynchronous programming with asyncio, which is critical for handling real-time user interactions without blocking the main thread.
+## Implementation Notes
+- The decision to use a combination of keyword matching and LLM for intent classification balances performance and accuracy, but may introduce latency for medium-length messages.
+- Extensive debug logging is present to aid in development, but it should be managed in production environments to avoid cluttering logs.
+- The agent's design allows for easy extension and modification, as new features or commands can be added to the existing framework without significant refactoring.
