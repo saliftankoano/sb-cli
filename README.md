@@ -173,7 +173,7 @@ After running `sb init`, you can customize behavior in `.sb-config.json`:
     "excludePatterns": ["*.test.ts", "dist/**"],
     "maxFilesPerAnalysis": 10
   },
-  "livekit": {
+  "livekit": { // Optional: Override default LiveKit for testing
     "url": "wss://your-project.livekit.cloud",
     "apiKey": "AP...",
     "apiSecret": "your-secret-here"
@@ -185,29 +185,21 @@ After running `sb init`, you can customize behavior in `.sb-config.json`:
 
 ### Voice Onboarding Setup
 
-To enable voice-first onboarding with LiveKit:
+Voice onboarding is pre-configured with a default LiveKit project for testing. You can skip credential setup and jump straight to running the agent.
 
-1. **Get LiveKit Cloud credentials** (free tier available):
-   - Sign up at https://cloud.livekit.io
-   - Create a project and get API credentials
-
-2. **Add to `.sb-config.json`** (see example above)
-
-3. **Set up the agent**:
+1. **Set up the agent**:
    ```bash
    cd agent
    pip install -r requirements.txt
-   export LIVEKIT_URL="wss://your-project.livekit.cloud"
-   export LIVEKIT_API_KEY="AP..."
-   export LIVEKIT_API_SECRET="your-secret"
+   # Use default LiveKit keys (pre-configured)
    export OPENAI_API_KEY="sk-..."
    export REPO_ROOT="/path/to/repo"
    python main.py dev
    ```
 
-4. **Start the server**: `sb serve`
+2. **Start the server**: `sb serve`
 
-See [LIVEKIT_SETUP.md](./LIVEKIT_SETUP.md) for detailed setup instructions.
+For custom LiveKit setup, see [LIVEKIT_SETUP.md](./LIVEKIT_SETUP.md).
 
 ---
 

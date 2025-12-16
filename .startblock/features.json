@@ -1,0 +1,89 @@
+{
+  "version": "1.0",
+  "lastUpdated": "2025-12-16T01:02:43.094Z",
+  "features": [
+    {
+      "id": "startblock-onboarding",
+      "name": "Startblock Onboarding",
+      "description": "",
+      "category": "Services",
+      "entryPoint": "agent/main.py",
+      "userFlows": [
+        "User can navigate through codebase files using voice commands",
+        "User can receive personalized greetings and guidance during onboarding",
+        "User can ask questions and get responses about the codebase"
+      ],
+      "mermaidDiagram": "flowchart TD\n  Start([Startblock Onboarding])\n  startblock_onboarding_1[User can navigate through codebase files using ...]\n  startblock_onboarding_2[User can receive personalized greetings and gui...]\n  startblock_onboarding_3[User can ask questions and get responses about ...]\n  Start --> startblock_onboarding_1\n  startblock_onboarding_1 --> startblock_onboarding_2\n  startblock_onboarding_2 --> startblock_onboarding_3\n  startblock_onboarding_3 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title Startblock Onboarding\n  section User Actions\n    User can navigate through codebase fi...: 3: User\n    User can receive personalized greetin...: 3: User\n    User can ask questions and get respon...: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant agent/main.py as agent/main.py\n    participant knowledge_loader.py as knowledge_loader.py\n    participant prompts.py as prompts.py\n    participant commands.py as commands.py\n    User->>agent/main.py: User can navigate through codebase files using ...\n    agent/main.py->>knowledge_loader.py: process\n    knowledge_loader.py->>prompts.py: process\n    prompts.py->>commands.py: process\n    agent/main.py->>knowledge_loader.py: process\n    knowledge_loader.py->>prompts.py: process\n    prompts.py->>commands.py: process\n    agent/main.py->>knowledge_loader.py: process\n    knowledge_loader.py->>prompts.py: process\n    prompts.py->>commands.py: process\n",
+      "files": [
+        "agent/main.py",
+        "knowledge_loader.py",
+        "prompts.py",
+        "commands.py"
+      ],
+      "filesByAction": {
+        "User can navigate through codebase files using voice commands": [
+          "agent/main.py",
+          "knowledge_loader.py",
+          "prompts.py",
+          "commands.py"
+        ],
+        "User can receive personalized greetings and guidance during onboarding": [
+          "agent/main.py",
+          "knowledge_loader.py",
+          "prompts.py",
+          "commands.py"
+        ],
+        "User can ask questions and get responses about the codebase": [
+          "agent/main.py",
+          "knowledge_loader.py",
+          "prompts.py",
+          "commands.py"
+        ]
+      },
+      "dependencies": [],
+      "tags": [
+        "agent",
+        "python",
+        "new"
+      ]
+    },
+    {
+      "id": "livekit-integration",
+      "name": "Livekit Integration",
+      "description": "",
+      "category": "API",
+      "entryPoint": "src/server/api/livekit.ts",
+      "userFlows": [
+        "User can generate a LiveKit token for real-time communication",
+        "User can create or join a LiveKit room for onboarding sessions"
+      ],
+      "mermaidDiagram": "flowchart TD\n  Start([Livekit Integration])\n  livekit_integration_1[User can generate a LiveKit token for real-time...]\n  livekit_integration_2[User can create or join a LiveKit room for onbo...]\n  Start --> livekit_integration_1\n  livekit_integration_1 --> livekit_integration_2\n  livekit_integration_2 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title Livekit Integration\n  section User Actions\n    User can generate a LiveKit token for...: 3: User\n    User can create or join a LiveKit roo...: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant src/server/api/livekit.ts as src/server/api/livekit.ts\n    participant ../../config/loader.js as ../../config/loader.js\n    User->>src/server/api/livekit.ts: User can generate a LiveKit token for real-time...\n    src/server/api/livekit.ts->>../../config/loader.js: process\n    src/server/api/livekit.ts->>../../config/loader.js: process\n",
+      "files": [
+        "src/server/api/livekit.ts",
+        "../../config/loader.js"
+      ],
+      "filesByAction": {
+        "User can generate a LiveKit token for real-time communication": [
+          "src/server/api/livekit.ts",
+          "../../config/loader.js"
+        ],
+        "User can create or join a LiveKit room for onboarding sessions": [
+          "src/server/api/livekit.ts",
+          "../../config/loader.js"
+        ]
+      },
+      "dependencies": [],
+      "tags": [
+        "src",
+        "server",
+        "api",
+        "typescript",
+        "new"
+      ]
+    }
+  ]
+}

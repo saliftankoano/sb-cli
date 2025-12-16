@@ -1,11 +1,16 @@
 import { Router } from "express";
-import { AccessToken } from "livekit-server-sdk";
+import { AccessToken, RoomServiceClient } from "livekit-server-sdk";
 import { loadConfig } from "../../config/loader.js";
 import * as path from "path";
 
 interface LiveKitTokenRequest {
   sessionId?: string;
 }
+
+// Default LiveKit credentials for testing phase
+const DEFAULT_LIVEKIT_URL = "wss://startblock-sncm0o91.livekit.cloud";
+const DEFAULT_LIVEKIT_API_KEY = "APIoCuSsjC9ddep";
+const DEFAULT_LIVEKIT_API_SECRET = "3dWlyYTjkhzj5CQ8Aeftd53h2iLeA7iSCFFuBW3euAWD";
 
 export function setupLiveKitRoutes(repoRoot: string): Router {
   const router = Router();
@@ -14,12 +19,17 @@ export function setupLiveKitRoutes(repoRoot: string): Router {
     try {
       const config = await loadConfig(repoRoot);
 
-      // Check for LiveKit config
-      const livekitUrl = process.env.LIVEKIT_URL || config.livekit?.url;
+      // Check for LiveKit config, fallback to defaults
+      const livekitUrl =
+        process.env.LIVEKIT_URL || config.livekit?.url || DEFAULT_LIVEKIT_URL;
       const livekitApiKey =
-        process.env.LIVEKIT_API_KEY || config.livekit?.apiKey;
+        process.env.LIVEKIT_API_KEY ||
+        config.livekit?.apiKey ||
+        DEFAULT_LIVEKIT_API_KEY;
       const livekitApiSecret =
-        process.env.LIVEKIT_API_SECRET || config.livekit?.apiSecret;
+        process.env.LIVEKIT_API_SECRET ||
+        config.livekit?.apiSecret ||
+        DEFAULT_LIVEKIT_API_SECRET;
 
       if (!livekitUrl || !livekitApiKey || !livekitApiSecret) {
         return res.status(400).json({
@@ -34,6 +44,29 @@ export function setupLiveKitRoutes(repoRoot: string): Router {
       const roomName = sessionId
         ? `onboarding-${sessionId}`
         : `onboarding-${Date.now()}`;
+
+      // Create room with metadata containing the repo root
+      // This allows the agent to know which repo to load context from
+      const roomMetadata = JSON.stringify({
+        repoRoot: repoRoot,
+        sessionId: sessionId,
+      });
+
+      // Create the room with metadata using RoomServiceClient
+      const roomService = new RoomServiceClient(
+        livekitUrl.replace("wss://", "https://"),
+        livekitApiKey,
+        livekitApiSecret
+      );
+
+      try {
+        await roomService.createRoom({
+          name: roomName,
+          metadata: roomMetadata,
+        });
+      } catch {
+        // Room might already exist, that's ok
+      }
 
       // Create access token
       const at = new AccessToken(livekitApiKey, livekitApiSecret, {
@@ -56,6 +89,7 @@ export function setupLiveKitRoutes(repoRoot: string): Router {
         token,
         roomName,
         url: livekitUrl,
+        repoRoot: repoRoot, // Also send to frontend for debugging
       });
     } catch (error: any) {
       console.error("LiveKit token error:", error);
