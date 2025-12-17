@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2025-12-17T01:30:42.353Z",
+  "lastUpdated": "2025-12-17T01:33:56.189Z",
   "features": [
     {
       "id": "startblock-onboarding",
@@ -100,20 +100,23 @@
       "name": "Onboarding Agent",
       "description": "",
       "category": "Services",
-      "entryPoint": "agent/main.py",
       "userFlows": [
         "User can navigate through the codebase using voice commands",
         "User can ask questions about the codebase and receive explanations",
-        "User can receive personalized onboarding guidance based on their session data"
+        "User can receive personalized onboarding guidance based on their session data",
+        "User can receive personalized onboarding prompts",
+        "User can understand codebase structure through guided prompts",
+        "User can transition smoothly between different files during onboarding"
       ],
-      "mermaidDiagram": "flowchart TD\n  Start([Onboarding Agent])\n  onboarding_agent_1[User can navigate through the codebase using vo...]\n  onboarding_agent_2[User can ask questions about the codebase and r...]\n  onboarding_agent_3[User can receive personalized onboarding guidan...]\n  Start --> onboarding_agent_1\n  onboarding_agent_1 --> onboarding_agent_2\n  onboarding_agent_2 --> onboarding_agent_3\n  onboarding_agent_3 --> End([Complete])\n",
-      "mermaidJourney": "journey\n  title Onboarding Agent\n  section User Actions\n    User can navigate through the codebas...: 3: User\n    User can ask questions about the code...: 3: User\n    User can receive personalized onboard...: 3: User\n",
-      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant agent/main.py as agent/main.py\n    participant knowledge_loader.py as knowledge_loader.py\n    participant prompts.py as prompts.py\n    participant commands.py as commands.py\n    User->>agent/main.py: User can navigate through the codebase using vo...\n    agent/main.py->>knowledge_loader.py: process\n    knowledge_loader.py->>prompts.py: process\n    prompts.py->>commands.py: process\n    agent/main.py->>knowledge_loader.py: process\n    knowledge_loader.py->>prompts.py: process\n    prompts.py->>commands.py: process\n    agent/main.py->>knowledge_loader.py: process\n    knowledge_loader.py->>prompts.py: process\n    prompts.py->>commands.py: process\n",
+      "mermaidDiagram": "flowchart TD\n  Start([Onboarding Agent])\n  onboarding_agent_1[User can receive personalized onboarding prompts]\n  onboarding_agent_2[User can understand codebase structure through ...]\n  onboarding_agent_3[User can transition smoothly between different ...]\n  Start --> onboarding_agent_1\n  onboarding_agent_1 --> onboarding_agent_2\n  onboarding_agent_2 --> onboarding_agent_3\n  onboarding_agent_3 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title Onboarding Agent\n  section User Actions\n    User can receive personalized onboard...: 3: User\n    User can understand codebase structur...: 3: User\n    User can transition smoothly between ...: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant agent/prompts.py as agent/prompts.py\n    User->>agent/prompts.py: User can receive personalized onboarding prompts\n",
       "files": [
         "agent/main.py",
         "knowledge_loader.py",
         "prompts.py",
-        "commands.py"
+        "commands.py",
+        "agent/prompts.py"
       ],
       "filesByAction": {
         "User can navigate through the codebase using voice commands": [
@@ -133,12 +136,22 @@
           "knowledge_loader.py",
           "prompts.py",
           "commands.py"
+        ],
+        "User can receive personalized onboarding prompts": [
+          "agent/prompts.py"
+        ],
+        "User can understand codebase structure through guided prompts": [
+          "agent/prompts.py"
+        ],
+        "User can transition smoothly between different files during onboarding": [
+          "agent/prompts.py"
         ]
       },
       "dependencies": [],
       "tags": [
         "agent",
-        "python"
+        "python",
+        "new"
       ]
     },
     {
@@ -213,6 +226,90 @@
         "src",
         "lib",
         "typescript"
+      ]
+    },
+    {
+      "id": "agent-commands",
+      "name": "Agent Commands",
+      "description": "",
+      "category": "Services",
+      "userFlows": [
+        "User can navigate between files or steps",
+        "User can view connections between files",
+        "User can expand sections in the UI",
+        "User can highlight specific lines of code",
+        "User can open the file tree sidebar",
+        "User can view a file with contextual information and code snippets"
+      ],
+      "mermaidDiagram": "flowchart TD\n  Start([Agent Commands])\n  agent_commands_1[User can navigate between files or steps]\n  agent_commands_2[User can view connections between files]\n  agent_commands_3[User can expand sections in the UI]\n  agent_commands_4[User can highlight specific lines of code]\n  agent_commands_5[User can open the file tree sidebar]\n  agent_commands_6[User can view a file with contextual informatio...]\n  Start --> agent_commands_1\n  agent_commands_1 --> agent_commands_2\n  agent_commands_2 --> agent_commands_3\n  agent_commands_3 --> agent_commands_4\n  agent_commands_4 --> agent_commands_5\n  agent_commands_5 --> agent_commands_6\n  agent_commands_6 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title Agent Commands\n  section User Actions\n    User can navigate between files or steps: 3: User\n    User can view connections between files: 3: User\n    User can expand sections in the UI: 3: User\n    User can highlight specific lines of ...: 3: User\n    User can open the file tree sidebar: 3: User\n    User can view a file with contextual ...: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant agent/commands.py as agent/commands.py\n    User->>agent/commands.py: User can navigate between files or steps\n",
+      "files": [
+        "agent/commands.py"
+      ],
+      "filesByAction": {
+        "User can navigate between files or steps": [
+          "agent/commands.py"
+        ],
+        "User can view connections between files": [
+          "agent/commands.py"
+        ],
+        "User can expand sections in the UI": [
+          "agent/commands.py"
+        ],
+        "User can highlight specific lines of code": [
+          "agent/commands.py"
+        ],
+        "User can open the file tree sidebar": [
+          "agent/commands.py"
+        ],
+        "User can view a file with contextual information and code snippets": [
+          "agent/commands.py"
+        ]
+      },
+      "dependencies": [],
+      "tags": [
+        "agent",
+        "python",
+        "new"
+      ]
+    },
+    {
+      "id": "knowledge-loader",
+      "name": "Knowledge Loader",
+      "description": "",
+      "category": "Services",
+      "userFlows": [
+        "User can access onboarding documents",
+        "User can view a summary of system features",
+        "User can retrieve detailed knowledge about specific files"
+      ],
+      "mermaidDiagram": "flowchart TD\n  Start([Knowledge Loader])\n  knowledge_loader_1[User can access onboarding documents]\n  knowledge_loader_2[User can view a summary of system features]\n  knowledge_loader_3[User can retrieve detailed knowledge about spec...]\n  Start --> knowledge_loader_1\n  knowledge_loader_1 --> knowledge_loader_2\n  knowledge_loader_2 --> knowledge_loader_3\n  knowledge_loader_3 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title Knowledge Loader\n  section User Actions\n    User can access onboarding documents: 3: User\n    User can view a summary of system fea...: 3: User\n    User can retrieve detailed knowledge ...: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant agent/knowledge_loader.py as agent/knowledge_loader.py\n    participant frontmatter.py as frontmatter.py\n    User->>agent/knowledge_loader.py: User can access onboarding documents\n    agent/knowledge_loader.py->>frontmatter.py: process\n    agent/knowledge_loader.py->>frontmatter.py: process\n    agent/knowledge_loader.py->>frontmatter.py: process\n",
+      "files": [
+        "agent/knowledge_loader.py",
+        "frontmatter.py"
+      ],
+      "filesByAction": {
+        "User can access onboarding documents": [
+          "agent/knowledge_loader.py",
+          "frontmatter.py"
+        ],
+        "User can view a summary of system features": [
+          "agent/knowledge_loader.py",
+          "frontmatter.py"
+        ],
+        "User can retrieve detailed knowledge about specific files": [
+          "agent/knowledge_loader.py",
+          "frontmatter.py"
+        ]
+      },
+      "dependencies": [],
+      "tags": [
+        "agent",
+        "python",
+        "new"
       ]
     }
   ]

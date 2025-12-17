@@ -2,8 +2,8 @@
 UI command definitions for agent-to-frontend communication.
 """
 
-from typing import Literal, Optional
-from dataclasses import dataclass, asdict
+from typing import Literal, Optional, List
+from dataclasses import dataclass, asdict, field
 import json
 
 
@@ -43,6 +43,23 @@ class OpenSidebarCommand:
     type: Literal["openSidebar"] = "openSidebar"
 
 
+@dataclass
+class ShowFileCommand:
+    """Show a file with knowledge context and optional code excerpt.
+    
+    This is the primary command for guided onboarding - it tells the UI
+    to display the file's knowledge card along with a relevant code snippet.
+    """
+    file: str  # File path relative to repo root
+    title: str  # What the agent is explaining (e.g., "Request Handler")
+    explanation: str  # Brief explanation for this segment
+    startLine: Optional[int] = None  # If set, show code from this line
+    endLine: Optional[int] = None  # If set, show code to this line
+    highlightLines: Optional[List[int]] = None  # Lines to highlight
+    featureName: Optional[str] = None  # Feature this belongs to
+    type: Literal["showFile"] = "showFile"
+
+
 # Union type for all commands
 UICommand = (
     NavigateCommand
@@ -50,6 +67,7 @@ UICommand = (
     | ExpandSectionCommand
     | HighlightCodeCommand
     | OpenSidebarCommand
+    | ShowFileCommand
 )
 
 
