@@ -27,8 +27,10 @@ export async function createIgnoreFilter(
 export async function filterRelevantFiles(
   files: string[],
   config: SBConfig,
-  repoRoot: string
+  repoRoot: string,
+  options: { skipExistenceCheck?: boolean } = {}
 ): Promise<string[]> {
+  const { skipExistenceCheck = false } = options;
   const ig = await createIgnoreFilter(repoRoot);
 
   // Add config exclude patterns
@@ -49,10 +51,12 @@ export async function filterRelevantFiles(
     }
 
     // Check file actually exists
-    const fullPath = path.join(repoRoot, file);
-    if (!(await fileExists(fullPath))) {
-      console.warn(`⚠️  File selected by AI does not exist: ${file}`);
-      continue;
+    if (!skipExistenceCheck) {
+      const fullPath = path.join(repoRoot, file);
+      if (!(await fileExists(fullPath))) {
+        console.warn(`⚠️  File selected by AI does not exist: ${file}`);
+        continue;
+      }
     }
 
     validFiles.push(file);

@@ -15,6 +15,18 @@ export interface DependencyContext {
 }
 
 /**
+ * Extended dependency graph for architecture visualization
+ */
+export interface DependencyGraph {
+  nodes: Map<string, FileNode>;
+  edges: Array<{
+    from: string;
+    to: string;
+    type: "imports" | "exports";
+  }>;
+}
+
+/**
  * Parse imports from a JavaScript/TypeScript file
  */
 export async function parseImports(filePath: string): Promise<string[]> {
@@ -134,4 +146,86 @@ export function getDependencyContext(
     })),
     dependents: node.importedBy,
   };
+}
+
+/**
+ * Convert Map<string, FileNode> to DependencyGraph format
+ * Used for architecture visualization
+ */
+export function toDependencyGraph(
+  graph: Map<string, FileNode>
+): DependencyGraph {
+  const edges: Array<{
+    from: string;
+    to: string;
+    type: "imports" | "exports";
+  }> = [];
+
+  for (const [filePath, node] of graph.entries()) {
+    for (const importPath of node.imports) {
+      edges.push({
+        from: filePath,
+        to: importPath,
+        type: "imports",
+      });
+    }
+  }
+
+  return { nodes: graph, edges };
+}
+
+/**
+ * Find files that are "hub" files (many dependents)
+ */
+export function findHubFiles(
+  graph: Map<string, FileNode>,
+  minDependents: number = 3
+): string[] {
+  const hubs: string[] = [];
+
+  for (const [filePath, node] of graph.entries()) {
+    if (node.importedBy.length >= minDependents) {
+      hubs.push(filePath);
+    }
+  }
+
+  return hubs.sort((a, b) => {
+    const aDeps = graph.get(a)?.importedBy.length || 0;
+    const bDeps = graph.get(b)?.importedBy.length || 0;
+    return bDeps - aDeps; // Sort descending
+  });
+}
+
+/**
+ * Get files that share common imports (potential feature grouping)
+ */
+export function findFilesWithCommonImports(
+  graph: Map<string, FileNode>,
+  minCommonImports: number = 2
+): Map<string, string[]> {
+  const groups = new Map<string, string[]>();
+
+  // For each file, find other files that share imports
+  for (const [filePath, node] of graph.entries()) {
+    const similarFiles: string[] = [];
+
+    for (const [otherPath, otherNode] of graph.entries()) {
+      if (filePath === otherPath) continue;
+
+      // Count common imports
+      const commonImports = node.imports.filter((imp) =>
+        otherNode.imports.includes(imp)
+      );
+
+      if (commonImports.length >= minCommonImports) {
+        similarFiles.push(otherPath);
+      }
+    }
+
+    if (similarFiles.length > 0) {
+      groups.set(filePath, similarFiles);
+    }
+  }
+
+  return groups;
 }

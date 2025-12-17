@@ -1,4 +1,7 @@
 import boxen from "boxen";
+import chalk from "chalk";
+import { brandColor } from "../utils/intro.js";
+import type { CostEstimate } from "./cost-estimator.js";
 
 /**
  * Styled boxes for CLI UI using boxen
@@ -52,4 +55,38 @@ export function readyToCommitBox(knowledgeFileCount: number): string {
     borderColor: "#10b981",
     textAlignment: "center",
   });
+}
+
+export function gitflashEstimateBox(estimate: CostEstimate): string {
+  const title = chalk.bold(
+    brandColor("⚡ GitFlash - Document your history")
+  );
+  const lines = [
+    title,
+    "",
+    `Commits: ${estimate.commits}`,
+    `Files: ${estimate.filesToAnalyze}`,
+    `Est. cost: $${estimate.estimatedCost.toFixed(2)}`,
+    `Time: ~${estimate.estimatedMinutes.toFixed(1)} min`,
+  ].join("\n");
+
+  return boxen(lines, {
+    padding: 1,
+    margin: { top: 1, bottom: 1 },
+    borderStyle: "round",
+    borderColor: "#a855f7",
+    textAlignment: "left",
+    title: "GitFlash Estimate",
+    titleAlignment: "left",
+  });
+}
+
+export function gitflashProgressLine(
+  current: number,
+  total: number,
+  message: string
+): string {
+  const bullet = brandColor("◉");
+  const counter = brandColor(`[${current}/${total}]`);
+  return `${bullet} ${counter} ${message}`;
 }

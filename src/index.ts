@@ -58,6 +58,12 @@ async function main() {
         await serveCommand();
         break;
 
+      case "gitflash": {
+        const { gitflashCommand } = await import("./commands/gitflash.js");
+        await gitflashCommand();
+        break;
+      }
+
       case "migrate-features":
         await migrateFeaturesCommand();
         break;
@@ -120,6 +126,11 @@ function showHelp() {
     "  " +
       chalk.cyan("sb migrate-features") +
       " Migrate existing knowledge files to feature-based format"
+  );
+  console.log(
+    "  " +
+      chalk.cyan("sb gitflash --commits 50") +
+      " Document historical commits with GitFlash"
   );
   console.log(
     "  " + chalk.cyan("sb --help") + "          Show this help message"

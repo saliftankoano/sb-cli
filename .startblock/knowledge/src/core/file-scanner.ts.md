@@ -1,7 +1,7 @@
 ---
 filePath: src/core/file-scanner.ts
-fileVersion: 73caec7ca66a98f267aa4ae1de89f334c7f2c911
-lastUpdated: '2025-11-23T21:59:29.462Z'
+fileVersion: ad2ece243cabb19aa268bce51ac6e7a2a559591b
+lastUpdated: '2025-12-17T01:36:28.383Z'
 updatedBy: sb-cli
 tags:
   - src
@@ -11,30 +11,38 @@ importance: low
 extractedBy: sb-cli@1.0.0
 model: gpt-4o-mini
 humanVerified: false
+feature: file-scanning
+featureRole: service
+userFlows:
+  - User can filter files based on configuration and ignore patterns
+  - User can ensure only relevant files are processed for analysis
+relatedFiles:
+  - ../utils/file-utils.js
+  - ../config/defaults.js
 ---
 ## Purpose
-This file provides functionality to filter files based on ignore patterns, file extensions, and existence checks, ensuring that only relevant files are processed in a repository context.
+This file provides functionality to filter files based on configuration and ignore patterns, primarily for use in a file scanning context.
 
 ## Key Functionality
-- `createIgnoreFilter(repoRoot: string)`: Creates an ignore filter based on the contents of the `.gitignore` file located at the specified repository root.
-- `filterRelevantFiles(files: string[], config: SBConfig, repoRoot: string)`: Filters the provided list of files according to ignore patterns, specified file extensions, and checks for file existence, returning an array of valid files.
-- `getLanguageFromExtension(filePath: string)`: Determines the programming language based on the file extension.
+- `createIgnoreFilter(repoRoot: string)`: Creates an ignore filter based on the contents of the `.gitignore` file located in the specified repository root.
+- `filterRelevantFiles(files: string[], config: SBConfig, repoRoot: string, options: { skipExistenceCheck?: boolean } = {})`: Filters the provided list of files based on ignore patterns and file extensions defined in the configuration. It also checks for file existence unless bypassed.
+- `getLanguageFromExtension(filePath: string)`: Returns the programming language associated with a given file extension.
 
 ## Gotchas
-- The use of `continue` in the filtering loop allows for skipping invalid files without exiting the loop, which is important for processing all files. Be cautious not to confuse this with a return statement.
-- If the `.gitignore` file is large, reading it can introduce latency; ensure it's only read when necessary.
-- The `fileExists` function is called for each file, which can be a performance bottleneck if the file system is slow. Consider caching results if the same files are checked multiple times.
-- Logging warnings for non-existent files can clutter logs; consider implementing a threshold for logging or using a more structured logging approach.
+- The `skipExistenceCheck` option can lead to silent failures if not handled properly, as non-existent files will not trigger warnings.
+- A malformed `.gitignore` may cause unexpected filtering results, potentially excluding valid files from processing.
+- Performance can degrade with a large number of files due to multiple asynchronous calls to `fileExists`, especially if existence checks are not skipped.
 
 ## Dependencies
-- `ignore`: Used to handle ignore patterns efficiently, allowing for easy integration of `.gitignore` rules into the file filtering process.
-- `fs/promises`: Used for asynchronous file operations, enabling non-blocking checks for file existence.
-- `path`: Provides utilities for working with file and directory paths, ensuring cross-platform compatibility.
+- `ignore`: Used to create a filter based on `.gitignore`, allowing for flexible file exclusion.
+- `fs/promises`: Provides promise-based file system operations, enabling asynchronous file checks and reads.
+- `path`: Used for handling and resolving file paths in a platform-independent manner.
+- `fileExists` and `matchesExtensions`: Custom utility functions that encapsulate file existence checks and extension matching logic, promoting code reuse and separation of concerns.
 
 ## Architecture Context
-This file is part of a larger system that likely involves analyzing or processing files in a repository. It serves as a utility to ensure that only relevant files are considered for further operations, which is critical in environments with many files and complex ignore rules.
+This file is part of the core functionality for file scanning within the application, enabling the system to intelligently filter files based on user-defined configurations and existing project structures. It interacts with configuration files and the file system to ensure relevant files are processed.
 
 ## Implementation Notes
-- The decision to filter files in a single loop with multiple checks (ignore patterns, extensions, existence) is efficient and keeps the code straightforward.
-- Ensure that the configuration object (`SBConfig`) is well-defined and includes all necessary properties for filtering, as missing properties could lead to unexpected behavior.
-- Consider the implications of file system performance on the overall responsiveness of the application, especially in environments with a large number of files.
+- The addition of `skipExistenceCheck` was made to improve performance in scenarios where file existence is guaranteed, but developers must be cautious about its implications.
+- The use of asynchronous functions is critical for maintaining responsiveness, but it requires careful handling of promises to avoid performance bottlenecks.
+- The filtering logic is designed to be extensible, allowing for easy updates to ignore patterns and file type configurations as project requirements evolve.

@@ -75,6 +75,68 @@ function extractImports(
 }
 
 /**
+ * Generate feature description using AI
+ */
+async function generateFeatureDescription(
+  filePath: string,
+  fileContent: string,
+  featureName: string,
+  userFlows: string[],
+  openaiClient: OpenAIClient
+): Promise<string> {
+  const prompt = `Analyze this code file and generate a concise one-line description of what this feature does.
+
+Feature Name: ${featureName}
+File: ${filePath}
+
+Code:
+\`\`\`
+${fileContent.substring(0, 2000)}${fileContent.length > 2000 ? "..." : ""}
+\`\`\`
+
+User Flows:
+${userFlows.map((flow) => `- ${flow}`).join("\n")}
+
+Generate a single, concise sentence (max 120 characters) describing what this feature enables or provides.
+Focus on the value it delivers, not implementation details.
+Examples:
+- "Manages feature metadata and user journey visualization for onboarding"
+- "Handles MCP API calls and routes requests to appropriate handlers"
+- "Provides knowledge documentation management with auto-merging capabilities"
+
+Return only the description text, no quotes or extra formatting.`;
+
+  try {
+    const response = await (openaiClient as any).client.chat.completions.create(
+      {
+        model: (openaiClient as any).config.openai.model,
+        temperature: 0.5,
+        max_tokens: 100,
+        messages: [
+          {
+            role: "system",
+            content:
+              "You are an expert at writing concise feature descriptions. Return only the description text, no quotes or formatting.",
+          },
+          { role: "user", content: prompt },
+        ],
+      }
+    );
+
+    const content = response.choices[0]?.message?.content;
+    if (!content) {
+      return "";
+    }
+
+    // Clean up the response (remove quotes, trim)
+    return content.trim().replace(/^["']|["']$/g, "");
+  } catch (error) {
+    console.warn(`Failed to generate description for ${filePath}:`, error);
+    return "";
+  }
+}
+
+/**
  * Generate user flows using AI
  */
 async function generateUserFlows(
@@ -307,11 +369,25 @@ export async function migrateFeaturesCommand(): Promise<void> {
           );
         }
 
+        // Generate feature description if missing
+        const featureName = featureIdToName(feature);
+        let description = frontmatter.description || "";
+        if (!description && userFlows.length > 0) {
+          description = await generateFeatureDescription(
+            sourceFilePath,
+            fileContent,
+            featureName,
+            userFlows,
+            openaiClient
+          );
+        }
+
         // Update features.json
         const category = inferFeatureCategory(sourceFilePath, frontmatter.tags);
         await updateFeatureEntry(repoRoot, {
           id: feature,
-          name: featureIdToName(feature),
+          name: featureName,
+          description,
           category,
           files: allFiles,
           userFlows,

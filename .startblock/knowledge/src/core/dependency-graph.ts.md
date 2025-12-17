@@ -1,59 +1,50 @@
 ---
 filePath: src/core/dependency-graph.ts
-fileVersion: 7e019c662dfbf93f083367ec7fb1cde1a1698639
-lastUpdated: '2025-11-15T19:00:33.359Z'
+fileVersion: 73caec7ca66a98f267aa4ae1de89f334c7f2c911
+lastUpdated: '2025-12-17T01:36:28.382Z'
 updatedBy: sb-cli
 tags:
   - src
   - core
   - typescript
-  - new
 importance: low
 extractedBy: sb-cli@1.0.0
 model: gpt-4o-mini
 humanVerified: false
+feature: dependency-graph
+featureRole: service
+userFlows:
+  - User can visualize the dependency graph of the codebase
+  - User can identify hub files with many dependents
+  - User can find files that share common imports for potential feature grouping
+relatedFiles:
+  - ../utils/file-utils.js
 ---
-# Documentation for `src/core/dependency-graph.ts`
-
-## Purpose
-This file provides functionality to parse JavaScript/TypeScript files for their import dependencies, build a dependency graph, and retrieve contextual information about dependencies and dependents.
+# Purpose
+This file provides functionality to build and visualize a dependency graph of JavaScript/TypeScript files, helping to analyze module relationships.
 
 ## Key Functionality
-- **`parseImports(filePath: string): Promise<string[]>`**: Asynchronously parses a file to extract its import statements, returning an array of import paths. Handles both ES6 `import` statements and CommonJS `require()` calls.
-  
-- **`resolveImportPath(importStr: string, fromFile: string, repoRoot: string): string | null`**: Resolves a relative import path to an absolute file path based on the current file's location and the repository root. Skips external packages in `node_modules`.
-
-- **`buildDependencyGraph(files: string[], repoRoot: string): Promise<Map<string, FileNode>>`**: Constructs a dependency graph from a list of files, mapping each file to its imports and the files that import it.
-
-- **`getDependencyContext(filePath: string, graph: Map<string, FileNode>): DependencyContext`**: Retrieves the dependency context for a specified file, including its direct dependencies and dependents.
+- **parseImports**: Parses a file to extract its import statements.
+- **resolveImportPath**: Resolves relative import paths to absolute file paths.
+- **buildDependencyGraph**: Constructs a dependency graph from a list of files.
+- **getDependencyContext**: Retrieves the dependencies and dependents for a specific file.
+- **toDependencyGraph**: Converts the internal representation of the graph to a format suitable for visualization.
+- **findHubFiles**: Identifies files that are hubs, having many dependents.
+- **findFilesWithCommonImports**: Groups files that share common imports, indicating potential feature grouping.
 
 ## Gotchas
-- **Error Handling in `parseImports`**: If parsing fails (e.g., due to syntax errors), the function returns an empty array instead of throwing an error. This may lead to silent failures where a file is assumed to have no imports when it actually does.
-
-- **Import Path Resolution**: The `resolveImportPath` function only returns paths for local imports (starting with `.` or `/`). It will return `null` for external packages, which might lead to unexpected behavior if the caller assumes all imports will be resolved.
-
-- **Common Mistake with Extensions**: The loop in `resolveImportPath` attempts to append extensions but does not actually check if the resolved path exists. This could lead to incorrect assumptions about the availability of the file.
-
-- **Dependency Graph Initialization**: The graph is initialized for all files, but if a file has no imports, it will still be present in the graph with empty arrays. This could lead to confusion if users expect only files with dependencies to be included.
+- The `findHubFiles` function's default minimum dependents threshold may not fit all projects, potentially missing important hub files in smaller codebases.
+- The `findFilesWithCommonImports` function has O(n^2) complexity due to nested loops, which can lead to performance issues in larger projects.
+- The `toDependencyGraph` function currently only captures import relationships, ignoring exports which may be relevant for a complete analysis.
+- Error handling in `parseImports` is minimal; it returns an empty array on failure without logging, which can obscure issues during parsing.
 
 ## Dependencies
-- **`@babel/parser`**: Used for parsing JavaScript/TypeScript code into an Abstract Syntax Tree (AST), enabling the extraction of import statements.
-  
-- **`@babel/traverse`**: Facilitates traversing the AST to find specific nodes (like import declarations), making it easier to collect import paths.
-
-- **`path`**: A Node.js module used for handling and transforming file paths, crucial for resolving import paths relative to the file structure.
-
-- **`readFileSafe`**: A utility function that safely reads file content, ensuring that the application can handle file read errors gracefully.
+- The file relies on `@babel/parser` and `@babel/traverse` for parsing and traversing the AST of JavaScript/TypeScript files, which are essential for accurately extracting import statements.
 
 ## Architecture Context
-This module is part of a larger system that likely involves static analysis or tooling for JavaScript/TypeScript projects. The dependency graph it builds can be used for various purposes, such as code analysis, visualization, or optimization tasks.
+This file is part of the core functionality for analyzing dependencies in the codebase, providing insights that can inform architectural decisions and improve module organization.
 
 ## Implementation Notes
-- **Performance Considerations**: The `buildDependencyGraph` function processes files sequentially, which may lead to performance bottlenecks for large projects. Consider parallelizing the parsing of files if performance becomes an issue.
-
-- **Future Enhancements**: The `getDependencyContext` function currently does not parse exports. Future implementations could enhance this by analyzing the AST to extract exported members, providing richer context for dependencies.
-
-- **Error Recovery in Parsing**: The `errorRecovery` option in the parser configuration allows for more robust handling of malformed files, but it may also lead to unexpected results if the file structure is significantly broken. Ensure that users are aware of this behavior.
-
-## Developer Notes
-
+- The design allows for easy extension; additional features like parsing exports could be added in the future.
+- The use of a `Map` for the dependency graph facilitates efficient lookups and modifications, but care should be taken with memory usage in large projects.
+- The functions are designed to be asynchronous, which is important for handling file I/O without blocking the event loop, but this may introduce complexity in error handling and flow control.

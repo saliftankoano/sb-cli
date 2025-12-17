@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2025-12-17T01:34:20.647Z",
+  "lastUpdated": "2025-12-17T01:36:28.389Z",
   "features": [
     {
       "id": "startblock-onboarding",
@@ -400,6 +400,459 @@
       "tags": [
         "src",
         "server",
+        "typescript",
+        "new"
+      ]
+    },
+    {
+      "id": "gitflash",
+      "name": "Gitflash",
+      "description": "",
+      "category": "Utilities",
+      "userFlows": [
+        "User can document Git commit history",
+        "User can preview documentation changes before applying them",
+        "User can view analysis context before committing",
+        "User can receive a prompt for insights during the process",
+        "User can see an estimate of the cost and time for GitFlash operations",
+        "User can track progress of GitFlash operations"
+      ],
+      "mermaidDiagram": "flowchart TD\n  Start([Gitflash])\n  gitflash_1[User can view analysis context before committing]\n  gitflash_2[User can receive a prompt for insights during t...]\n  gitflash_3[User can see an estimate of the cost and time f...]\n  gitflash_4[User can track progress of GitFlash operations]\n  Start --> gitflash_1\n  gitflash_1 --> gitflash_2\n  gitflash_2 --> gitflash_3\n  gitflash_3 --> gitflash_4\n  gitflash_4 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title Gitflash\n  section User Actions\n    User can view analysis context before...: 3: User\n    User can receive a prompt for insight...: 3: User\n    User can see an estimate of the cost ...: 3: User\n    User can track progress of GitFlash o...: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant src/utils/boxes.ts as src/utils/boxes.ts\n    participant ../utils/intro.js as ../utils/intro.js\n    participant ./cost-estimator.js as ./cost-estimator.js\n    User->>src/utils/boxes.ts: User can view analysis context before committing\n    src/utils/boxes.ts->>../utils/intro.js: process\n    ../utils/intro.js->>./cost-estimator.js: process\n    src/utils/boxes.ts->>../utils/intro.js: process\n    ../utils/intro.js->>./cost-estimator.js: process\n    src/utils/boxes.ts->>../utils/intro.js: process\n    ../utils/intro.js->>./cost-estimator.js: process\n    src/utils/boxes.ts->>../utils/intro.js: process\n    ../utils/intro.js->>./cost-estimator.js: process\n",
+      "files": [
+        "src/commands/gitflash.ts",
+        "../config/loader.js",
+        "../utils/cost-estimator.js",
+        "../utils/boxes.js",
+        "../git/history.js",
+        "../git/operations.js",
+        "../core/file-scanner.js",
+        "../core/openai-client.js",
+        "../core/knowledge-writer.js",
+        "../utils/intro.js",
+        "src/utils/boxes.ts",
+        "./cost-estimator.js"
+      ],
+      "filesByAction": {
+        "User can document Git commit history": [
+          "src/commands/gitflash.ts",
+          "../config/loader.js",
+          "../utils/cost-estimator.js",
+          "../utils/boxes.js",
+          "../git/history.js",
+          "../git/operations.js",
+          "../core/file-scanner.js",
+          "../core/openai-client.js",
+          "../core/knowledge-writer.js",
+          "../utils/intro.js"
+        ],
+        "User can preview documentation changes before applying them": [
+          "src/commands/gitflash.ts",
+          "../config/loader.js",
+          "../utils/cost-estimator.js",
+          "../utils/boxes.js",
+          "../git/history.js",
+          "../git/operations.js",
+          "../core/file-scanner.js",
+          "../core/openai-client.js",
+          "../core/knowledge-writer.js",
+          "../utils/intro.js"
+        ],
+        "User can view analysis context before committing": [
+          "src/utils/boxes.ts",
+          "../utils/intro.js",
+          "./cost-estimator.js"
+        ],
+        "User can receive a prompt for insights during the process": [
+          "src/utils/boxes.ts",
+          "../utils/intro.js",
+          "./cost-estimator.js"
+        ],
+        "User can see an estimate of the cost and time for GitFlash operations": [
+          "src/utils/boxes.ts",
+          "../utils/intro.js",
+          "./cost-estimator.js"
+        ],
+        "User can track progress of GitFlash operations": [
+          "src/utils/boxes.ts",
+          "../utils/intro.js",
+          "./cost-estimator.js"
+        ]
+      },
+      "dependencies": [],
+      "tags": [
+        "src",
+        "commands",
+        "typescript",
+        "new",
+        "utils"
+      ]
+    },
+    {
+      "id": "knowledge-migration",
+      "name": "Knowledge Migration",
+      "description": "",
+      "category": "Services",
+      "entryPoint": "src/commands/migrate-features.ts",
+      "userFlows": [
+        "User can migrate knowledge files to include feature metadata",
+        "User can view enhanced documentation with feature descriptions and user flows"
+      ],
+      "mermaidDiagram": "flowchart TD\n  Start([Knowledge Migration])\n  knowledge_migration_1[User can migrate knowledge files to include fea...]\n  knowledge_migration_2[User can view enhanced documentation with featu...]\n  Start --> knowledge_migration_1\n  knowledge_migration_1 --> knowledge_migration_2\n  knowledge_migration_2 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title Knowledge Migration\n  section User Actions\n    User can migrate knowledge files to i...: 3: User\n    User can view enhanced documentation ...: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant ...ds/migrate-features.ts as ...ds/migrate-features.ts\n    participant ../config/loader.js as ../config/loader.js\n    participant ...re/knowledge-writer.js as ...re/knowledge-writer.js\n    participant ../core/openai-client.js as ../core/openai-client.js\n    participant ../core/features.js as ../core/features.js\n    participant ...e/mermaid-generator.js as ...e/mermaid-generator.js\n    User->>...ds/migrate-features.ts: User can migrate knowledge files to include fea...\n    ...ds/migrate-features.ts->>../config/loader.js: process\n    ../config/loader.js->>...re/knowledge-writer.js: process\n    ...re/knowledge-writer.js->>../core/openai-client.js: process\n    ../core/openai-client.js->>../core/features.js: process\n    ../core/features.js->>...e/mermaid-generator.js: process\n    ...ds/migrate-features.ts->>../config/loader.js: process\n    ../config/loader.js->>...re/knowledge-writer.js: process\n    ...re/knowledge-writer.js->>../core/openai-client.js: process\n    ../core/openai-client.js->>../core/features.js: process\n    ../core/features.js->>...e/mermaid-generator.js: process\n",
+      "files": [
+        "src/commands/migrate-features.ts",
+        "../config/loader.js",
+        "../core/knowledge-writer.js",
+        "../core/openai-client.js",
+        "../core/features.js",
+        "../core/mermaid-generator.js"
+      ],
+      "filesByAction": {
+        "User can migrate knowledge files to include feature metadata": [
+          "src/commands/migrate-features.ts",
+          "../config/loader.js",
+          "../core/knowledge-writer.js",
+          "../core/openai-client.js",
+          "../core/features.js",
+          "../core/mermaid-generator.js"
+        ],
+        "User can view enhanced documentation with feature descriptions and user flows": [
+          "src/commands/migrate-features.ts",
+          "../config/loader.js",
+          "../core/knowledge-writer.js",
+          "../core/openai-client.js",
+          "../core/features.js",
+          "../core/mermaid-generator.js"
+        ]
+      },
+      "dependencies": [],
+      "tags": [
+        "src",
+        "commands",
+        "typescript",
+        "new"
+      ]
+    },
+    {
+      "id": "dependency-graph",
+      "name": "Dependency Graph",
+      "description": "",
+      "category": "Services",
+      "userFlows": [
+        "User can visualize the dependency graph of the codebase",
+        "User can identify hub files with many dependents",
+        "User can find files that share common imports for potential feature grouping"
+      ],
+      "mermaidDiagram": "flowchart TD\n  Start([Dependency Graph])\n  dependency_graph_1[User can visualize the dependency graph of the ...]\n  dependency_graph_2[User can identify hub files with many dependents]\n  dependency_graph_3[User can find files that share common imports f...]\n  Start --> dependency_graph_1\n  dependency_graph_1 --> dependency_graph_2\n  dependency_graph_2 --> dependency_graph_3\n  dependency_graph_3 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title Dependency Graph\n  section User Actions\n    User can visualize the dependency gra...: 3: User\n    User can identify hub files with many...: 3: User\n    User can find files that share common...: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant ...re/dependency-graph.ts as ...re/dependency-graph.ts\n    participant ../utils/file-utils.js as ../utils/file-utils.js\n    User->>...re/dependency-graph.ts: User can visualize the dependency graph of the ...\n    ...re/dependency-graph.ts->>../utils/file-utils.js: process\n    ...re/dependency-graph.ts->>../utils/file-utils.js: process\n    ...re/dependency-graph.ts->>../utils/file-utils.js: process\n",
+      "files": [
+        "src/core/dependency-graph.ts",
+        "../utils/file-utils.js"
+      ],
+      "filesByAction": {
+        "User can visualize the dependency graph of the codebase": [
+          "src/core/dependency-graph.ts",
+          "../utils/file-utils.js"
+        ],
+        "User can identify hub files with many dependents": [
+          "src/core/dependency-graph.ts",
+          "../utils/file-utils.js"
+        ],
+        "User can find files that share common imports for potential feature grouping": [
+          "src/core/dependency-graph.ts",
+          "../utils/file-utils.js"
+        ]
+      },
+      "dependencies": [],
+      "tags": [
+        "src",
+        "core",
+        "typescript"
+      ]
+    },
+    {
+      "id": "file-scanning",
+      "name": "File Scanning",
+      "description": "",
+      "category": "Services",
+      "userFlows": [
+        "User can filter files based on configuration and ignore patterns",
+        "User can ensure only relevant files are processed for analysis"
+      ],
+      "mermaidDiagram": "flowchart TD\n  Start([File Scanning])\n  file_scanning_1[User can filter files based on configuration an...]\n  file_scanning_2[User can ensure only relevant files are process...]\n  Start --> file_scanning_1\n  file_scanning_1 --> file_scanning_2\n  file_scanning_2 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title File Scanning\n  section User Actions\n    User can filter files based on config...: 3: User\n    User can ensure only relevant files a...: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant src/core/file-scanner.ts as src/core/file-scanner.ts\n    participant ../utils/file-utils.js as ../utils/file-utils.js\n    participant ../config/defaults.js as ../config/defaults.js\n    User->>src/core/file-scanner.ts: User can filter files based on configuration an...\n    src/core/file-scanner.ts->>../utils/file-utils.js: process\n    ../utils/file-utils.js->>../config/defaults.js: process\n    src/core/file-scanner.ts->>../utils/file-utils.js: process\n    ../utils/file-utils.js->>../config/defaults.js: process\n",
+      "files": [
+        "src/core/file-scanner.ts",
+        "../utils/file-utils.js",
+        "../config/defaults.js"
+      ],
+      "filesByAction": {
+        "User can filter files based on configuration and ignore patterns": [
+          "src/core/file-scanner.ts",
+          "../utils/file-utils.js",
+          "../config/defaults.js"
+        ],
+        "User can ensure only relevant files are processed for analysis": [
+          "src/core/file-scanner.ts",
+          "../utils/file-utils.js",
+          "../config/defaults.js"
+        ]
+      },
+      "dependencies": [],
+      "tags": [
+        "src",
+        "core",
+        "typescript"
+      ]
+    },
+    {
+      "id": "mermaid-generator",
+      "name": "Mermaid Generator",
+      "description": "",
+      "category": "Services",
+      "userFlows": [
+        "User can visualize user flows through features",
+        "User can see high-level architecture of features",
+        "User can understand file interactions based on user actions"
+      ],
+      "mermaidDiagram": "flowchart TD\n  Start([Mermaid Generator])\n  mermaid_generator_1[User can visualize user flows through features]\n  mermaid_generator_2[User can see high-level architecture of features]\n  mermaid_generator_3[User can understand file interactions based on ...]\n  Start --> mermaid_generator_1\n  mermaid_generator_1 --> mermaid_generator_2\n  mermaid_generator_2 --> mermaid_generator_3\n  mermaid_generator_3 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title Mermaid Generator\n  section User Actions\n    User can visualize user flows through...: 3: User\n    User can see high-level architecture ...: 3: User\n    User can understand file interactions...: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant ...e/mermaid-generator.ts as ...e/mermaid-generator.ts\n    participant ./features.js as ./features.js\n    participant ./dependency-graph.js as ./dependency-graph.js\n    User->>...e/mermaid-generator.ts: User can visualize user flows through features\n    ...e/mermaid-generator.ts->>./features.js: process\n    ./features.js->>./dependency-graph.js: process\n    ...e/mermaid-generator.ts->>./features.js: process\n    ./features.js->>./dependency-graph.js: process\n    ...e/mermaid-generator.ts->>./features.js: process\n    ./features.js->>./dependency-graph.js: process\n",
+      "files": [
+        "src/core/mermaid-generator.ts",
+        "./features.js",
+        "./dependency-graph.js"
+      ],
+      "filesByAction": {
+        "User can visualize user flows through features": [
+          "src/core/mermaid-generator.ts",
+          "./features.js",
+          "./dependency-graph.js"
+        ],
+        "User can see high-level architecture of features": [
+          "src/core/mermaid-generator.ts",
+          "./features.js",
+          "./dependency-graph.js"
+        ],
+        "User can understand file interactions based on user actions": [
+          "src/core/mermaid-generator.ts",
+          "./features.js",
+          "./dependency-graph.js"
+        ]
+      },
+      "dependencies": [],
+      "tags": [
+        "src",
+        "core",
+        "typescript",
+        "new"
+      ]
+    },
+    {
+      "id": "git-history",
+      "name": "Git History",
+      "description": "",
+      "category": "Services",
+      "userFlows": [
+        "User can view the history of commits in a Git repository",
+        "User can retrieve details about specific commits",
+        "User can see which files were changed in a commit",
+        "User can access the content of files at specific commits"
+      ],
+      "mermaidDiagram": "flowchart TD\n  Start([Git History])\n  git_history_1[User can view the history of commits in a Git r...]\n  git_history_2[User can retrieve details about specific commits]\n  git_history_3[User can see which files were changed in a commit]\n  git_history_4[User can access the content of files at specifi...]\n  Start --> git_history_1\n  git_history_1 --> git_history_2\n  git_history_2 --> git_history_3\n  git_history_3 --> git_history_4\n  git_history_4 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title Git History\n  section User Actions\n    User can view the history of commits ...: 3: User\n    User can retrieve details about speci...: 3: User\n    User can see which files were changed...: 3: User\n    User can access the content of files ...: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant src/git/history.ts as src/git/history.ts\n    participant simple-git as simple-git\n    User->>src/git/history.ts: User can view the history of commits in a Git r...\n    src/git/history.ts->>simple-git: process\n    src/git/history.ts->>simple-git: process\n    src/git/history.ts->>simple-git: process\n    src/git/history.ts->>simple-git: process\n",
+      "files": [
+        "src/git/history.ts",
+        "simple-git"
+      ],
+      "filesByAction": {
+        "User can view the history of commits in a Git repository": [
+          "src/git/history.ts",
+          "simple-git"
+        ],
+        "User can retrieve details about specific commits": [
+          "src/git/history.ts",
+          "simple-git"
+        ],
+        "User can see which files were changed in a commit": [
+          "src/git/history.ts",
+          "simple-git"
+        ],
+        "User can access the content of files at specific commits": [
+          "src/git/history.ts",
+          "simple-git"
+        ]
+      },
+      "dependencies": [],
+      "tags": [
+        "src",
+        "git",
+        "typescript",
+        "new"
+      ]
+    },
+    {
+      "id": "knowledge-capture-cli",
+      "name": "Knowledge Capture Cli",
+      "description": "",
+      "category": "Services",
+      "entryPoint": "src/index.ts",
+      "userFlows": [
+        "User can initialize the knowledge capture in a repository",
+        "User can analyze commits for documentation purposes",
+        "User can onboard new users with personalized instructions",
+        "User can migrate existing knowledge files to a new format",
+        "User can document historical commits with GitFlash"
+      ],
+      "mermaidDiagram": "flowchart TD\n  Start([Knowledge Capture Cli])\n  knowledge_capture_cli_1[User can initialize the knowledge capture in a ...]\n  knowledge_capture_cli_2[User can analyze commits for documentation purp...]\n  knowledge_capture_cli_3[User can onboard new users with personalized in...]\n  knowledge_capture_cli_4[User can migrate existing knowledge files to a ...]\n  knowledge_capture_cli_5[User can document historical commits with GitFlash]\n  Start --> knowledge_capture_cli_1\n  knowledge_capture_cli_1 --> knowledge_capture_cli_2\n  knowledge_capture_cli_2 --> knowledge_capture_cli_3\n  knowledge_capture_cli_3 --> knowledge_capture_cli_4\n  knowledge_capture_cli_4 --> knowledge_capture_cli_5\n  knowledge_capture_cli_5 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title Knowledge Capture Cli\n  section User Actions\n    User can initialize the knowledge cap...: 3: User\n    User can analyze commits for document...: 3: User\n    User can onboard new users with perso...: 3: User\n    User can migrate existing knowledge f...: 3: User\n    User can document historical commits ...: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant src/index.ts as src/index.ts\n    participant commands/init.js as commands/init.js\n    participant ...ands/analyze-commit.js as ...ands/analyze-commit.js\n    participant ...ands/simulate-intro.js as ...ands/simulate-intro.js\n    participant commands/onboard.js as commands/onboard.js\n    participant ...ds/setup-onboarding.js as ...ds/setup-onboarding.js\n    participant ...ds/migrate-features.js as ...ds/migrate-features.js\n    participant commands/gitflash.js as commands/gitflash.js\n    User->>src/index.ts: User can initialize the knowledge capture in a ...\n    src/index.ts->>commands/init.js: process\n    commands/init.js->>...ands/analyze-commit.js: process\n    ...ands/analyze-commit.js->>...ands/simulate-intro.js: process\n    ...ands/simulate-intro.js->>commands/onboard.js: process\n    commands/onboard.js->>...ds/setup-onboarding.js: process\n    ...ds/setup-onboarding.js->>...ds/migrate-features.js: process\n    ...ds/migrate-features.js->>commands/gitflash.js: process\n    commands/gitflash.js->>package.json: process\n    src/index.ts->>commands/init.js: process\n    commands/init.js->>...ands/analyze-commit.js: process\n    ...ands/analyze-commit.js->>...ands/simulate-intro.js: process\n    ...ands/simulate-intro.js->>commands/onboard.js: process\n    commands/onboard.js->>...ds/setup-onboarding.js: process\n    ...ds/setup-onboarding.js->>...ds/migrate-features.js: process\n    ...ds/migrate-features.js->>commands/gitflash.js: process\n    commands/gitflash.js->>package.json: process\n    src/index.ts->>commands/init.js: process\n    commands/init.js->>...ands/analyze-commit.js: process\n    ...ands/analyze-commit.js->>...ands/simulate-intro.js: process\n    ...ands/simulate-intro.js->>commands/onboard.js: process\n    commands/onboard.js->>...ds/setup-onboarding.js: process\n    ...ds/setup-onboarding.js->>...ds/migrate-features.js: process\n    ...ds/migrate-features.js->>commands/gitflash.js: process\n    commands/gitflash.js->>package.json: process\n    src/index.ts->>commands/init.js: process\n    commands/init.js->>...ands/analyze-commit.js: process\n    ...ands/analyze-commit.js->>...ands/simulate-intro.js: process\n    ...ands/simulate-intro.js->>commands/onboard.js: process\n    commands/onboard.js->>...ds/setup-onboarding.js: process\n    ...ds/setup-onboarding.js->>...ds/migrate-features.js: process\n    ...ds/migrate-features.js->>commands/gitflash.js: process\n    commands/gitflash.js->>package.json: process\n    src/index.ts->>commands/init.js: process\n    commands/init.js->>...ands/analyze-commit.js: process\n    ...ands/analyze-commit.js->>...ands/simulate-intro.js: process\n    ...ands/simulate-intro.js->>commands/onboard.js: process\n    commands/onboard.js->>...ds/setup-onboarding.js: process\n    ...ds/setup-onboarding.js->>...ds/migrate-features.js: process\n    ...ds/migrate-features.js->>commands/gitflash.js: process\n    commands/gitflash.js->>package.json: process\n",
+      "files": [
+        "src/index.ts",
+        "commands/init.js",
+        "commands/analyze-commit.js",
+        "commands/simulate-intro.js",
+        "commands/onboard.js",
+        "commands/setup-onboarding.js",
+        "commands/migrate-features.js",
+        "commands/gitflash.js",
+        "package.json"
+      ],
+      "filesByAction": {
+        "User can initialize the knowledge capture in a repository": [
+          "src/index.ts",
+          "commands/init.js",
+          "commands/analyze-commit.js",
+          "commands/simulate-intro.js",
+          "commands/onboard.js",
+          "commands/setup-onboarding.js",
+          "commands/migrate-features.js",
+          "commands/gitflash.js",
+          "package.json"
+        ],
+        "User can analyze commits for documentation purposes": [
+          "src/index.ts",
+          "commands/init.js",
+          "commands/analyze-commit.js",
+          "commands/simulate-intro.js",
+          "commands/onboard.js",
+          "commands/setup-onboarding.js",
+          "commands/migrate-features.js",
+          "commands/gitflash.js",
+          "package.json"
+        ],
+        "User can onboard new users with personalized instructions": [
+          "src/index.ts",
+          "commands/init.js",
+          "commands/analyze-commit.js",
+          "commands/simulate-intro.js",
+          "commands/onboard.js",
+          "commands/setup-onboarding.js",
+          "commands/migrate-features.js",
+          "commands/gitflash.js",
+          "package.json"
+        ],
+        "User can migrate existing knowledge files to a new format": [
+          "src/index.ts",
+          "commands/init.js",
+          "commands/analyze-commit.js",
+          "commands/simulate-intro.js",
+          "commands/onboard.js",
+          "commands/setup-onboarding.js",
+          "commands/migrate-features.js",
+          "commands/gitflash.js",
+          "package.json"
+        ],
+        "User can document historical commits with GitFlash": [
+          "src/index.ts",
+          "commands/init.js",
+          "commands/analyze-commit.js",
+          "commands/simulate-intro.js",
+          "commands/onboard.js",
+          "commands/setup-onboarding.js",
+          "commands/migrate-features.js",
+          "commands/gitflash.js",
+          "package.json"
+        ]
+      },
+      "dependencies": [],
+      "tags": [
+        "src",
+        "typescript"
+      ]
+    },
+    {
+      "id": "prompts-templates",
+      "name": "Prompts Templates",
+      "description": "",
+      "category": "Services",
+      "userFlows": [
+        "User can generate documentation for code files based on their context",
+        "User can analyze changes in code files with historical commit information"
+      ],
+      "mermaidDiagram": "flowchart TD\n  Start([Prompts Templates])\n  prompts_templates_1[User can generate documentation for code files ...]\n  prompts_templates_2[User can analyze changes in code files with his...]\n  Start --> prompts_templates_1\n  prompts_templates_1 --> prompts_templates_2\n  prompts_templates_2 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title Prompts Templates\n  section User Actions\n    User can generate documentation for c...: 3: User\n    User can analyze changes in code file...: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant src/prompts/templates.ts as src/prompts/templates.ts\n    User->>src/prompts/templates.ts: User can generate documentation for code files ...\n",
+      "files": [
+        "src/prompts/templates.ts"
+      ],
+      "filesByAction": {
+        "User can generate documentation for code files based on their context": [
+          "src/prompts/templates.ts"
+        ],
+        "User can analyze changes in code files with historical commit information": [
+          "src/prompts/templates.ts"
+        ]
+      },
+      "dependencies": [],
+      "tags": [
+        "src",
+        "prompts",
+        "typescript"
+      ]
+    },
+    {
+      "id": "cost-estimator",
+      "name": "Cost Estimator",
+      "description": "",
+      "category": "Utilities",
+      "userFlows": [
+        "User can estimate the cost of processing git commits",
+        "User can analyze the potential time required for processing changes in a repository"
+      ],
+      "mermaidDiagram": "flowchart TD\n  Start([Cost Estimator])\n  cost_estimator_1[User can estimate the cost of processing git co...]\n  cost_estimator_2[User can analyze the potential time required fo...]\n  Start --> cost_estimator_1\n  cost_estimator_1 --> cost_estimator_2\n  cost_estimator_2 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title Cost Estimator\n  section User Actions\n    User can estimate the cost of process...: 3: User\n    User can analyze the potential time r...: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant ...tils/cost-estimator.ts as ...tils/cost-estimator.ts\n    participant ../config/defaults.js as ../config/defaults.js\n    participant ../git/history.js as ../git/history.js\n    participant ../core/file-scanner.js as ../core/file-scanner.js\n    User->>...tils/cost-estimator.ts: User can estimate the cost of processing git co...\n    ...tils/cost-estimator.ts->>../config/defaults.js: process\n    ../config/defaults.js->>../git/history.js: process\n    ../git/history.js->>../core/file-scanner.js: process\n    ...tils/cost-estimator.ts->>../config/defaults.js: process\n    ../config/defaults.js->>../git/history.js: process\n    ../git/history.js->>../core/file-scanner.js: process\n",
+      "files": [
+        "src/utils/cost-estimator.ts",
+        "../config/defaults.js",
+        "../git/history.js",
+        "../core/file-scanner.js"
+      ],
+      "filesByAction": {
+        "User can estimate the cost of processing git commits": [
+          "src/utils/cost-estimator.ts",
+          "../config/defaults.js",
+          "../git/history.js",
+          "../core/file-scanner.js"
+        ],
+        "User can analyze the potential time required for processing changes in a repository": [
+          "src/utils/cost-estimator.ts",
+          "../config/defaults.js",
+          "../git/history.js",
+          "../core/file-scanner.js"
+        ]
+      },
+      "dependencies": [],
+      "tags": [
+        "src",
+        "utils",
         "typescript",
         "new"
       ]

@@ -1,20 +1,36 @@
-export const SYSTEM_PROMPT = `You are a senior software engineer with a knack for explaining code in a way that is easy to understand and use. You are also a great at creating knowledge documentation for team members.
+export const SYSTEM_PROMPT = `You are a senior software engineer with a knack for explaining code in a way that is easy to understand and use. You are also great at creating knowledge documentation for team members.
 
 Your goal: Extract tacit knowledge that isn't obvious from reading the code alone.
 
-Focus on:
-- WHY decisions were made (not just WHAT the code does)
-- Gotchas and edge cases
-- Non-obvious behaviors
-- Performance considerations
-- Common mistakes to avoid
+## CRITICAL RULES
+
+1. **DO NOT restate what the code obviously does** - focus on NON-OBVIOUS insights
+2. **DO NOT include Node.js built-ins in relatedFiles** (fs, path, http, crypto, os, util, child_process, stream, buffer, events, etc.) - only LOCAL project files
+3. **Focus on:** edge cases, gotchas, WHY decisions were made, performance traps, common mistakes
+4. **If something is straightforward**, say so briefly and move on
+
+BAD example: "This function adds two numbers" (obvious from code)
+GOOD example: "Returns NaN if either input is undefined - callers must validate" (non-obvious)
+
+## INCREMENTAL DOCUMENTATION MODE
+
+When you receive EXISTING_DOCUMENTATION, you are UPDATING, not replacing:
+
+1. **PRESERVE** insights that are still accurate and valuable
+2. **ADD** new insights discovered from the latest code changes
+3. **REMOVE** only insights that are demonstrably no longer true (code deleted, behavior changed)
+4. **DO NOT reword** things that don't need rewording - preserve the original voice
+5. **MERGE** gotchas, don't replace the list
+6. **APPEND** to implementation notes with dated updates if significant
+
+If a section in existing docs is still accurate, keep it verbatim. Your job is to ENRICH, not rewrite.
 
 ## Feature-Aware Documentation
 
 When documenting files, also extract:
 1. **Feature ID**: Based on directory structure (e.g., app/dashboard → "dashboard-analytics")
 2. **User Flows**: What USER ACTIONS does this file enable? Think from end-user perspective.
-3. **Related Files**: Extract from imports - convert relative imports to file paths
+3. **Related Files**: ONLY local project files from imports - NOT node built-ins or npm packages
 4. **Feature Role**: Is this an entry_point, helper, component, service, or config?
 
 Be concise and technical. Use code examples sparingly.`;
@@ -27,6 +43,12 @@ export interface PromptContext {
   gitDiff?: string;
   dependencies: Array<{ path: string; exports: string[] }>;
   dependents: string[];
+  commitContext?: {
+    hash: string;
+    message: string;
+    date: Date;
+    author: string;
+  };
 }
 
 /**
@@ -41,6 +63,7 @@ export function generateUserPrompt(context: PromptContext): string {
     gitDiff,
     dependencies,
     dependents,
+    commitContext,
   } = context;
 
   let prompt = `Analyze this file and generate knowledge documentation.
@@ -49,6 +72,16 @@ FILE: ${filePath}
 LANGUAGE: ${language}
 GIT STATUS: ${isNew ? "NEW FILE" : "MODIFIED"}
 `;
+
+  if (commitContext) {
+    const formattedDate = commitContext.date.toISOString();
+    prompt += `COMMIT CONTEXT:
+- HASH: ${commitContext.hash}
+- AUTHOR: ${commitContext.author}
+- DATE: ${formattedDate}
+- MESSAGE: ${commitContext.message}
+`;
+  }
 
   if (gitDiff && !isNew) {
     prompt += `\nCHANGES IN THIS COMMIT:

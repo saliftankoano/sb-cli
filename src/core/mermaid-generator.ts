@@ -5,6 +5,7 @@
  */
 
 import type { Feature } from "./features.js";
+import type { FileNode } from "./dependency-graph.js";
 
 /**
  * Generate a Mermaid flowchart from user flows
@@ -293,6 +294,155 @@ export function generateArchitectureMermaid(
             diagram += `  ${toNodeId} --> ${fromNodeId}\n`;
           }
         });
+      }
+    });
+  });
+
+  return diagram;
+}
+
+/**
+ * Generate connected architecture diagram using dependency graph
+ * Shows real connections between features based on file imports
+ *
+ * @param features - Array of features
+ * @param graph - Dependency graph (Map of file path to FileNode)
+ * @returns Mermaid diagram code as a string
+ */
+export function generateConnectedArchitecture(
+  features: Feature[],
+  graph: Map<string, FileNode>
+): string {
+  if (!features || features.length === 0) {
+    return "";
+  }
+
+  // Build a map of file -> feature(s) that contain it
+  const fileToFeatures = new Map<string, string[]>();
+  features.forEach((feature) => {
+    feature.files.forEach((file) => {
+      if (!fileToFeatures.has(file)) {
+        fileToFeatures.set(file, []);
+      }
+      fileToFeatures.get(file)!.push(feature.id);
+    });
+  });
+
+  // Build feature-to-feature connections based on file imports
+  const featureConnections = new Map<string, Set<string>>();
+  features.forEach((feature) => {
+    featureConnections.set(feature.id, new Set());
+  });
+
+  // For each file in the graph, check its imports
+  // If it connects files from different features, add a connection
+  for (const [filePath, node] of graph.entries()) {
+    const fromFeatures = fileToFeatures.get(filePath) || [];
+
+    for (const importPath of node.imports) {
+      const toFeatures = fileToFeatures.get(importPath) || [];
+
+      fromFeatures.forEach((fromFeature) => {
+        toFeatures.forEach((toFeature) => {
+          if (fromFeature !== toFeature) {
+            featureConnections.get(fromFeature)?.add(toFeature);
+          }
+        });
+      });
+    }
+  }
+
+  // Separate features into entry points and services
+  const entryPoints: Feature[] = [];
+  const services: Feature[] = [];
+  const apis: Feature[] = [];
+
+  features.forEach((feature) => {
+    if (feature.entryPoint || feature.category === "API") {
+      apis.push(feature);
+    } else if (feature.category === "Services") {
+      services.push(feature);
+    } else {
+      entryPoints.push(feature);
+    }
+  });
+
+  // Generate flowchart LR (left-right) diagram
+  let diagram = "flowchart LR\n";
+
+  // Create Entry Points subgraph
+  if (apis.length > 0) {
+    const cleanEntryName = "Entry";
+    diagram += `  subgraph ${cleanEntryName}["Entry Points"]\n`;
+    apis.forEach((feature) => {
+      const cleanFeatureId = feature.id.replace(/[^a-zA-Z0-9]/g, "_");
+      const nodeId = `${cleanEntryName}_${cleanFeatureId}`;
+      const displayName =
+        feature.name.length > 25
+          ? feature.name.substring(0, 22) + "..."
+          : feature.name;
+      diagram += `    ${nodeId}["${displayName}"]\n`;
+    });
+    diagram += `  end\n`;
+  }
+
+  // Create Services subgraph
+  if (services.length > 0) {
+    const cleanServicesName = "Services";
+    diagram += `  subgraph ${cleanServicesName}["Services"]\n`;
+    services.forEach((feature) => {
+      const cleanFeatureId = feature.id.replace(/[^a-zA-Z0-9]/g, "_");
+      const nodeId = `${cleanServicesName}_${cleanFeatureId}`;
+      const displayName =
+        feature.name.length > 25
+          ? feature.name.substring(0, 22) + "..."
+          : feature.name;
+      diagram += `    ${nodeId}["${displayName}"]\n`;
+    });
+    diagram += `  end\n`;
+  }
+
+  // Add connections between features
+  featureConnections.forEach((connectedFeatures, featureId) => {
+    const feature = features.find((f) => f.id === featureId);
+    if (!feature) return;
+
+    const featureCategory = feature.category || "Services";
+    const cleanCatName =
+      featureCategory === "API"
+        ? "Entry"
+        : featureCategory.replace(/[^a-zA-Z0-9]/g, "_");
+    const cleanFeatureId = featureId.replace(/[^a-zA-Z0-9]/g, "_");
+    const fromNodeId = `${cleanCatName}_${cleanFeatureId}`;
+
+    connectedFeatures.forEach((connectedFeatureId) => {
+      const connectedFeature = features.find(
+        (f) => f.id === connectedFeatureId
+      );
+      if (!connectedFeature) return;
+
+      const connectedCategory = connectedFeature.category || "Services";
+      const connectedCleanCatName =
+        connectedCategory === "API"
+          ? "Entry"
+          : connectedCategory.replace(/[^a-zA-Z0-9]/g, "_");
+      const connectedCleanFeatureId = connectedFeatureId.replace(
+        /[^a-zA-Z0-9]/g,
+        "_"
+      );
+      const toNodeId = `${connectedCleanCatName}_${connectedCleanFeatureId}`;
+
+      // Only add edge if both nodes exist
+      const fromExists =
+        (featureCategory === "API" && apis.includes(feature)) ||
+        (featureCategory === "Services" && services.includes(feature));
+      const toExists =
+        (connectedCategory === "API" && apis.includes(connectedFeature)) ||
+        (connectedCategory === "Services" &&
+          services.includes(connectedFeature));
+
+      if (fromExists && toExists) {
+        diagram += `  ${fromNodeId} --> ${toNodeId}\n`;
       }
     });
   });
