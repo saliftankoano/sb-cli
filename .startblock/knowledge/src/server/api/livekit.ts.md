@@ -1,7 +1,7 @@
 ---
 filePath: src/server/api/livekit.ts
-fileVersion: 57491bcac0bca1c30b9bc5ae0d853f915763fc4e
-lastUpdated: '2025-12-16T01:14:10.238Z'
+fileVersion: c766688c23eea47221c7fbd5175bbbd63c3c579f
+lastUpdated: '2025-12-17T01:30:42.349Z'
 updatedBy: sb-cli
 tags:
   - src
@@ -12,33 +12,34 @@ importance: low
 extractedBy: sb-cli@1.0.0
 model: gpt-4o-mini
 humanVerified: false
-feature: livekit-integration
+feature: livekit-setup
 featureRole: entry_point
 userFlows:
-  - User can generate a LiveKit token for video sessions
-  - User can join a video room based on session ID
+  - User can generate a LiveKit token for onboarding sessions
+  - User can create or join a LiveKit room for real-time communication
 relatedFiles:
   - ../../config/loader.js
 ---
-# Purpose
-This file sets up API routes for generating LiveKit tokens, essential for user sessions in a video conferencing context.
+## Purpose
+This file sets up API routes for generating LiveKit tokens and managing rooms for real-time communication.
 
-# Key Functionality
-- `setupLiveKitRoutes(repoRoot: string): Router`: Configures the Express router to handle LiveKit token generation requests.
+## Key Functionality
+- `setupLiveKitRoutes(repoRoot: string): Router`: Configures the Express router with a POST endpoint for generating LiveKit tokens.
 
-# Gotchas
-- The removal of default credentials means that the application now strictly requires environment variables or configuration files for LiveKit setup, increasing security but also requiring proper setup before deployment.
-- If the LiveKit configuration is incomplete, it returns a 400 error; however, it does not validate the format or correctness of the provided URLs or keys, which could lead to runtime errors if they are invalid.
-- The room creation process is idempotent; if a room already exists, it silently continues without throwing an error, which is a design choice that can lead to confusion if not documented properly.
-- The access token is generated with a unique identity based on the current timestamp, which may lead to potential conflicts if multiple requests are processed in quick succession.
+## Gotchas
+- LiveKit credentials are now strictly sourced from environment variables, and users of the CLI do not need to provide them, which can lead to confusion if not documented properly.
+- The room creation process is designed to be idempotent; if a room already exists, the error is caught and ignored, which may lead to unexpected behavior if not understood.
+- The access token generation includes permissions that allow users to join and interact with the room, which is crucial for ensuring proper access control during onboarding sessions.
+- The room name generation uses the current timestamp if no session ID is provided, which may lead to non-unique room names if multiple requests are made in quick succession.
 
-# Dependencies
-- `livekit-server-sdk`: Used for creating rooms and generating access tokens for LiveKit, which is crucial for enabling video conferencing features.
-- `loadConfig`: Loads configuration settings, allowing for dynamic setup based on environment variables or configuration files.
+## Dependencies
+- `express`: Used for creating the API routes.
+- `livekit-server-sdk`: Provides the necessary classes for generating access tokens and managing rooms in LiveKit.
 
-# Architecture Context
-This file is part of the server-side API that integrates with LiveKit to facilitate real-time communication features in the application. It serves as a bridge between client requests and the LiveKit service, ensuring that users can join video sessions securely.
+## Architecture Context
+This file is part of the server-side implementation for handling real-time communication features, specifically focusing on token generation and room management for onboarding sessions.
 
-# Implementation Notes
-- The decision to rely solely on environment variables or configuration files for LiveKit credentials enhances security but requires careful management of these settings.
-- The error handling strategy for room creation is lenient, which may simplify user experience but could obscure issues if room management is not well understood by developers.
+## Implementation Notes
+- The decision to source LiveKit credentials from environment variables simplifies configuration for end users but requires clear documentation to avoid confusion.
+- The use of `Date.now()` for generating room names ensures that room names are unique unless multiple requests occur at the same millisecond, which could be a potential edge case to monitor for.
+- The implementation handles errors gracefully, logging them and responding with a 500 status code, which is important for maintaining a good user experience during failures.

@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2025-12-16T01:14:10.239Z",
+  "lastUpdated": "2025-12-17T01:30:42.353Z",
   "features": [
     {
       "id": "startblock-onboarding",
@@ -139,6 +139,80 @@
       "tags": [
         "agent",
         "python"
+      ]
+    },
+    {
+      "id": "livekit-setup",
+      "name": "Livekit Setup",
+      "description": "",
+      "category": "API",
+      "entryPoint": "src/server/api/livekit.ts",
+      "userFlows": [
+        "User can generate a LiveKit token for onboarding sessions",
+        "User can create or join a LiveKit room for real-time communication"
+      ],
+      "mermaidDiagram": "flowchart TD\n  Start([Livekit Setup])\n  livekit_setup_1[User can generate a LiveKit token for onboardin...]\n  livekit_setup_2[User can create or join a LiveKit room for real...]\n  Start --> livekit_setup_1\n  livekit_setup_1 --> livekit_setup_2\n  livekit_setup_2 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title Livekit Setup\n  section User Actions\n    User can generate a LiveKit token for...: 3: User\n    User can create or join a LiveKit roo...: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant src/server/api/livekit.ts as src/server/api/livekit.ts\n    participant ../../config/loader.js as ../../config/loader.js\n    User->>src/server/api/livekit.ts: User can generate a LiveKit token for onboardin...\n    src/server/api/livekit.ts->>../../config/loader.js: process\n    src/server/api/livekit.ts->>../../config/loader.js: process\n",
+      "files": [
+        "src/server/api/livekit.ts",
+        "../../config/loader.js"
+      ],
+      "filesByAction": {
+        "User can generate a LiveKit token for onboarding sessions": [
+          "src/server/api/livekit.ts",
+          "../../config/loader.js"
+        ],
+        "User can create or join a LiveKit room for real-time communication": [
+          "src/server/api/livekit.ts",
+          "../../config/loader.js"
+        ]
+      },
+      "dependencies": [],
+      "tags": [
+        "src",
+        "server",
+        "api",
+        "typescript"
+      ]
+    },
+    {
+      "id": "api",
+      "name": "Api",
+      "description": "",
+      "category": "Services",
+      "userFlows": [
+        "User can fetch available features",
+        "User can access onboarding documentation",
+        "User can retrieve a LiveKit token for real-time communication",
+        "User can view the file structure of the project"
+      ],
+      "mermaidDiagram": "flowchart TD\n  Start([Api])\n  api_1[User can fetch available features]\n  api_2[User can access onboarding documentation]\n  api_3[User can retrieve a LiveKit token for real-time...]\n  api_4[User can view the file structure of the project]\n  Start --> api_1\n  api_1 --> api_2\n  api_2 --> api_3\n  api_3 --> api_4\n  api_4 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title Api\n  section User Actions\n    User can fetch available features: 3: User\n    User can access onboarding documentation: 3: User\n    User can retrieve a LiveKit token for...: 3: User\n    User can view the file structure of t...: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant ui/src/lib/api.ts as ui/src/lib/api.ts\n    User->>ui/src/lib/api.ts: User can fetch available features\n",
+      "files": [
+        "ui/src/lib/api.ts"
+      ],
+      "filesByAction": {
+        "User can fetch available features": [
+          "ui/src/lib/api.ts"
+        ],
+        "User can access onboarding documentation": [
+          "ui/src/lib/api.ts"
+        ],
+        "User can retrieve a LiveKit token for real-time communication": [
+          "ui/src/lib/api.ts"
+        ],
+        "User can view the file structure of the project": [
+          "ui/src/lib/api.ts"
+        ]
+      },
+      "dependencies": [],
+      "tags": [
+        "ui",
+        "src",
+        "lib",
+        "typescript"
       ]
     }
   ]

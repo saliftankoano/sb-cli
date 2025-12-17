@@ -1,14 +1,16 @@
 # LiveKit Setup Guide
 
-To enable voice-first onboarding, you need to configure LiveKit Cloud credentials.
+Closed testing: LiveKit is hosted by Startblock and credentials are injected on the server side. Test users do **not** need to configure LiveKit keys. If you are self-hosting or want to use your own LiveKit project, follow the steps below.
 
 ## Step 1: Get LiveKit Cloud Credentials
 
 1. **Sign up for LiveKit Cloud** (if you haven't already):
+
    - Go to https://cloud.livekit.io
    - Sign up for a free account (includes free tier)
 
 2. **Create a Project**:
+
    - After logging in, create a new project
    - Note your project's **URL** (e.g., `wss://your-project.livekit.cloud`)
 
@@ -55,12 +57,14 @@ Add to your `.sb-config.json`:
 The agent needs to run separately. You'll need:
 
 1. **Python environment** with the agent dependencies:
+
    ```bash
    cd agent
    pip install -r requirements.txt
    ```
 
 2. **Environment variables for the agent**:
+
    ```bash
    export LIVEKIT_URL="wss://your-project.livekit.cloud"
    export LIVEKIT_API_KEY="AP..."
@@ -77,6 +81,7 @@ The agent needs to run separately. You'll need:
 ## Step 4: Test It
 
 1. Start the onboarding server:
+
    ```bash
    sb serve
    ```
@@ -88,31 +93,35 @@ The agent needs to run separately. You'll need:
 ## Troubleshooting
 
 **"LiveKit configuration missing" error:**
+
 - Make sure you've set the credentials in either `.sb-config.json` or environment variables
 - Restart the server after adding config
 
 **Agent not connecting:**
+
 - Check that the agent is running
 - Verify LIVEKIT_URL, LIVEKIT_API_KEY, and LIVEKIT_API_SECRET are set correctly
 - Check agent logs for connection errors
 
 **No voice in browser:**
+
 - Check browser console for errors
 - Make sure microphone permissions are granted
 - Verify LiveKit room is being created (check LiveKit Cloud dashboard)
 
 ## What You Need Summary
 
-| Credential | Where to Get It | Where to Put It |
-|------------|----------------|-----------------|
-| **LiveKit URL** | LiveKit Cloud project settings | `.sb-config.json` or `LIVEKIT_URL` env var |
-| **LiveKit API Key** | LiveKit Cloud API Keys section | `.sb-config.json` or `LIVEKIT_API_KEY` env var |
-| **LiveKit API Secret** | LiveKit Cloud API Keys section | `.sb-config.json` or `LIVEKIT_API_SECRET` env var |
-| **OpenAI API Key** | platform.openai.com/api-keys | `.sb-config.json` or `OPENAI_API_KEY` env var (already configured) |
+| Credential             | Where to Get It                | Where to Put It                                                    |
+| ---------------------- | ------------------------------ | ------------------------------------------------------------------ |
+| **LiveKit URL**        | LiveKit Cloud project settings | `.sb-config.json` or `LIVEKIT_URL` env var                         |
+| **LiveKit API Key**    | LiveKit Cloud API Keys section | `.sb-config.json` or `LIVEKIT_API_KEY` env var                     |
+| **LiveKit API Secret** | LiveKit Cloud API Keys section | `.sb-config.json` or `LIVEKIT_API_SECRET` env var                  |
+| **OpenAI API Key**     | platform.openai.com/api-keys   | `.sb-config.json` or `OPENAI_API_KEY` env var (already configured) |
 
 ## Next Steps
 
 Once configured:
+
 1. Run `sb onboard` to create a session
 2. Start the server: `sb serve`
 3. Start the agent: `python agent/main.py dev`

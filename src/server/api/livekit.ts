@@ -1,7 +1,5 @@
 import { Router } from "express";
 import { AccessToken, RoomServiceClient } from "livekit-server-sdk";
-import { loadConfig } from "../../config/loader.js";
-import * as path from "path";
 
 interface LiveKitTokenRequest {
   sessionId?: string;
@@ -12,19 +10,16 @@ export function setupLiveKitRoutes(repoRoot: string): Router {
 
   router.post("/token", async (req, res) => {
     try {
-      const config = await loadConfig(repoRoot);
-
-      // Check for LiveKit config
-      const livekitUrl = process.env.LIVEKIT_URL || config.livekit?.url;
-      const livekitApiKey =
-        process.env.LIVEKIT_API_KEY || config.livekit?.apiKey;
-      const livekitApiSecret =
-        process.env.LIVEKIT_API_SECRET || config.livekit?.apiSecret;
+      // LiveKit credentials are provided by the Startblock service env vars only.
+      // Users of the CLI do NOT need to supply keys during closed testing.
+      const livekitUrl = process.env.LIVEKIT_URL;
+      const livekitApiKey = process.env.LIVEKIT_API_KEY;
+      const livekitApiSecret = process.env.LIVEKIT_API_SECRET;
 
       if (!livekitUrl || !livekitApiKey || !livekitApiSecret) {
         return res.status(400).json({
           error:
-            "LiveKit configuration missing. Please set LIVEKIT_URL, LIVEKIT_API_KEY, and LIVEKIT_API_SECRET in your environment or .sb-config.json",
+            "LiveKit configuration missing. Set LIVEKIT_URL, LIVEKIT_API_KEY, and LIVEKIT_API_SECRET on the server (end users do not need to configure these).",
         });
       }
 

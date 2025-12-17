@@ -185,31 +185,23 @@ After running `sb init`, you can customize behavior in `.sb-config.json`:
 
 > 🔒 **Security**: Your API keys are stored locally in `.sb-config.json` which is automatically added to `.gitignore`.
 
-### Voice Onboarding Setup
+### Voice Onboarding (Closed Testing Default)
 
-To enable voice-first onboarding with LiveKit:
+During closed testing, LiveKit credentials are provided by Startblock on the server side. Users do **not** need to supply LiveKit keys.
 
-1. **Get LiveKit Cloud credentials** (free tier available):
-   - Sign up at https://cloud.livekit.io
-   - Create a project and get API credentials
+1. **Run the agent**:
 
-2. **Add to `.sb-config.json`** (see example above)
-
-3. **Set up the agent**:
    ```bash
    cd agent
    pip install -r requirements.txt
-   export LIVEKIT_URL="wss://your-project.livekit.cloud"
-   export LIVEKIT_API_KEY="AP..."
-   export LIVEKIT_API_SECRET="your-secret"
    export OPENAI_API_KEY="sk-..."
    export REPO_ROOT="/path/to/repo"
    python main.py dev
    ```
 
-4. **Start the server**: `sb serve`
+2. **Start the server**: `sb serve`
 
-See [LIVEKIT_SETUP.md](./LIVEKIT_SETUP.md) for detailed setup instructions.
+Optional self-hosting or BYO LiveKit: see [LIVEKIT_SETUP.md](./LIVEKIT_SETUP.md) for configuring your own LiveKit Cloud credentials.
 
 ---
 

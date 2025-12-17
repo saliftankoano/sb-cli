@@ -1,4 +1,6 @@
 const API_BASE = "/api";
+const LIVEKIT_TOKEN_URL =
+  process.env.NEXT_PUBLIC_LIVEKIT_TOKEN_URL || `${API_BASE}/livekit/token`;
 
 export interface Feature {
   id: string;
@@ -165,7 +167,7 @@ export interface LiveKitTokenResponse {
 export async function fetchLiveKitToken(
   sessionId?: string
 ): Promise<LiveKitTokenResponse> {
-  const response = await fetch(`${API_BASE}/livekit/token`, {
+  const response = await fetch(LIVEKIT_TOKEN_URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
