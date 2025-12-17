@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { fetchFeatures, type Feature, type FeaturesManifest } from "../lib/api";
+import { useProgress } from "../hooks/useProgress";
 import {
   CubeIcon,
   ArrowRightIcon,
@@ -13,6 +14,7 @@ export default function FeaturesView({ featureId }: { featureId?: string }) {
   const [manifest, setManifest] = useState<FeaturesManifest | null>(null);
   const [selectedFeature, setSelectedFeature] = useState<Feature | null>(null);
   const [loading, setLoading] = useState(true);
+  const { markFeatureExplored } = useProgress();
 
   useEffect(() => {
     fetchFeatures().then((data) => {
@@ -24,11 +26,14 @@ export default function FeaturesView({ featureId }: { featureId?: string }) {
   useEffect(() => {
     if (manifest && featureId) {
       const found = manifest.features.find((f) => f.id === featureId);
-      if (found) setSelectedFeature(found);
+      if (found) {
+        setSelectedFeature(found);
+        markFeatureExplored(featureId);
+      }
     } else if (manifest && !featureId) {
       setSelectedFeature(null);
     }
-  }, [manifest, featureId]);
+  }, [manifest, featureId, markFeatureExplored]);
 
   if (loading) {
     return (

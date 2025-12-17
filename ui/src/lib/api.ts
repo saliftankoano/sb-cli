@@ -179,3 +179,36 @@ export async function fetchLiveKitToken(
   }
   return response.json();
 }
+
+export interface FileContentLine {
+  number: number;
+  content: string;
+}
+
+export interface FileContentResponse {
+  filePath: string;
+  content: string;
+  lines: FileContentLine[];
+  totalLines: number;
+  startLine: number;
+  endLine: number;
+}
+
+export async function fetchFileContent(
+  filePath: string,
+  startLine?: number,
+  endLine?: number
+): Promise<FileContentResponse> {
+  const params = new URLSearchParams();
+  if (startLine !== undefined) params.set("startLine", String(startLine));
+  if (endLine !== undefined) params.set("endLine", String(endLine));
+
+  const url = `${API_BASE}/files/${filePath}${
+    params.toString() ? `?${params}` : ""
+  }`;
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch file: ${filePath}`);
+  }
+  return response.json();
+}

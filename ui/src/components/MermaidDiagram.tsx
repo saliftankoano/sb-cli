@@ -6,13 +6,33 @@ interface MermaidDiagramProps {
   className?: string;
 }
 
+// Sanitize mermaid diagram to fix common syntax issues
+function sanitizeMermaidDiagram(diagram: string): string {
+  let sanitized = diagram.trim();
+
+  // Remove any HTML entities that might cause issues
+  sanitized = sanitized
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&amp;/g, "&")
+    .replace(/&quot;/g, '"');
+
+  // Fix common issues with node labels containing special characters
+  // Replace ... with ellipsis to avoid parsing issues
+  sanitized = sanitized.replace(/\.\.\./g, "…");
+
+  // Ensure proper newlines
+  sanitized = sanitized.replace(/\\n/g, "\n");
+
+  return sanitized;
+}
+
 export default function MermaidDiagram({
   diagram,
   className = "",
 }: MermaidDiagramProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isDark, setIsDark] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   // Detect dark mode
   useEffect(() => {
@@ -49,6 +69,9 @@ export default function MermaidDiagram({
     const container = containerRef.current;
     const id = `mermaid-${Math.random().toString(36).substr(2, 9)}`;
 
+    // Sanitize the diagram
+    const sanitizedDiagram = sanitizeMermaidDiagram(diagram);
+
     // Initialize Mermaid with theme
     mermaid.initialize({
       startOnLoad: false,
@@ -64,23 +87,31 @@ export default function MermaidDiagram({
           }
         : undefined,
       securityLevel: "loose",
+      suppressErrorRendering: true,
     });
 
     // Clear previous content
     container.innerHTML = "";
 
-    // Render diagram
-    mermaid
-      .render(id, diagram.trim())
-      .then((result) => {
-        container.innerHTML = result.svg;
-        setError(null);
-      })
-      .catch((err) => {
-        console.error("Mermaid rendering error:", err);
-        setError("Failed to render diagram");
-        container.innerHTML = `<div class="text-red-500 text-sm p-4">Error rendering diagram: ${err.message}</div>`;
-      });
+    // Render diagram - wrap in try/catch to handle sync errors
+    try {
+      mermaid
+        .render(id, sanitizedDiagram)
+        .then((result) => {
+          if (container) {
+            container.innerHTML = result.svg;
+          }
+        })
+        .catch(() => {
+          // Silently fail - don't show error in UI
+          if (container) {
+            container.innerHTML = "";
+          }
+        });
+    } catch {
+      // Silently fail for sync errors
+      container.innerHTML = "";
+    }
   }, [diagram, isDark]);
 
   if (!diagram) {
@@ -91,12 +122,6 @@ export default function MermaidDiagram({
     <div
       ref={containerRef}
       className={`mermaid-container ${className} overflow-x-auto my-4`}
-    >
-      {error && (
-        <div className="text-red-500 text-sm p-2 bg-red-50 dark:bg-red-900/20 rounded">
-          {error}
-        </div>
-      )}
-    </div>
+    />
   );
 }

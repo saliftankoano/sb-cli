@@ -1,7 +1,7 @@
 ---
 filePath: ui/src/lib/api.ts
-fileVersion: e79e872063ecc7ae9518cd8ed987b60af3b96e2f
-lastUpdated: '2025-12-17T01:30:42.352Z'
+fileVersion: 47a0fae09d8add3f6e041cab60a1cfc07b8b24c0
+lastUpdated: '2025-12-17T01:38:41.913Z'
 updatedBy: sb-cli
 tags:
   - ui
@@ -12,37 +12,33 @@ importance: low
 extractedBy: sb-cli@1.0.0
 model: gpt-4o-mini
 humanVerified: false
-feature: api
+feature: file-content-fetching
 featureRole: service
 userFlows:
-  - User can fetch available features
-  - User can access onboarding documentation
-  - User can retrieve a LiveKit token for real-time communication
-  - User can view the file structure of the project
+  - User can fetch specific lines from a file
+  - User can view onboarding documents
+  - User can retrieve feature information
 relatedFiles: []
 ---
 ## Purpose
-This file acts as an API client for fetching data related to features, onboarding documentation, and knowledge management within the application.
+This file provides a set of API functions to interact with various backend services, including fetching features, onboarding documents, and file content.
 
 ## Key Functionality
-- `fetchFeatures`: Retrieves the list of features from the API.
-- `fetchOnboardingDocs`: Fetches onboarding documentation.
-- `fetchLiveKitToken`: Obtains a LiveKit token for real-time communication, utilizing a configurable URL.
-- `fetchKnowledge`: Fetches knowledge files related to the application.
-- `fetchTree`: Retrieves the file structure of the project.
+- `fetchFeatures`: Fetches a list of features from the backend.
+- `fetchOnboardingDocs`: Retrieves onboarding documents.
+- `fetchFileContent`: Fetches specific lines of a file based on provided line numbers.
+- `fetchKnowledge`: Fetches knowledge files for onboarding sessions.
 
 ## Gotchas
-- The `fetchLiveKitToken` function requires a `sessionId` parameter; if the backend expects this and it is not provided, it may lead to unexpected behavior or errors.
-- The `fetchOnboardingDocs` function returns an empty array if the response is not OK, which may mask underlying issues; developers should log or handle this case appropriately.
-- Ensure that the environment variable `NEXT_PUBLIC_LIVEKIT_TOKEN_URL` is set correctly in production to avoid fallback to the default URL, which may not be valid.
+- The `fetchFileContent` function does not validate if `startLine` and `endLine` are within the valid range of lines in the file, which could lead to unexpected results or errors.
+- Ensure that the `filePath` is properly encoded when constructing the URL to avoid issues with special characters.
 
 ## Dependencies
-- The file relies on the `fetch` API for making HTTP requests, which is standard in modern JavaScript environments. The use of environment variables allows for flexibility in different deployment environments.
+This file relies on the `fetch` API to communicate with the backend services, which is essential for retrieving data dynamically based on user actions.
 
 ## Architecture Context
-This file is part of the application's service layer, facilitating communication with the backend API. It abstracts the details of API interaction, allowing other parts of the application to focus on business logic and user interface.
+This file acts as a service layer that abstracts the API calls for various features, promoting separation of concerns and making it easier to manage and update API interactions without affecting the UI components directly.
 
 ## Implementation Notes
-- The decision to use environment variables for the LiveKit token URL enhances configurability and supports different deployment scenarios.
-- Consistent error handling across all fetch functions ensures that developers can easily manage API errors, but they must ensure that the backend adheres to expected status codes for this to be effective.
-- The file is structured to support both synchronous and asynchronous operations, making it suitable for use in a variety of contexts within the application.
+- The API base URL is defined as a constant, allowing for easy adjustments if the backend URL changes.
+- Consistent error handling is implemented across all fetch functions, throwing errors when responses are not OK. However, consider enhancing error messages for better clarity during debugging.

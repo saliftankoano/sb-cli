@@ -112,6 +112,8 @@ export default function FeatureFlow({
 }: FeatureFlowProps) {
   // Store collapsed state (IDs of nodes that are collapsed/hidden)
   const [collapsedIds, setCollapsedIds] = useState<Set<string>>(new Set());
+  // Store selected node to show file panel
+  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
 
   const nodeTypes = useMemo(
     () => ({
@@ -178,7 +180,7 @@ export default function FeatureFlow({
           isInteractive: true,
           idx,
         },
-        selected: !isCollapsed, // Visual feedback for open state
+        selected: selectedNodeId === flowId, // Visual feedback for selected state
       });
 
       // 2. Create File Nodes (Sub-layer) if NOT collapsed
@@ -221,10 +223,11 @@ export default function FeatureFlow({
     });
 
     return { nodes, edges };
-  }, [feature, collapsedIds]);
+  }, [feature, collapsedIds, selectedNodeId]);
 
   const onNodeClick = useCallback((_: React.MouseEvent, node: Node) => {
     if (node.id.startsWith("flow-")) {
+      // Toggle collapsed state
       setCollapsedIds((prev) => {
         const next = new Set(prev);
         if (next.has(node.id)) {
@@ -234,8 +237,22 @@ export default function FeatureFlow({
         }
         return next;
       });
+
+      // Toggle selected state for file panel
+      setSelectedNodeId((prev) => (prev === node.id ? null : node.id));
     }
   }, []);
+
+  // Get files for selected node
+  const selectedFiles = useMemo(() => {
+    if (!selectedNodeId || !selectedNodeId.startsWith("flow-")) {
+      return [];
+    }
+    const flowIndex = parseInt(selectedNodeId.replace("flow-", ""));
+    const flow = feature.userFlows?.[flowIndex];
+    if (!flow) return [];
+    return feature.filesByAction?.[flow] || [];
+  }, [selectedNodeId, feature]);
 
   if (!feature.userFlows?.length) {
     return (
@@ -246,40 +263,88 @@ export default function FeatureFlow({
   }
 
   return (
-    <div
-      style={{ height }}
-      className="rounded-xl overflow-hidden border border-gray-800 bg-gray-950 shadow-2xl relative"
-    >
-      <div className="absolute top-4 left-4 z-10 bg-gray-900/80 backdrop-blur px-3 py-2 rounded-lg border border-gray-800 text-xs text-gray-400 pointer-events-none">
-        <span className="text-blue-400 font-bold">Interactive Mode</span>: Click
-        steps to toggle file visibility.
+    <div className="flex gap-4">
+      <div
+        style={{ height }}
+        className="flex-1 rounded-xl overflow-hidden border border-gray-800 bg-gray-950 shadow-2xl relative"
+      >
+        <div className="absolute top-4 left-4 z-10 bg-gray-900/80 backdrop-blur px-3 py-2 rounded-lg border border-gray-800 text-xs text-gray-400 pointer-events-none">
+          <span className="text-blue-400 font-bold">Interactive Mode</span>:
+          Click steps to toggle file visibility.
+        </div>
+        <ReactFlowProvider>
+          <ReactFlow
+            id={feature.id}
+            nodes={initialNodes}
+            edges={initialEdges}
+            nodeTypes={nodeTypes}
+            onNodeClick={onNodeClick}
+            fitView
+            minZoom={0.2}
+            maxZoom={1.5}
+            proOptions={{ hideAttribution: true }}
+            defaultEdgeOptions={defaultEdgeOptions}
+            style={{ background: "#020617" }}
+          >
+            <Background
+              gap={20}
+              size={1}
+              color="#1e293b"
+              variant={"dots" as any}
+            />
+            <Controls
+              className="!bg-gray-900 !border-gray-800 [&>button]:!fill-gray-400 hover:[&>button]:!fill-white"
+              showInteractive={false}
+            />
+          </ReactFlow>
+        </ReactFlowProvider>
       </div>
-      <ReactFlowProvider>
-        <ReactFlow
-          id={feature.id}
-          nodes={initialNodes}
-          edges={initialEdges}
-          nodeTypes={nodeTypes}
-          onNodeClick={onNodeClick}
-          fitView
-          minZoom={0.2}
-          maxZoom={1.5}
-          proOptions={{ hideAttribution: true }}
-          defaultEdgeOptions={defaultEdgeOptions}
-          style={{ background: "#020617" }}
+
+      {/* File Panel */}
+      {selectedNodeId && selectedFiles.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: 20 }}
+          className="w-80 rounded-xl border border-gray-800 bg-gray-950 shadow-2xl overflow-hidden"
         >
-          <Background
-            gap={20}
-            size={1}
-            color="#1e293b"
-            variant={"dots" as any}
-          />
-          <Controls
-            className="!bg-gray-900 !border-gray-800 [&>button]:!fill-gray-400 hover:[&>button]:!fill-white"
-            showInteractive={false}
-          />
-        </ReactFlow>
-      </ReactFlowProvider>
+          <div className="p-4 border-b border-gray-800 bg-gray-900/50">
+            <h3 className="text-sm font-semibold text-gray-200 mb-1">
+              Files Involved
+            </h3>
+            <p className="text-xs text-gray-400">
+              {
+                feature.userFlows?.[
+                  parseInt(selectedNodeId.replace("flow-", ""))
+                ]
+              }
+            </p>
+          </div>
+          <div
+            className="p-4 overflow-y-auto"
+            style={{ maxHeight: height - 80 }}
+          >
+            <div className="space-y-2">
+              {selectedFiles.map((file, idx) => (
+                <motion.div
+                  key={file}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: idx * 0.05 }}
+                  className="p-3 rounded-lg bg-gray-900/50 border border-gray-800 hover:border-blue-500 transition-colors"
+                >
+                  <div className="flex items-start gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1.5 shrink-0" />
+                    <code className="text-xs text-gray-300 font-mono break-all">
+                      {file}
+                    </code>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </motion.div>
+      )}
     </div>
   );
 }

@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2025-12-17T01:36:28.389Z",
+  "lastUpdated": "2025-12-17T01:38:41.913Z",
   "features": [
     {
       "id": "startblock-onboarding",
@@ -53,20 +53,40 @@
       "id": "livekit-integration",
       "name": "Livekit Integration",
       "description": "",
-      "category": "API",
-      "entryPoint": "src/server/api/livekit.ts",
+      "category": "Services",
+      "entryPoint": "ui/src/App.tsx",
       "userFlows": [
         "User can generate a LiveKit token for real-time communication",
         "User can create or join a LiveKit room for onboarding sessions",
         "User can generate a LiveKit token for video sessions",
-        "User can join a video room based on session ID"
+        "User can join a video room based on session ID",
+        "User can join a live audio session",
+        "User can navigate through onboarding documents",
+        "User can view features and details about the application",
+        "User can access guided assistance from an agent"
       ],
-      "mermaidDiagram": "flowchart TD\n  Start([Livekit Integration])\n  livekit_integration_1[User can generate a LiveKit token for video ses...]\n  livekit_integration_2[User can join a video room based on session ID]\n  Start --> livekit_integration_1\n  livekit_integration_1 --> livekit_integration_2\n  livekit_integration_2 --> End([Complete])\n",
-      "mermaidJourney": "journey\n  title Livekit Integration\n  section User Actions\n    User can generate a LiveKit token for...: 3: User\n    User can join a video room based on s...: 3: User\n",
-      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant src/server/api/livekit.ts as src/server/api/livekit.ts\n    participant ../../config/loader.js as ../../config/loader.js\n    User->>src/server/api/livekit.ts: User can generate a LiveKit token for video ses...\n    src/server/api/livekit.ts->>../../config/loader.js: process\n    src/server/api/livekit.ts->>../../config/loader.js: process\n",
+      "mermaidDiagram": "flowchart TD\n  Start([Livekit Integration])\n  livekit_integration_1[User can join a live audio session]\n  livekit_integration_2[User can navigate through onboarding documents]\n  livekit_integration_3[User can view features and details about the ap...]\n  livekit_integration_4[User can access guided assistance from an agent]\n  Start --> livekit_integration_1\n  livekit_integration_1 --> livekit_integration_2\n  livekit_integration_2 --> livekit_integration_3\n  livekit_integration_3 --> livekit_integration_4\n  livekit_integration_4 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title Livekit Integration\n  section User Actions\n    User can join a live audio session: 3: User\n    User can navigate through onboarding ...: 3: User\n    User can view features and details ab...: 3: User\n    User can access guided assistance fro...: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant ui/src/App.tsx as ui/src/App.tsx\n    participant ./components/Layout as ./components/Layout\n    participant ./hooks/useSession as ./hooks/useSession\n    participant ./hooks/useJourney as ./hooks/useJourney\n    participant ./lib/api as ./lib/api\n    participant ./components/JourneyView as ./components/JourneyView\n    participant ./components/FileFocus as ./components/FileFocus\n    participant ...ponents/ConnectionView as ...ponents/ConnectionView\n    User->>ui/src/App.tsx: User can join a live audio session\n    ui/src/App.tsx->>./components/Layout: process\n    ./components/Layout->>./hooks/useSession: process\n    ./hooks/useSession->>./hooks/useJourney: process\n    ./hooks/useJourney->>./lib/api: process\n    ./lib/api->>./components/JourneyView: process\n    ./components/JourneyView->>./components/FileFocus: process\n    ./components/FileFocus->>...ponents/ConnectionView: process\n    ...ponents/ConnectionView->>./components/FileSidebar: process\n    ./components/FileSidebar->>...mponents/WelcomeScreen: process\n    ...mponents/WelcomeScreen->>...nts/VoiceControlIsland: process\n    ...nts/VoiceControlIsland->>...mponents/ContentHeader: process\n    ...mponents/ContentHeader->>./components/FeaturesView: process\n    ./components/FeaturesView->>...nts/OnboardingDocsView: process\n    ...nts/OnboardingDocsView->>./components/GuidedView: process\n    ./components/GuidedView->>./hooks/useAgentCommands: process\n    ui/src/App.tsx->>./components/Layout: process\n    ./components/Layout->>./hooks/useSession: process\n    ./hooks/useSession->>./hooks/useJourney: process\n    ./hooks/useJourney->>./lib/api: process\n    ./lib/api->>./components/JourneyView: process\n    ./components/JourneyView->>./components/FileFocus: process\n    ./components/FileFocus->>...ponents/ConnectionView: process\n    ...ponents/ConnectionView->>./components/FileSidebar: process\n    ./components/FileSidebar->>...mponents/WelcomeScreen: process\n    ...mponents/WelcomeScreen->>...nts/VoiceControlIsland: process\n    ...nts/VoiceControlIsland->>...mponents/ContentHeader: process\n    ...mponents/ContentHeader->>./components/FeaturesView: process\n    ./components/FeaturesView->>...nts/OnboardingDocsView: process\n    ...nts/OnboardingDocsView->>./components/GuidedView: process\n    ./components/GuidedView->>./hooks/useAgentCommands: process\n    ui/src/App.tsx->>./components/Layout: process\n    ./components/Layout->>./hooks/useSession: process\n    ./hooks/useSession->>./hooks/useJourney: process\n    ./hooks/useJourney->>./lib/api: process\n    ./lib/api->>./components/JourneyView: process\n    ./components/JourneyView->>./components/FileFocus: process\n    ./components/FileFocus->>...ponents/ConnectionView: process\n    ...ponents/ConnectionView->>./components/FileSidebar: process\n    ./components/FileSidebar->>...mponents/WelcomeScreen: process\n    ...mponents/WelcomeScreen->>...nts/VoiceControlIsland: process\n    ...nts/VoiceControlIsland->>...mponents/ContentHeader: process\n    ...mponents/ContentHeader->>./components/FeaturesView: process\n    ./components/FeaturesView->>...nts/OnboardingDocsView: process\n    ...nts/OnboardingDocsView->>./components/GuidedView: process\n    ./components/GuidedView->>./hooks/useAgentCommands: process\n    ui/src/App.tsx->>./components/Layout: process\n    ./components/Layout->>./hooks/useSession: process\n    ./hooks/useSession->>./hooks/useJourney: process\n    ./hooks/useJourney->>./lib/api: process\n    ./lib/api->>./components/JourneyView: process\n    ./components/JourneyView->>./components/FileFocus: process\n    ./components/FileFocus->>...ponents/ConnectionView: process\n    ...ponents/ConnectionView->>./components/FileSidebar: process\n    ./components/FileSidebar->>...mponents/WelcomeScreen: process\n    ...mponents/WelcomeScreen->>...nts/VoiceControlIsland: process\n    ...nts/VoiceControlIsland->>...mponents/ContentHeader: process\n    ...mponents/ContentHeader->>./components/FeaturesView: process\n    ./components/FeaturesView->>...nts/OnboardingDocsView: process\n    ...nts/OnboardingDocsView->>./components/GuidedView: process\n    ./components/GuidedView->>./hooks/useAgentCommands: process\n",
       "files": [
         "src/server/api/livekit.ts",
-        "../../config/loader.js"
+        "../../config/loader.js",
+        "ui/src/App.tsx",
+        "./components/Layout",
+        "./hooks/useSession",
+        "./hooks/useJourney",
+        "./lib/api",
+        "./components/JourneyView",
+        "./components/FileFocus",
+        "./components/ConnectionView",
+        "./components/FileSidebar",
+        "./components/WelcomeScreen",
+        "./components/VoiceControlIsland",
+        "./components/ContentHeader",
+        "./components/FeaturesView",
+        "./components/OnboardingDocsView",
+        "./components/GuidedView",
+        "./hooks/useAgentCommands"
       ],
       "filesByAction": {
         "User can generate a LiveKit token for real-time communication": [
@@ -84,6 +104,78 @@
         "User can join a video room based on session ID": [
           "src/server/api/livekit.ts",
           "../../config/loader.js"
+        ],
+        "User can join a live audio session": [
+          "ui/src/App.tsx",
+          "./components/Layout",
+          "./hooks/useSession",
+          "./hooks/useJourney",
+          "./lib/api",
+          "./components/JourneyView",
+          "./components/FileFocus",
+          "./components/ConnectionView",
+          "./components/FileSidebar",
+          "./components/WelcomeScreen",
+          "./components/VoiceControlIsland",
+          "./components/ContentHeader",
+          "./components/FeaturesView",
+          "./components/OnboardingDocsView",
+          "./components/GuidedView",
+          "./hooks/useAgentCommands"
+        ],
+        "User can navigate through onboarding documents": [
+          "ui/src/App.tsx",
+          "./components/Layout",
+          "./hooks/useSession",
+          "./hooks/useJourney",
+          "./lib/api",
+          "./components/JourneyView",
+          "./components/FileFocus",
+          "./components/ConnectionView",
+          "./components/FileSidebar",
+          "./components/WelcomeScreen",
+          "./components/VoiceControlIsland",
+          "./components/ContentHeader",
+          "./components/FeaturesView",
+          "./components/OnboardingDocsView",
+          "./components/GuidedView",
+          "./hooks/useAgentCommands"
+        ],
+        "User can view features and details about the application": [
+          "ui/src/App.tsx",
+          "./components/Layout",
+          "./hooks/useSession",
+          "./hooks/useJourney",
+          "./lib/api",
+          "./components/JourneyView",
+          "./components/FileFocus",
+          "./components/ConnectionView",
+          "./components/FileSidebar",
+          "./components/WelcomeScreen",
+          "./components/VoiceControlIsland",
+          "./components/ContentHeader",
+          "./components/FeaturesView",
+          "./components/OnboardingDocsView",
+          "./components/GuidedView",
+          "./hooks/useAgentCommands"
+        ],
+        "User can access guided assistance from an agent": [
+          "ui/src/App.tsx",
+          "./components/Layout",
+          "./hooks/useSession",
+          "./hooks/useJourney",
+          "./lib/api",
+          "./components/JourneyView",
+          "./components/FileFocus",
+          "./components/ConnectionView",
+          "./components/FileSidebar",
+          "./components/WelcomeScreen",
+          "./components/VoiceControlIsland",
+          "./components/ContentHeader",
+          "./components/FeaturesView",
+          "./components/OnboardingDocsView",
+          "./components/GuidedView",
+          "./hooks/useAgentCommands"
         ]
       },
       "dependencies": [],
@@ -92,7 +184,8 @@
         "server",
         "api",
         "typescript",
-        "new"
+        "new",
+        "ui"
       ]
     },
     {
@@ -239,13 +332,19 @@
         "User can expand sections in the UI",
         "User can highlight specific lines of code",
         "User can open the file tree sidebar",
-        "User can view a file with contextual information and code snippets"
+        "User can view a file with contextual information and code snippets",
+        "User can navigate to different sections based on agent commands",
+        "User can view files with context provided by the agent",
+        "User can see connections related to the current context"
       ],
-      "mermaidDiagram": "flowchart TD\n  Start([Agent Commands])\n  agent_commands_1[User can navigate between files or steps]\n  agent_commands_2[User can view connections between files]\n  agent_commands_3[User can expand sections in the UI]\n  agent_commands_4[User can highlight specific lines of code]\n  agent_commands_5[User can open the file tree sidebar]\n  agent_commands_6[User can view a file with contextual informatio...]\n  Start --> agent_commands_1\n  agent_commands_1 --> agent_commands_2\n  agent_commands_2 --> agent_commands_3\n  agent_commands_3 --> agent_commands_4\n  agent_commands_4 --> agent_commands_5\n  agent_commands_5 --> agent_commands_6\n  agent_commands_6 --> End([Complete])\n",
-      "mermaidJourney": "journey\n  title Agent Commands\n  section User Actions\n    User can navigate between files or steps: 3: User\n    User can view connections between files: 3: User\n    User can expand sections in the UI: 3: User\n    User can highlight specific lines of ...: 3: User\n    User can open the file tree sidebar: 3: User\n    User can view a file with contextual ...: 3: User\n",
-      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant agent/commands.py as agent/commands.py\n    User->>agent/commands.py: User can navigate between files or steps\n",
+      "mermaidDiagram": "flowchart TD\n  Start([Agent Commands])\n  agent_commands_1[User can navigate to different sections based o...]\n  agent_commands_2[User can view files with context provided by th...]\n  agent_commands_3[User can see connections related to the current...]\n  Start --> agent_commands_1\n  agent_commands_1 --> agent_commands_2\n  agent_commands_2 --> agent_commands_3\n  agent_commands_3 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title Agent Commands\n  section User Actions\n    User can navigate to different sectio...: 3: User\n    User can view files with context prov...: 3: User\n    User can see connections related to t...: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant ...ks/useAgentCommands.ts as ...ks/useAgentCommands.ts\n    participant _livekit/components-react as @livekit/components-react\n    participant _/components/GuidedView as @/components/GuidedView\n    User->>...ks/useAgentCommands.ts: User can navigate to different sections based o...\n    ...ks/useAgentCommands.ts->>_livekit/components-react: process\n    _livekit/components-react->>_/components/GuidedView: process\n    ...ks/useAgentCommands.ts->>_livekit/components-react: process\n    _livekit/components-react->>_/components/GuidedView: process\n    ...ks/useAgentCommands.ts->>_livekit/components-react: process\n    _livekit/components-react->>_/components/GuidedView: process\n",
       "files": [
-        "agent/commands.py"
+        "agent/commands.py",
+        "ui/src/hooks/useAgentCommands.ts",
+        "@livekit/components-react",
+        "@/components/GuidedView"
       ],
       "filesByAction": {
         "User can navigate between files or steps": [
@@ -265,13 +364,32 @@
         ],
         "User can view a file with contextual information and code snippets": [
           "agent/commands.py"
+        ],
+        "User can navigate to different sections based on agent commands": [
+          "ui/src/hooks/useAgentCommands.ts",
+          "@livekit/components-react",
+          "@/components/GuidedView"
+        ],
+        "User can view files with context provided by the agent": [
+          "ui/src/hooks/useAgentCommands.ts",
+          "@livekit/components-react",
+          "@/components/GuidedView"
+        ],
+        "User can see connections related to the current context": [
+          "ui/src/hooks/useAgentCommands.ts",
+          "@livekit/components-react",
+          "@/components/GuidedView"
         ]
       },
       "dependencies": [],
       "tags": [
         "agent",
         "python",
-        "new"
+        "new",
+        "ui",
+        "src",
+        "hooks",
+        "typescript"
       ]
     },
     {
@@ -855,6 +973,353 @@
         "utils",
         "typescript",
         "new"
+      ]
+    },
+    {
+      "id": "onboarding",
+      "name": "Onboarding",
+      "description": "",
+      "category": "UI",
+      "userFlows": [
+        "User can view onboarding progress",
+        "User can toggle the sidebar for navigation",
+        "User can reset onboarding progress",
+        "User can view onboarding content",
+        "User can navigate through onboarding steps",
+        "User can begin the onboarding process"
+      ],
+      "mermaidDiagram": "flowchart TD\n  Start([Onboarding])\n  onboarding_1[User can view onboarding content]\n  onboarding_2[User can navigate through onboarding steps]\n  onboarding_3[User can begin the onboarding process]\n  Start --> onboarding_1\n  onboarding_1 --> onboarding_2\n  onboarding_2 --> onboarding_3\n  onboarding_3 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title Onboarding\n  section User Actions\n    User can view onboarding content: 3: User\n    User can navigate through onboarding ...: 3: User\n    User can begin the onboarding process: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant ...mponents/IndexView.tsx as ...mponents/IndexView.tsx\n    participant ../lib/api as ../lib/api\n    participant ../hooks/useProgress as ../hooks/useProgress\n    participant ./MarkdownRenderer as ./MarkdownRenderer\n    User->>...mponents/IndexView.tsx: User can view onboarding content\n    ...mponents/IndexView.tsx->>../lib/api: process\n    ../lib/api->>../hooks/useProgress: process\n    ../hooks/useProgress->>./MarkdownRenderer: process\n    ...mponents/IndexView.tsx->>../lib/api: process\n    ../lib/api->>../hooks/useProgress: process\n    ../hooks/useProgress->>./MarkdownRenderer: process\n    ...mponents/IndexView.tsx->>../lib/api: process\n    ../lib/api->>../hooks/useProgress: process\n    ../hooks/useProgress->>./MarkdownRenderer: process\n",
+      "files": [
+        "ui/src/components/ContentHeader.tsx",
+        "hooks/useSession.ts",
+        "hooks/useProgress.ts",
+        "ui/src/components/IndexView.tsx",
+        "../lib/api",
+        "../hooks/useProgress",
+        "./MarkdownRenderer"
+      ],
+      "filesByAction": {
+        "User can view onboarding progress": [
+          "ui/src/components/ContentHeader.tsx",
+          "hooks/useSession.ts",
+          "hooks/useProgress.ts"
+        ],
+        "User can toggle the sidebar for navigation": [
+          "ui/src/components/ContentHeader.tsx",
+          "hooks/useSession.ts",
+          "hooks/useProgress.ts"
+        ],
+        "User can reset onboarding progress": [
+          "ui/src/components/ContentHeader.tsx",
+          "hooks/useSession.ts",
+          "hooks/useProgress.ts"
+        ],
+        "User can view onboarding content": [
+          "ui/src/components/IndexView.tsx",
+          "../lib/api",
+          "../hooks/useProgress",
+          "./MarkdownRenderer"
+        ],
+        "User can navigate through onboarding steps": [
+          "ui/src/components/IndexView.tsx",
+          "../lib/api",
+          "../hooks/useProgress",
+          "./MarkdownRenderer"
+        ],
+        "User can begin the onboarding process": [
+          "ui/src/components/IndexView.tsx",
+          "../lib/api",
+          "../hooks/useProgress",
+          "./MarkdownRenderer"
+        ]
+      },
+      "dependencies": [],
+      "tags": [
+        "ui",
+        "src",
+        "components",
+        "typescript",
+        "new"
+      ]
+    },
+    {
+      "id": "feature-flow",
+      "name": "Feature Flow",
+      "description": "",
+      "category": "UI",
+      "userFlows": [
+        "User can visualize user flows and associated files",
+        "User can collapse or expand nodes to manage visibility of information",
+        "User can interact with nodes to see detailed file information"
+      ],
+      "mermaidDiagram": "flowchart TD\n  Start([Feature Flow])\n  feature_flow_1[User can visualize user flows and associated files]\n  feature_flow_2[User can collapse or expand nodes to manage vis...]\n  feature_flow_3[User can interact with nodes to see detailed fi...]\n  Start --> feature_flow_1\n  feature_flow_1 --> feature_flow_2\n  feature_flow_2 --> feature_flow_3\n  feature_flow_3 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title Feature Flow\n  section User Actions\n    User can visualize user flows and ass...: 3: User\n    User can collapse or expand nodes to ...: 3: User\n    User can interact with nodes to see d...: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant ...onents/FeatureFlow.tsx as ...onents/FeatureFlow.tsx\n    participant ../lib/api as ../lib/api\n    User->>...onents/FeatureFlow.tsx: User can visualize user flows and associated files\n    ...onents/FeatureFlow.tsx->>../lib/api: process\n    ...onents/FeatureFlow.tsx->>../lib/api: process\n    ...onents/FeatureFlow.tsx->>../lib/api: process\n",
+      "files": [
+        "ui/src/components/FeatureFlow.tsx",
+        "../lib/api"
+      ],
+      "filesByAction": {
+        "User can visualize user flows and associated files": [
+          "ui/src/components/FeatureFlow.tsx",
+          "../lib/api"
+        ],
+        "User can collapse or expand nodes to manage visibility of information": [
+          "ui/src/components/FeatureFlow.tsx",
+          "../lib/api"
+        ],
+        "User can interact with nodes to see detailed file information": [
+          "ui/src/components/FeatureFlow.tsx",
+          "../lib/api"
+        ]
+      },
+      "dependencies": [],
+      "tags": [
+        "ui",
+        "src",
+        "components",
+        "typescript",
+        "new"
+      ]
+    },
+    {
+      "id": "features-view",
+      "name": "Features View",
+      "description": "",
+      "category": "UI",
+      "userFlows": [
+        "User can view a list of system features",
+        "User can select a feature to view detailed information",
+        "User can navigate back to the feature list"
+      ],
+      "mermaidDiagram": "flowchart TD\n  Start([Features View])\n  features_view_1[User can view a list of system features]\n  features_view_2[User can select a feature to view detailed info...]\n  features_view_3[User can navigate back to the feature list]\n  Start --> features_view_1\n  features_view_1 --> features_view_2\n  features_view_2 --> features_view_3\n  features_view_3 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title Features View\n  section User Actions\n    User can view a list of system features: 3: User\n    User can select a feature to view det...: 3: User\n    User can navigate back to the feature...: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant ...nents/FeaturesView.tsx as ...nents/FeaturesView.tsx\n    participant ../lib/api as ../lib/api\n    participant ../hooks/useProgress as ../hooks/useProgress\n    participant ./FeatureFlow as ./FeatureFlow\n    User->>...nents/FeaturesView.tsx: User can view a list of system features\n    ...nents/FeaturesView.tsx->>../lib/api: process\n    ../lib/api->>../hooks/useProgress: process\n    ../hooks/useProgress->>./FeatureFlow: process\n    ...nents/FeaturesView.tsx->>../lib/api: process\n    ../lib/api->>../hooks/useProgress: process\n    ../hooks/useProgress->>./FeatureFlow: process\n    ...nents/FeaturesView.tsx->>../lib/api: process\n    ../lib/api->>../hooks/useProgress: process\n    ../hooks/useProgress->>./FeatureFlow: process\n",
+      "files": [
+        "ui/src/components/FeaturesView.tsx",
+        "../lib/api",
+        "../hooks/useProgress",
+        "./FeatureFlow"
+      ],
+      "filesByAction": {
+        "User can view a list of system features": [
+          "ui/src/components/FeaturesView.tsx",
+          "../lib/api",
+          "../hooks/useProgress",
+          "./FeatureFlow"
+        ],
+        "User can select a feature to view detailed information": [
+          "ui/src/components/FeaturesView.tsx",
+          "../lib/api",
+          "../hooks/useProgress",
+          "./FeatureFlow"
+        ],
+        "User can navigate back to the feature list": [
+          "ui/src/components/FeaturesView.tsx",
+          "../lib/api",
+          "../hooks/useProgress",
+          "./FeatureFlow"
+        ]
+      },
+      "dependencies": [],
+      "tags": [
+        "ui",
+        "src",
+        "components",
+        "typescript",
+        "new"
+      ]
+    },
+    {
+      "id": "guided-view",
+      "name": "Guided View",
+      "description": "",
+      "category": "UI",
+      "userFlows": [
+        "User can view code snippets with explanations",
+        "User can toggle additional knowledge sections for better understanding of the code"
+      ],
+      "mermaidDiagram": "flowchart TD\n  Start([Guided View])\n  guided_view_1[User can view code snippets with explanations]\n  guided_view_2[User can toggle additional knowledge sections f...]\n  Start --> guided_view_1\n  guided_view_1 --> guided_view_2\n  guided_view_2 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title Guided View\n  section User Actions\n    User can view code snippets with expl...: 3: User\n    User can toggle additional knowledge ...: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant ...ponents/GuidedView.tsx as ...ponents/GuidedView.tsx\n    participant hooks/useKnowledge.ts as hooks/useKnowledge.ts\n    participant lib/api.ts as lib/api.ts\n    User->>...ponents/GuidedView.tsx: User can view code snippets with explanations\n    ...ponents/GuidedView.tsx->>hooks/useKnowledge.ts: process\n    hooks/useKnowledge.ts->>lib/api.ts: process\n    ...ponents/GuidedView.tsx->>hooks/useKnowledge.ts: process\n    hooks/useKnowledge.ts->>lib/api.ts: process\n",
+      "files": [
+        "ui/src/components/GuidedView.tsx",
+        "hooks/useKnowledge.ts",
+        "lib/api.ts"
+      ],
+      "filesByAction": {
+        "User can view code snippets with explanations": [
+          "ui/src/components/GuidedView.tsx",
+          "hooks/useKnowledge.ts",
+          "lib/api.ts"
+        ],
+        "User can toggle additional knowledge sections for better understanding of the code": [
+          "ui/src/components/GuidedView.tsx",
+          "hooks/useKnowledge.ts",
+          "lib/api.ts"
+        ]
+      },
+      "dependencies": [],
+      "tags": [
+        "ui",
+        "src",
+        "components",
+        "typescript",
+        "new"
+      ]
+    },
+    {
+      "id": "mermaid-diagram",
+      "name": "Mermaid Diagram",
+      "description": "",
+      "category": "UI",
+      "userFlows": [
+        "User can view a visual representation of data through a Mermaid diagram",
+        "User can switch between light and dark themes dynamically while viewing diagrams"
+      ],
+      "mermaidDiagram": "flowchart TD\n  Start([Mermaid Diagram])\n  mermaid_diagram_1[User can view a visual representation of data t...]\n  mermaid_diagram_2[User can switch between light and dark themes d...]\n  Start --> mermaid_diagram_1\n  mermaid_diagram_1 --> mermaid_diagram_2\n  mermaid_diagram_2 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title Mermaid Diagram\n  section User Actions\n    User can view a visual representation...: 3: User\n    User can switch between light and dar...: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant ...nts/MermaidDiagram.tsx as ...nts/MermaidDiagram.tsx\n    User->>...nts/MermaidDiagram.tsx: User can view a visual representation of data t...\n",
+      "files": [
+        "ui/src/components/MermaidDiagram.tsx"
+      ],
+      "filesByAction": {
+        "User can view a visual representation of data through a Mermaid diagram": [
+          "ui/src/components/MermaidDiagram.tsx"
+        ],
+        "User can switch between light and dark themes dynamically while viewing diagrams": [
+          "ui/src/components/MermaidDiagram.tsx"
+        ]
+      },
+      "dependencies": [],
+      "tags": [
+        "ui",
+        "src",
+        "components",
+        "typescript",
+        "new"
+      ]
+    },
+    {
+      "id": "onboarding-docs",
+      "name": "Onboarding Docs",
+      "description": "",
+      "category": "UI",
+      "userFlows": [
+        "User can view onboarding documentation",
+        "User can navigate to different documents"
+      ],
+      "mermaidDiagram": "flowchart TD\n  Start([Onboarding Docs])\n  onboarding_docs_1[User can view onboarding documentation]\n  onboarding_docs_2[User can navigate to different documents]\n  Start --> onboarding_docs_1\n  onboarding_docs_1 --> onboarding_docs_2\n  onboarding_docs_2 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title Onboarding Docs\n  section User Actions\n    User can view onboarding documentation: 3: User\n    User can navigate to different documents: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant ...OnboardingDocsView.tsx as ...OnboardingDocsView.tsx\n    participant ../lib/api as ../lib/api\n    participant ./MarkdownRenderer as ./MarkdownRenderer\n    participant ./IndexView as ./IndexView\n    User->>...OnboardingDocsView.tsx: User can view onboarding documentation\n    ...OnboardingDocsView.tsx->>../lib/api: process\n    ../lib/api->>./MarkdownRenderer: process\n    ./MarkdownRenderer->>./IndexView: process\n    ...OnboardingDocsView.tsx->>../lib/api: process\n    ../lib/api->>./MarkdownRenderer: process\n    ./MarkdownRenderer->>./IndexView: process\n",
+      "files": [
+        "ui/src/components/OnboardingDocsView.tsx",
+        "../lib/api",
+        "./MarkdownRenderer",
+        "./IndexView"
+      ],
+      "filesByAction": {
+        "User can view onboarding documentation": [
+          "ui/src/components/OnboardingDocsView.tsx",
+          "../lib/api",
+          "./MarkdownRenderer",
+          "./IndexView"
+        ],
+        "User can navigate to different documents": [
+          "ui/src/components/OnboardingDocsView.tsx",
+          "../lib/api",
+          "./MarkdownRenderer",
+          "./IndexView"
+        ]
+      },
+      "dependencies": [],
+      "tags": [
+        "ui",
+        "src",
+        "components",
+        "typescript",
+        "new"
+      ]
+    },
+    {
+      "id": "onboarding-progress",
+      "name": "Onboarding Progress",
+      "description": "",
+      "category": "Services",
+      "userFlows": [
+        "User can track their onboarding progress",
+        "User can mark documents as viewed",
+        "User can mark features as explored",
+        "User can complete onboarding steps",
+        "User can reset their onboarding progress"
+      ],
+      "mermaidDiagram": "flowchart TD\n  Start([Onboarding Progress])\n  onboarding_progress_1[User can track their onboarding progress]\n  onboarding_progress_2[User can mark documents as viewed]\n  onboarding_progress_3[User can mark features as explored]\n  onboarding_progress_4[User can complete onboarding steps]\n  onboarding_progress_5[User can reset their onboarding progress]\n  Start --> onboarding_progress_1\n  onboarding_progress_1 --> onboarding_progress_2\n  onboarding_progress_2 --> onboarding_progress_3\n  onboarding_progress_3 --> onboarding_progress_4\n  onboarding_progress_4 --> onboarding_progress_5\n  onboarding_progress_5 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title Onboarding Progress\n  section User Actions\n    User can track their onboarding progress: 3: User\n    User can mark documents as viewed: 3: User\n    User can mark features as explored: 3: User\n    User can complete onboarding steps: 3: User\n    User can reset their onboarding progress: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant ...c/hooks/useProgress.ts as ...c/hooks/useProgress.ts\n    User->>...c/hooks/useProgress.ts: User can track their onboarding progress\n",
+      "files": [
+        "ui/src/hooks/useProgress.ts"
+      ],
+      "filesByAction": {
+        "User can track their onboarding progress": [
+          "ui/src/hooks/useProgress.ts"
+        ],
+        "User can mark documents as viewed": [
+          "ui/src/hooks/useProgress.ts"
+        ],
+        "User can mark features as explored": [
+          "ui/src/hooks/useProgress.ts"
+        ],
+        "User can complete onboarding steps": [
+          "ui/src/hooks/useProgress.ts"
+        ],
+        "User can reset their onboarding progress": [
+          "ui/src/hooks/useProgress.ts"
+        ]
+      },
+      "dependencies": [],
+      "tags": [
+        "ui",
+        "src",
+        "hooks",
+        "typescript",
+        "new"
+      ]
+    },
+    {
+      "id": "file-content-fetching",
+      "name": "File Content Fetching",
+      "description": "",
+      "category": "Services",
+      "userFlows": [
+        "User can fetch specific lines from a file",
+        "User can view onboarding documents",
+        "User can retrieve feature information"
+      ],
+      "mermaidDiagram": "flowchart TD\n  Start([File Content Fetching])\n  file_content_fetching_1[User can fetch specific lines from a file]\n  file_content_fetching_2[User can view onboarding documents]\n  file_content_fetching_3[User can retrieve feature information]\n  Start --> file_content_fetching_1\n  file_content_fetching_1 --> file_content_fetching_2\n  file_content_fetching_2 --> file_content_fetching_3\n  file_content_fetching_3 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title File Content Fetching\n  section User Actions\n    User can fetch specific lines from a ...: 3: User\n    User can view onboarding documents: 3: User\n    User can retrieve feature information: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant ui/src/lib/api.ts as ui/src/lib/api.ts\n    User->>ui/src/lib/api.ts: User can fetch specific lines from a file\n",
+      "files": [
+        "ui/src/lib/api.ts"
+      ],
+      "filesByAction": {
+        "User can fetch specific lines from a file": [
+          "ui/src/lib/api.ts"
+        ],
+        "User can view onboarding documents": [
+          "ui/src/lib/api.ts"
+        ],
+        "User can retrieve feature information": [
+          "ui/src/lib/api.ts"
+        ]
+      },
+      "dependencies": [],
+      "tags": [
+        "ui",
+        "src",
+        "lib",
+        "typescript"
       ]
     }
   ]

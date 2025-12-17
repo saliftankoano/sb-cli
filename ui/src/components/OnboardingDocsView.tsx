@@ -2,8 +2,17 @@ import { useState, useEffect } from "react";
 import { fetchOnboardingDoc } from "../lib/api";
 import { motion } from "framer-motion";
 import MarkdownRenderer from "./MarkdownRenderer";
+import IndexView from "./IndexView";
 
-export default function OnboardingDocsView({ docId }: { docId?: string }) {
+interface OnboardingDocsViewProps {
+  docId?: string;
+  onNavigate?: (docId: string) => void;
+}
+
+export default function OnboardingDocsView({
+  docId,
+  onNavigate,
+}: OnboardingDocsViewProps) {
   const [content, setContent] = useState<string>("");
   const [loading, setLoading] = useState(false);
 
@@ -23,6 +32,15 @@ export default function OnboardingDocsView({ docId }: { docId?: string }) {
     return (
       <div className="text-center py-12">
         <p className="text-gray-500">Select a document to view.</p>
+      </div>
+    );
+  }
+
+  // Use custom IndexView for INDEX.md
+  if (docId === "INDEX.md") {
+    return (
+      <div className="h-full overflow-y-auto pr-4">
+        <IndexView content={content} onNavigate={onNavigate} />
       </div>
     );
   }
