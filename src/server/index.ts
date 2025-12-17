@@ -11,6 +11,7 @@ import { setupTreeRoutes } from "./api/tree.js";
 import { setupNarrationRoutes } from "./api/narration.js";
 import { setupLiveKitRoutes } from "./api/livekit.js";
 import { setupFeaturesRoutes } from "./api/features.js";
+import { setupFilesRoutes } from "./api/files.js";
 import type { ServeOptions } from "../commands/serve.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -45,6 +46,7 @@ export async function startServer(
   app.use("/api/narration", setupNarrationRoutes(repoRoot, { noVoice }));
   app.use("/api/livekit", setupLiveKitRoutes(repoRoot));
   app.use("/api/features", setupFeaturesRoutes(repoRoot));
+  app.use("/api/files", setupFilesRoutes(repoRoot));
 
   // Serve static UI files
   const uiDir = path.join(__dirname, "..", "..", "dist", "ui");
@@ -70,10 +72,22 @@ export async function startServer(
         });
       }
 
-      // Graceful shutdown
+      // Graceful shutdown with force timeout
+      let isShuttingDown = false;
       const shutdown = () => {
+        if (isShuttingDown) return; // Prevent multiple shutdowns
+        isShuttingDown = true;
+
         console.log(chalk.dim("\n\nShutting down server..."));
+
+        // Force exit after 2 seconds if graceful shutdown fails
+        const forceExit = setTimeout(() => {
+          console.log(chalk.dim("Force closing...\n"));
+          process.exit(0);
+        }, 2000);
+
         server.close(() => {
+          clearTimeout(forceExit);
           console.log(chalk.dim("Server stopped.\n"));
           process.exit(0);
         });
@@ -81,9 +95,6 @@ export async function startServer(
 
       process.on("SIGINT", shutdown);
       process.on("SIGTERM", shutdown);
-
-      // Keep process alive
-      process.stdin.resume();
     });
 
     server.on("error", (error: NodeJS.ErrnoException) => {

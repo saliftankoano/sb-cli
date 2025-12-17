@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2025-12-17T01:33:56.189Z",
+  "lastUpdated": "2025-12-17T01:34:20.647Z",
   "features": [
     {
       "id": "startblock-onboarding",
@@ -309,6 +309,98 @@
       "tags": [
         "agent",
         "python",
+        "new"
+      ]
+    },
+    {
+      "id": "file-management",
+      "name": "File Management",
+      "description": "",
+      "category": "API",
+      "entryPoint": "src/server/api/files.ts",
+      "userFlows": [
+        "User can retrieve the content of a file from the repository",
+        "User can specify a range of lines to view from the file"
+      ],
+      "mermaidDiagram": "flowchart TD\n  Start([File Management])\n  file_management_1[User can retrieve the content of a file from th...]\n  file_management_2[User can specify a range of lines to view from ...]\n  Start --> file_management_1\n  file_management_1 --> file_management_2\n  file_management_2 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title File Management\n  section User Actions\n    User can retrieve the content of a fi...: 3: User\n    User can specify a range of lines to ...: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant src/server/api/files.ts as src/server/api/files.ts\n    participant ../../utils/file-utils.js as ../../utils/file-utils.js\n    User->>src/server/api/files.ts: User can retrieve the content of a file from th...\n    src/server/api/files.ts->>../../utils/file-utils.js: process\n    src/server/api/files.ts->>../../utils/file-utils.js: process\n",
+      "files": [
+        "src/server/api/files.ts",
+        "../../utils/file-utils.js"
+      ],
+      "filesByAction": {
+        "User can retrieve the content of a file from the repository": [
+          "src/server/api/files.ts",
+          "../../utils/file-utils.js"
+        ],
+        "User can specify a range of lines to view from the file": [
+          "src/server/api/files.ts",
+          "../../utils/file-utils.js"
+        ]
+      },
+      "dependencies": [],
+      "tags": [
+        "src",
+        "server",
+        "api",
+        "typescript",
+        "new"
+      ]
+    },
+    {
+      "id": "server",
+      "name": "Server",
+      "description": "",
+      "category": "Services",
+      "entryPoint": "src/server/index.ts",
+      "userFlows": [
+        "User can access API endpoints for knowledge, session, tree, narration, livekit, features, and files.",
+        "User can serve and interact with the web application's UI."
+      ],
+      "mermaidDiagram": "flowchart TD\n  Start([Server])\n  server_1[User can access API endpoints for knowledge, se...]\n  server_2[User can serve and interact with the web applic...]\n  Start --> server_1\n  server_1 --> server_2\n  server_2 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title Server\n  section User Actions\n    User can access API endpoints for kno...: 3: User\n    User can serve and interact with the ...: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant src/server/index.ts as src/server/index.ts\n    participant src/api/knowledge.js as src/api/knowledge.js\n    participant src/api/session.js as src/api/session.js\n    participant src/api/tree.js as src/api/tree.js\n    participant src/api/narration.js as src/api/narration.js\n    participant src/api/livekit.js as src/api/livekit.js\n    participant src/api/features.js as src/api/features.js\n    participant src/api/files.js as src/api/files.js\n    User->>src/server/index.ts: User can access API endpoints for knowledge, se...\n    src/server/index.ts->>src/api/knowledge.js: process\n    src/api/knowledge.js->>src/api/session.js: process\n    src/api/session.js->>src/api/tree.js: process\n    src/api/tree.js->>src/api/narration.js: process\n    src/api/narration.js->>src/api/livekit.js: process\n    src/api/livekit.js->>src/api/features.js: process\n    src/api/features.js->>src/api/files.js: process\n    src/api/files.js->>../commands/serve.js: process\n    src/server/index.ts->>src/api/knowledge.js: process\n    src/api/knowledge.js->>src/api/session.js: process\n    src/api/session.js->>src/api/tree.js: process\n    src/api/tree.js->>src/api/narration.js: process\n    src/api/narration.js->>src/api/livekit.js: process\n    src/api/livekit.js->>src/api/features.js: process\n    src/api/features.js->>src/api/files.js: process\n    src/api/files.js->>../commands/serve.js: process\n",
+      "files": [
+        "src/server/index.ts",
+        "src/api/knowledge.js",
+        "src/api/session.js",
+        "src/api/tree.js",
+        "src/api/narration.js",
+        "src/api/livekit.js",
+        "src/api/features.js",
+        "src/api/files.js",
+        "../commands/serve.js"
+      ],
+      "filesByAction": {
+        "User can access API endpoints for knowledge, session, tree, narration, livekit, features, and files.": [
+          "src/server/index.ts",
+          "src/api/knowledge.js",
+          "src/api/session.js",
+          "src/api/tree.js",
+          "src/api/narration.js",
+          "src/api/livekit.js",
+          "src/api/features.js",
+          "src/api/files.js",
+          "../commands/serve.js"
+        ],
+        "User can serve and interact with the web application's UI.": [
+          "src/server/index.ts",
+          "src/api/knowledge.js",
+          "src/api/session.js",
+          "src/api/tree.js",
+          "src/api/narration.js",
+          "src/api/livekit.js",
+          "src/api/features.js",
+          "src/api/files.js",
+          "../commands/serve.js"
+        ]
+      },
+      "dependencies": [],
+      "tags": [
+        "src",
+        "server",
+        "typescript",
         "new"
       ]
     }
