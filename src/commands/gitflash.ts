@@ -5,25 +5,25 @@ import readlineSync from "readline-sync";
 import { createSpinner } from "nanospinner";
 import { loadConfig, validateConfig } from "../config/loader.js";
 import { estimateGitflashCost } from "../utils/cost-estimator.js";
-import {
-  gitflashEstimateBox,
-  gitflashProgressLine,
-} from "../utils/boxes.js";
-import {
-  createGitHistoryOperations,
-  type CommitInfo,
-} from "../git/history.js";
+import { gitflashEstimateBox, gitflashProgressLine } from "../utils/boxes.js";
+import { createGitHistoryOperations, type CommitInfo } from "../git/history.js";
 import { createGitOperations } from "../git/operations.js";
 import {
   filterRelevantFiles,
   getLanguageFromExtension,
 } from "../core/file-scanner.js";
+import {
+  buildDependencyGraph,
+  getDependencyContext,
+} from "../core/dependency-graph.js";
 import { OpenAIClient } from "../core/openai-client.js";
 import {
   writeKnowledgeFile,
   readKnowledgeFile,
 } from "../core/knowledge-writer.js";
 import { brandColor } from "../utils/intro.js";
+
+import { type PromptContext } from "../prompts/templates.js";
 
 interface GitflashOptions {
   commitLimit: number;
@@ -56,8 +56,7 @@ export async function gitflashCommand(): Promise<void> {
     ? config.output.knowledgeDir
     : path.join(repoRoot, config.output.knowledgeDir);
   const relativeKnowledgeDir =
-    path.relative(repoRoot, knowledgeDirAbsolute) ||
-    config.output.knowledgeDir;
+    path.relative(repoRoot, knowledgeDirAbsolute) || config.output.knowledgeDir;
   const knowledgeDirDisplayBase =
     relativeKnowledgeDir && relativeKnowledgeDir !== "."
       ? relativeKnowledgeDir
@@ -67,6 +66,14 @@ export async function gitflashCommand(): Promise<void> {
   );
   const knowledgeDirCommandTarget =
     knowledgeDirDisplay.replace(/\/$/, "") || ".";
+
+  // Pre-load all files for dependency graph if possible
+  // For historical analysis, this is an approximation based on current files
+  // but better than nothing.
+  const allFiles = await filterRelevantFiles(["."], config, repoRoot, {
+    skipExistenceCheck: true,
+  });
+  const graph = await buildDependencyGraph(allFiles, repoRoot);
 
   const history = createGitHistoryOperations(repoRoot);
   const spinner = createSpinner("Collecting git history...").start();
@@ -129,7 +136,9 @@ export async function gitflashCommand(): Promise<void> {
     );
 
     const changed = await history.getChangedFilesInCommit(commit.hash);
-    const statusByPath = new Map(changed.files.map((file) => [file.path, file]));
+    const statusByPath = new Map(
+      changed.files.map((file) => [file.path, file])
+    );
 
     const candidatePaths = Array.from(
       new Set(
@@ -159,112 +168,181 @@ export async function gitflashCommand(): Promise<void> {
       continue;
     }
 
-    for (let fileIndex = 0; fileIndex < relevant.length; fileIndex++) {
-      const filePath = relevant[fileIndex];
-      const branchPrefix =
-        fileIndex === relevant.length - 1 ? "       └─" : "       ├─";
-      const status = statusByPath.get(filePath);
-      const isNew = status?.status === "added";
-      const fileLabel = `${branchPrefix} ${filePath}`;
+    // Group files by directory for batch processing
+    const fileGroups = groupFilesByDirectory(relevant);
+    const sortedDirs = Array.from(fileGroups.keys()).sort();
 
-      const fileContent = await history.getFileAtCommit(
-        commit.hash,
-        filePath
-      );
-      if (!fileContent) {
-        console.log(
-          `${fileLabel} ${chalk.yellow("(skipped - file missing in commit)")}`
-        );
-        skippedFiles++;
-        continue;
-      }
+    for (const dir of sortedDirs) {
+      const dirFiles = fileGroups.get(dir) || [];
+      const batchItems: Array<{
+        filePath: string;
+        fileLabel: string;
+        detailLabel: string;
+        summaryEntry: DocumentedEntry;
+        context: PromptContext;
+      }> = [];
 
-      const metrics = getFileMetrics(fileContent);
-      const detailLabel = chalk.dim(
-        `[${metrics.tokens} tok · ${metrics.sizeLabel} KB]`
-      );
+      // First pass: Prepare context for all files in this batch
+      for (const filePath of dirFiles) {
+        const fileIndex = relevant.indexOf(filePath);
+        const branchPrefix =
+          fileIndex === relevant.length - 1 ? "       └─" : "       ├─";
+        const status = statusByPath.get(filePath);
+        const isNew = status?.status === "added";
+        const fileLabel = `${branchPrefix} ${filePath}`;
 
-      const existing = await readKnowledgeFile(
-        filePath,
-        knowledgeDirAbsolute
-      );
-      if (existing && existing.metadata.fileVersion === commit.hash) {
-        console.log(
-          `${fileLabel} ${chalk.dim("(skipped - already documented)")}`
-        );
-        skippedFiles++;
-        continue;
-      }
-
-      const summaryEntry: DocumentedEntry = {
-        sourcePath: filePath,
-        knowledgePath: resolveKnowledgeRelativePath(
-          repoRoot,
-          knowledgeDirAbsolute,
+        const fileContent = await history.getFileAtCommit(
+          commit.hash,
           filePath
-        ),
-        tokens: metrics.tokens,
-        sizeKb: metrics.sizeKb,
-        previousContent: existing?.content,
-      };
+        );
+        if (!fileContent) {
+          console.log(
+            `${fileLabel} ${chalk.yellow("(skipped - file missing in commit)")}`
+          );
+          skippedFiles++;
+          continue;
+        }
 
-      if (options.dryRun) {
-        console.log(`${fileLabel} ${detailLabel} ${chalk.blue("(preview)")}`);
-        plannedEntries.push(summaryEntry);
-        continue;
-      }
-
-      const commitContext = {
-        hash: commit.hash,
-        message: commit.message,
-        date: safeCommitDate(commit.date),
-        author: commit.author,
-      };
-
-      const context = {
-        filePath,
-        language: getLanguageFromExtension(filePath),
-        isNew: Boolean(isNew),
-        fileContent,
-        dependencies: [],
-        dependents: [],
-        commitContext,
-      };
-
-      const fileSpinner = createSpinner(`${fileLabel} ${detailLabel}`).start();
-
-      try {
-        const analysis = await openaiClient!.analyze(context);
-        const knowledgePath = await writeKnowledgeFile(filePath, analysis, {
-          knowledgeDir: knowledgeDirAbsolute,
-          fileVersion: commit.hash,
-          model: config.openai.model,
-        });
-
-        const relativeKnowledgePath = toPosixPath(
-          path.relative(repoRoot, knowledgePath)
+        const metrics = getFileMetrics(fileContent);
+        const detailLabel = chalk.dim(
+          `[${metrics.tokens} tok · ${metrics.sizeLabel} KB]`
         );
 
-        const entry: DocumentedEntry = {
-          ...summaryEntry,
-          knowledgePath: relativeKnowledgePath,
-          insights: analysis.insights || [],
+        const existing = await readKnowledgeFile(
+          filePath,
+          knowledgeDirAbsolute
+        );
+        if (existing && existing.metadata.fileVersion === commit.hash) {
+          console.log(
+            `${fileLabel} ${chalk.dim("(skipped - already documented)")}`
+          );
+          skippedFiles++;
+          continue;
+        }
+
+        const summaryEntry: DocumentedEntry = {
+          sourcePath: filePath,
+          knowledgePath: resolveKnowledgeRelativePath(
+            repoRoot,
+            knowledgeDirAbsolute,
+            filePath
+          ),
+          tokens: metrics.tokens,
+          sizeKb: metrics.sizeKb,
+          previousContent: existing?.content,
         };
 
-        documentedEntries.push(entry);
-        plannedEntries.push(entry);
-        knowledgePathsForStage.add(relativeKnowledgePath);
+        if (options.dryRun) {
+          console.log(`${fileLabel} ${detailLabel} ${chalk.blue("(preview)")}`);
+          plannedEntries.push(summaryEntry);
+          continue;
+        }
 
-        fileSpinner.success({
-          text: `${fileLabel} ${chalk.green("✓")} ${detailLabel}`,
-          mark: "",
+        const commitContext = {
+          hash: commit.hash,
+          message: commit.message,
+          date: safeCommitDate(commit.date),
+          author: commit.author,
+        };
+
+        const depContext = getDependencyContext(filePath, graph);
+        // Get diff if modified
+        const gitDiff = isNew
+          ? undefined
+          : (await history.getFileDiffInCommit(commit.hash, filePath)) ||
+            undefined;
+
+        const context: PromptContext = {
+          filePath,
+          language: getLanguageFromExtension(filePath),
+          isNew: Boolean(isNew),
+          fileContent,
+          gitDiff,
+          dependencies: depContext.dependencies,
+          dependents: depContext.dependents,
+          commitContext,
+          existingDocumentation: existing?.content,
+        };
+
+        batchItems.push({
+          filePath,
+          fileLabel,
+          detailLabel,
+          summaryEntry,
+          context,
         });
+      }
+
+      if (batchItems.length === 0) continue;
+
+      // Execute batch analysis
+      try {
+        const batchResults = await openaiClient!.analyzeBatch(
+          batchItems.map((item) => ({
+            filePath: item.filePath,
+            context: item.context,
+          }))
+        );
+
+        // Process results
+        for (const item of batchItems) {
+          const analysis = batchResults.get(item.filePath);
+          const fileSpinner = createSpinner(
+            `${item.fileLabel} ${item.detailLabel}`
+          ).start();
+
+          if (!analysis) {
+            fileSpinner.error({
+              text: `${item.fileLabel} ${chalk.red(
+                "(failed - analysis missing)"
+              )} ${item.detailLabel}`,
+            });
+            skippedFiles++;
+            continue;
+          }
+
+          try {
+            const knowledgePath = await writeKnowledgeFile(
+              item.filePath,
+              analysis,
+              {
+                knowledgeDir: knowledgeDirAbsolute,
+                fileVersion: commit.hash,
+                model: config.openai.model,
+              }
+            );
+
+            const relativeKnowledgePath = toPosixPath(
+              path.relative(repoRoot, knowledgePath)
+            );
+
+            const entry: DocumentedEntry = {
+              ...item.summaryEntry,
+              knowledgePath: relativeKnowledgePath,
+              insights: analysis.insights || [],
+            };
+
+            documentedEntries.push(entry);
+            plannedEntries.push(entry);
+            knowledgePathsForStage.add(relativeKnowledgePath);
+
+            fileSpinner.success({
+              text: `${item.fileLabel} ${chalk.green("✓")} ${item.detailLabel}`,
+              mark: "",
+            });
+          } catch (error: any) {
+            const message = error?.message ?? "write error";
+            fileSpinner.error({
+              text: `${item.fileLabel} ${chalk.red(`(failed - ${message})`)} ${
+                item.detailLabel
+              }`,
+            });
+            skippedFiles++;
+          }
+        }
       } catch (error: any) {
-        const message = error?.message ?? "analysis error";
-        fileSpinner.error({
-          text: `${fileLabel} ${chalk.red(`(failed - ${message})`)} ${detailLabel}`,
-        });
-        skippedFiles++;
+        console.error(chalk.red(`Batch analysis failed: ${error.message}`));
+        skippedFiles += batchItems.length;
       }
     }
 
@@ -477,8 +555,7 @@ function resolveKnowledgeRelativePath(
   sourceFile: string
 ): string {
   const knowledgePath = path.join(knowledgeDirAbsolute, `${sourceFile}.md`);
-  const relative =
-    path.relative(repoRoot, knowledgePath) || `${sourceFile}.md`;
+  const relative = path.relative(repoRoot, knowledgePath) || `${sourceFile}.md`;
   return toPosixPath(relative);
 }
 
@@ -508,9 +585,7 @@ function printSummaryBox(
   const lines: string[] = [];
 
   lines.push(
-    `${dryRun ? "Would save to" : "Knowledge saved to"}: ${
-      knowledgeDirDisplay
-    }`
+    `${dryRun ? "Would save to" : "Knowledge saved to"}: ${knowledgeDirDisplay}`
   );
   lines.push("");
 
@@ -526,22 +601,17 @@ function printSummaryBox(
             : file.sizeKb >= 0.1
             ? file.sizeKb.toFixed(1)
             : "<0.1";
-        lines.push(
-          `  • ${fileName} (${file.tokens} tok · ${sizeDisplay} KB)`
-        );
+        lines.push(`  • ${fileName} (${file.tokens} tok · ${sizeDisplay} KB)`);
       });
       lines.push("");
     });
 
     lines.push(
-      dryRun
-        ? "Next steps (after running without --dry-run):"
-        : "Next steps:"
+      dryRun ? "Next steps (after running without --dry-run):" : "Next steps:"
     );
 
     const reviewTarget =
-      entries[0]?.knowledgePath ||
-      path.posix.join(stageTarget, "<file>.md");
+      entries[0]?.knowledgePath || path.posix.join(stageTarget, "<file>.md");
 
     lines.push(`  Review: cat ${reviewTarget}`);
     lines.push(`  Stage: git add ${stageTarget}`);
@@ -572,6 +642,17 @@ function printSummaryBox(
       titleAlignment: "left",
     })
   );
+}
+
+function groupFilesByDirectory(files: string[]): Map<string, string[]> {
+  const groups = new Map<string, string[]>();
+  for (const file of files) {
+    const dir = path.dirname(file) || ".";
+    const bucket = groups.get(dir) ?? [];
+    bucket.push(file);
+    groups.set(dir, bucket);
+  }
+  return groups;
 }
 
 function groupEntriesByDirectory(

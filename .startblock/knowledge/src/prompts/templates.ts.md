@@ -1,7 +1,7 @@
 ---
 filePath: src/prompts/templates.ts
-fileVersion: 3b416f26343e9cc1cfd6140ef640501273e1831e
-lastUpdated: '2025-12-17T01:36:28.386Z'
+fileVersion: d41e59db13aa62aec5746fa874be5a4422d7eb22
+lastUpdated: '2025-12-28T17:47:07.408Z'
 updatedBy: sb-cli
 tags:
   - src
@@ -14,29 +14,28 @@ humanVerified: false
 feature: prompts-templates
 featureRole: helper
 userFlows:
-  - User can generate documentation for code files based on their context
-  - User can analyze changes in code files with historical commit information
+  - User can generate documentation for code changes
+  - User can analyze the context of a file in a repository
 relatedFiles: []
 ---
 ## Purpose
-This file defines a system prompt template and a function to generate user prompts for analyzing code files and generating knowledge documentation.
+This file defines the structure and functionality for generating user prompts for OpenAI analysis based on the context of a file's state in a code repository.
 
 ## Key Functionality
-- `SYSTEM_PROMPT`: A template string that outlines the guidelines for generating documentation.
-- `PromptContext`: An interface that structures the context needed for prompt generation, including file details and commit information.
-- `generateUserPrompt(context: PromptContext)`: A function that constructs a prompt for OpenAI analysis based on the provided context.
+- `PromptContext`: Interface that outlines the context required for generating prompts, including file path, language, and commit details.
+- `generateUserPrompt`: Function that constructs a detailed prompt string for OpenAI, incorporating various contextual elements like existing documentation and changes in the commit.
 
 ## Gotchas
-- The `commitContext` is optional; if not provided, the prompt will not include commit details, which may lead to a lack of historical context in the generated documentation.
-- The function assumes that the `dependencies` and `dependents` arrays are correctly populated; if they are not, the generated prompt may lack important context about file relationships.
-- Care should be taken when formatting the `gitDiff` to ensure it accurately reflects the changes; incorrect formatting can lead to confusion in the generated insights.
+- The `existingDocumentation` field is optional; if not provided, the prompt will not include prior documentation, which may lead to loss of context.
+- The function assumes that the `commitContext` is well-formed; if any fields are missing, it could lead to incomplete or malformed prompts.
+- Care must be taken when passing `gitDiff`, as it is only relevant for modified files; passing it for new files may lead to confusion in the output.
 
 ## Dependencies
-- The file does not have external dependencies but relies on the structure of the `PromptContext` to function correctly.
+- The file relies on the structure of the `PromptContext` interface to ensure that all necessary data is provided for prompt generation. This structure is crucial for maintaining clarity and consistency in the generated prompts.
 
 ## Architecture Context
-This file serves as a utility for generating prompts that aid in the documentation process, fitting into a larger system that automates code analysis and documentation generation.
+This file plays a critical role in the documentation and analysis workflow by providing a structured way to generate prompts that facilitate understanding and insights into code changes and context.
 
 ## Implementation Notes
-- The `SYSTEM_PROMPT` string has been updated to clarify the rules for generating documentation, emphasizing the importance of non-obvious insights.
-- The `commitContext` was added to enhance the context available for prompt generation, allowing for richer insights based on commit history.
+- The addition of the `existingDocumentation` field was made to enhance the ability to preserve and enrich prior documentation, reflecting a decision to improve the documentation process.
+- The prompt generation logic is designed to be extensible, allowing for future enhancements without significant refactoring.

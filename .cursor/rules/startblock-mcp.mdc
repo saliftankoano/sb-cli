@@ -99,7 +99,7 @@ Did I modify/create/explain a code file?
 **How it works:**
 
 1. **Call `knowledge.auto_document`** - This acts as a prompt/reminder to document your work
-   - Returns: `{knowledgeFilePath, newContent, category, tags}`
+   - Returns: `{knowledgeFilePath, featuresFilePath, newContent, category, tags, feature, shouldUpdateDiagram, diagramUpdateInstructions}`
 2. **Read existing knowledge** - Check if `knowledgeFilePath` exists and read it
 3. **Merge intelligently**:
    - If file exists: Parse frontmatter, find the category section (e.g., `## Insights`), append new content there
@@ -107,24 +107,79 @@ Did I modify/create/explain a code file?
    - If file doesn't exist: Create new file with frontmatter + category section
    - Update `lastUpdated` timestamp in frontmatter
    - Merge tags (avoid duplicates)
+   - **Include feature metadata**: Add `feature`, `featureRole`, `userFlows`, `relatedFiles` to frontmatter
 4. **Write the merged file** - Save to `knowledgeFilePath`
+5. **Update features.json** - Read `featuresFilePath`, update/create feature entry, write back
+
+**Feature-Aware Documentation:**
+
+When calling `knowledge.auto_document`, you MUST:
+
+1. **Extract relatedFiles** from the file's imports:
+   - Read the source file and parse imports
+   - Convert relative imports to file paths (e.g., `import { X } from './helper'` → `relatedFiles: ['./helper.ts']`)
+   - Include all imported files that are part of the same repository
+
+2. **Identify userFlows** - Ask: "What can a USER do because this file exists?"
+   - API route? → "User can fetch analytics data"
+   - Component? → "User can see dashboard charts"
+   - Service? → "System processes payments automatically"
+   - Think from the end-user perspective, not developer perspective
+
+3. **Determine feature** - Use directory + context:
+   - The tool will auto-infer from directory path, but you can provide `feature` explicitly
+   - Examples: `app/dashboard/analytics/page.tsx` → feature: "dashboard-analytics"
+   - `lib/auth/session.ts` → feature: "authentication"
+
+4. **Assess diagram impact** - Set `checkDiagramUpdate: true` when:
+   - You created a new file
+   - You changed the file's purpose/role
+   - You added/removed major dependencies
+   - Set `architectureImpact: 'major'` for new features/flows, `'minor'` for small changes
+   - Then evaluate: Does this change the architecture or user flow?
+
+5. **Update features.json** after writing knowledge file:
+   - Read `.startblock/features.json` (use `featuresFilePath` from response)
+   - Find or create feature entry matching `feature` ID
+   - Merge: add file to `files` array, merge `userFlows`, merge `tags`
+   - If `shouldUpdateDiagram: true`, consider updating `mermaidDiagram` and `filesByAction`
 
 **Example:**
 
 ```javascript
-// Step 1: Get reminder to document
+// Step 1: Get reminder to document with feature metadata
 const result = await knowledge.auto_document({
-  filePath: "app/api/mcp/route.ts",
-  content:
-    "Added `try.new_name` tool that returns a new name based on the user input.",
+  filePath: "app/dashboard/analytics/page.tsx",
+  content: "Added real-time chart updates using WebSocket subscription",
   category: "Insights",
   repoRoot: "startblock",
+  
+  // Feature-aware fields:
+  feature: "dashboard-analytics",
+  featureRole: "entry_point",
+  userFlows: [
+    "User views real-time analytics dashboard",
+    "User filters data by date range"
+  ],
+  relatedFiles: [
+    "lib/analytics/fetch.ts",
+    "components/charts/LineChart.tsx",
+    "lib/websocket/client.ts"
+  ],
+  
+  // Diagram update check:
+  checkDiagramUpdate: true,
+  architectureImpact: "minor"  // New WebSocket connection added
 });
 
-// Step 2-4: Read, merge, and write (you handle this)
+// Step 2-5: Read, merge, write knowledge file, then update features.json
 // Read existing file at result.data.knowledgeFilePath
 // Merge result.data.newContent into the appropriate category section
-// Write the updated file
+// Include feature metadata in frontmatter
+// Write the updated knowledge file
+// Read result.data.featuresFilePath
+// Update/create feature entry
+// Write updated features.json
 ```
 
 **When Triggered:** User says "Extract knowledge for this file" (or similar request)

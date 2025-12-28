@@ -1,7 +1,7 @@
 ---
 filePath: src/index.ts
-fileVersion: 3e2d5ba2cdfa1fd8e1086d9cd6d3be58a8f0cb04
-lastUpdated: '2025-12-17T01:36:28.386Z'
+fileVersion: d41e59db13aa62aec5746fa874be5a4422d7eb22
+lastUpdated: '2025-12-28T17:47:07.406Z'
 updatedBy: sb-cli
 tags:
   - src
@@ -10,14 +10,15 @@ importance: low
 extractedBy: sb-cli@1.0.0
 model: gpt-4o-mini
 humanVerified: false
-feature: knowledge-capture-cli
+feature: cli-command-handler
 featureRole: entry_point
 userFlows:
-  - User can initialize the knowledge capture in a repository
-  - User can analyze commits for documentation purposes
-  - User can onboard new users with personalized instructions
-  - User can migrate existing knowledge files to a new format
-  - User can document historical commits with GitFlash
+  - User can initialize the Startblock in their current repository
+  - User can analyze staged files for documentation
+  - User can run onboarding to generate documentation
+  - User can simulate an intro animation
+  - User can start a visual onboarding server
+  - User can migrate existing knowledge files to a feature-based format
 relatedFiles:
   - commands/init.js
   - commands/analyze-commit.js
@@ -26,29 +27,26 @@ relatedFiles:
   - commands/setup-onboarding.js
   - commands/migrate-features.js
   - commands/gitflash.js
-  - package.json
 ---
 ## Purpose
-This file acts as the main entry point for the CLI of the application, orchestrating command execution based on user input.
+This file serves as the main entry point for the command-line interface, orchestrating various commands based on user input.
 
 ## Key Functionality
-- `main()`: The main function that processes command-line arguments and executes the corresponding command.
-- `getVersion()`: Retrieves the application version from `package.json`.
-- `showHelp()`: Displays help information for available commands.
+- `main()`: The primary function that processes commands and executes corresponding actions.
+- `getVersion()`: Retrieves the current version of the application from package.json.
+- `showHelp()`: Displays the help message with available commands and usage instructions.
 
 ## Gotchas
-- The command parsing is strict; any unrecognized command will result in an error message and display of the help text.
-- The 'gitflash' command requires careful specification of the number of commits to avoid performance degradation when processing large histories.
-- Error handling in the `main` function is broad; specific errors may not be easily identifiable if they occur.
+- The command handling is case-sensitive; providing an unknown command will lead to an error and display the help message, which may confuse users not familiar with the CLI.
+- The `--postinstall` flag in the `onboard` command is critical for automatic onboarding; its absence requires manual invocation, potentially leading to missed onboarding opportunities.
+- Error handling is generic, which may not provide sufficient context for debugging if the error is not clear.
 
 ## Dependencies
-- `chalk`: Used for colored console output, enhancing user experience by making command feedback more readable.
-- Local command modules (e.g., `initCommand`, `analyzeCommitCommand`) are dynamically imported as needed, which can impact performance if commands are invoked frequently.
+- `chalk`: Used for colorful console output, enhancing user experience by making the CLI more readable and engaging.
 
 ## Architecture Context
-This file is central to the CLI's operation, linking various command functionalities and providing a user interface for interacting with the system's features.
+This file fits into the larger system as the entry point for the CLI, allowing users to interact with various commands that manage knowledge capture and onboarding processes.
 
 ## Implementation Notes
-- The dynamic import pattern allows for modular command loading, but it may introduce latency on the first call to a command.
-- The CLI supports various user actions, including initialization, onboarding, and migration of features, making it versatile for different user needs.
-- The error handling strategy should be revisited to ensure that specific errors can be logged and traced effectively.
+- The `getVersion` function defaults to 'unknown' if the package.json cannot be read, which could mislead users into thinking they are using an outdated version.
+- The design pattern used for command handling is straightforward but could be improved with a more modular approach to enhance maintainability and scalability.

@@ -43,6 +43,7 @@ export interface PromptContext {
   gitDiff?: string;
   dependencies: Array<{ path: string; exports: string[] }>;
   dependents: string[];
+  existingDocumentation?: string;
   commitContext?: {
     hash: string;
     message: string;
@@ -63,6 +64,7 @@ export function generateUserPrompt(context: PromptContext): string {
     gitDiff,
     dependencies,
     dependents,
+    existingDocumentation,
     commitContext,
   } = context;
 
@@ -80,6 +82,12 @@ GIT STATUS: ${isNew ? "NEW FILE" : "MODIFIED"}
 - AUTHOR: ${commitContext.author}
 - DATE: ${formattedDate}
 - MESSAGE: ${commitContext.message}
+`;
+  }
+
+  if (existingDocumentation) {
+    prompt += `\nEXISTING_DOCUMENTATION (preserve and enrich):
+${existingDocumentation}
 `;
   }
 

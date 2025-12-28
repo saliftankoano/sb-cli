@@ -1,7 +1,7 @@
 ---
 filePath: src/core/openai-client.ts
-fileVersion: 3f944582f06fea4635c5f60f11c7429d02c5eec6
-lastUpdated: '2025-11-23T21:59:29.463Z'
+fileVersion: 3b416f26343e9cc1cfd6140ef640501273e1831e
+lastUpdated: '2025-12-28T17:47:07.403Z'
 updatedBy: sb-cli
 tags:
   - src
@@ -11,28 +11,35 @@ importance: low
 extractedBy: sb-cli@1.0.0
 model: gpt-4o-mini
 humanVerified: false
+feature: openai-client
+featureRole: service
+userFlows:
+  - User can analyze multiple files for insights
+  - User can generate onboarding tasks based on their goals
+relatedFiles:
+  - ../config/defaults.js
+  - ../prompts/templates.js
+  - ../utils/sleep.js
 ---
 ## Purpose
-This file serves as a wrapper for the OpenAI client, enabling the selection of relevant directories and files for onboarding developers based on their goals and experience levels.
+This file serves as a wrapper for the OpenAI API, facilitating code analysis and onboarding task generation based on user context and repository structure.
 
 ## Key Functionality
-- `selectRelevantDirectories`: Analyzes the repository structure and user context to recommend directories.
-- `selectFilesForOnboarding`: Filters files from selected directories and recommends specific files for onboarding tasks.
-- `generateOnboardingTasks`: Creates actionable onboarding tasks tailored to the user's goals and experience level.
-- `chat`: Facilitates general Q&A with the OpenAI model for onboarding support.
+- `analyze(context: PromptContext)`: Analyzes a single file and returns structured insights.
+- `analyzeBatch(files: Array<{ filePath: string; context: PromptContext }>)`: Analyzes multiple files sequentially, respecting rate limits.
+- `generateOnboardingTasks(...)`: Creates tailored onboarding tasks based on user goals and experience levels.
 
 ## Gotchas
-- The AI's effectiveness is contingent on the prompt's clarity; vague prompts may yield suboptimal results.
-- If no relevant directories are found, the system defaults to using all files, which may not align with the user's specific needs.
-- The error handling for API calls only retries on rate limits; other errors will not trigger a retry, potentially leading to missed opportunities for user assistance.
+- The `analyzeBatch` method continues processing even if some analyses fail, which can lead to incomplete results without explicit error handling for the caller.
+- Rate limiting is handled in the `analyze` method, which retries after a delay; however, excessive retries could lead to longer processing times, potentially impacting user experience.
 
 ## Dependencies
-- The `openai` package is essential for interacting with the OpenAI API, providing the necessary methods for chat completions.
-- The `sleep` utility is used to manage rate limit responses, ensuring compliance with API usage policies.
+- The OpenAI client is used to interact with the OpenAI API, leveraging its capabilities for generating insights and tasks based on code analysis.
+- Utility functions like `sleep` are used to manage delays during rate limiting, ensuring compliance with API usage policies.
 
 ## Architecture Context
-This file is part of a larger onboarding system that leverages AI to enhance the developer experience by providing tailored guidance and resources, thereby reducing the learning curve associated with new codebases.
+This file is a service component within the larger system, responsible for integrating AI capabilities into the onboarding process, enabling users to effectively understand and navigate the codebase.
 
 ## Implementation Notes
-- The implementation uses JSON schema to validate responses from the OpenAI API, ensuring that the expected structure is adhered to.
-- Performance considerations include the handling of large repositories; the directory extraction process could be optimized further if performance issues arise with very large codebases.
+- The decision to process file analyses sequentially was made to avoid hitting API rate limits, which is crucial for maintaining service reliability. Future improvements could explore parallel processing, but this would require careful consideration of rate limits and context management.
+- The `analyzeBatch` method is designed with extensibility in mind, allowing for potential future enhancements like batching requests into a single prompt for efficiency.

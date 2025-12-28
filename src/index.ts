@@ -133,6 +133,16 @@ function showHelp() {
       " Document historical commits with GitFlash"
   );
   console.log(
+    "  " +
+      chalk.cyan("sb gitflash --hash <SHA>") +
+      "   Document a specific commit"
+  );
+  console.log(
+    "  " +
+      chalk.cyan("sb gitflash --all") +
+      "       Document ALL commits (careful!)"
+  );
+  console.log(
     "  " + chalk.cyan("sb --help") + "          Show this help message"
   );
   console.log("  " + chalk.cyan("sb --version") + "       Show CLI version\n");

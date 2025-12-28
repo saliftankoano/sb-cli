@@ -151,6 +151,29 @@ export class OpenAIClient {
   }
 
   /**
+   * Analyze a batch of files together
+   */
+  async analyzeBatch(
+    files: Array<{ filePath: string; context: PromptContext }>
+  ): Promise<Map<string, AnalysisResult>> {
+    const results = new Map<string, AnalysisResult>();
+
+    // For now, process sequentially to respect rate limits and context window
+    // In future this could be parallelized or batched into single prompt
+    for (const file of files) {
+      try {
+        const result = await this.analyze(file.context);
+        results.set(file.filePath, result);
+      } catch (error) {
+        console.error(`Failed to analyze ${file.filePath}:`, error);
+        // Continue with other files
+      }
+    }
+
+    return results;
+  }
+
+  /**
    * Extract tags from file path and context
    */
   private extractTags(context: PromptContext): string[] {

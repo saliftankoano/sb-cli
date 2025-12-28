@@ -30,6 +30,7 @@ export interface GitHistoryOperations {
   getLastNCommits(n: number): Promise<CommitInfo[]>;
   getCommit(hash: string): Promise<CommitInfo | null>;
   getFileAtCommit(hash: string, filePath: string): Promise<string | null>;
+  getFileDiffInCommit(hash: string, filePath: string): Promise<string | null>;
   getChangedFilesInCommit(hash: string): Promise<ChangedFiles>;
   getAllCommits(): Promise<CommitInfo[]>;
 }
@@ -58,6 +59,19 @@ export function createGitHistoryOperations(
       try {
         const content = await git.show([`${hash}:${filePath}`]);
         return content;
+      } catch {
+        return null;
+      }
+    },
+
+    async getFileDiffInCommit(
+      hash: string,
+      filePath: string
+    ): Promise<string | null> {
+      try {
+        // Get diff between parent (hash^) and commit (hash) for specific file
+        const diff = await git.raw(["diff", `${hash}^`, hash, "--", filePath]);
+        return diff || null;
       } catch {
         return null;
       }
@@ -111,8 +125,9 @@ export function createGitHistoryOperations(
           hash,
         ]);
 
-        const [fullHash, shortHash, author, date, ...messageParts] =
-          output.split("\n").filter(Boolean);
+        const [fullHash, shortHash, author, date, ...messageParts] = output
+          .split("\n")
+          .filter(Boolean);
 
         if (!fullHash) {
           return null;
