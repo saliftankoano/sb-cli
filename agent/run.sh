@@ -4,6 +4,19 @@
 
 set -e
 
+# Help / Usage
+if [[ "$1" == "-h" ]] || [[ "$1" == "--help" ]]; then
+  echo "Usage: ./run.sh [REPO_PATH]"
+  echo ""
+  echo "Arguments:"
+  echo "  REPO_PATH   Path to the repository root containing .sb-config.json"
+  echo "              Defaults to current directory if not specified."
+  echo ""
+  echo "Example:"
+  echo "  ./run.sh ..   (if running from agent/ subdir)"
+  exit 0
+fi
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 VENV_DIR="$SCRIPT_DIR/venv"
 REPO_ROOT="${1:-$(pwd)}"
