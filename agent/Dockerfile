@@ -14,8 +14,8 @@ COPY . .
 # Set default env vars
 ENV REPO_ROOT=/app/repo
 
-# Create a volume point for the repo
-VOLUME /app/repo
+# Create a mount point for the repo (configured via Railway Volumes or bind mounts)
+# VOLUME /app/repo
 
 # Start the agent
 # Use "start" for production deployment (connects to LiveKit Cloud)
