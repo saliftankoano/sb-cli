@@ -1,74 +1,92 @@
-# Deploying the Onboarding Agent
+# Deploying Startblock (Agent + UI)
 
-This guide explains how to deploy the Voice Onboarding Agent so users can connect without needing your local machine or personal API keys.
+This guide explains how to deploy both the **Voice Agent** (which joins rooms) and the **Web UI** (which generates tokens and hosts the frontend).
 
-## Prerequisites
+## Architecture
 
-- **LiveKit Cloud Project**: URL, API Key, and Secret.
-- **OpenAI API Key**.
-- **Hosting Platform**: Railway, Fly.io, or any Docker-compatible host.
+To allow users to access Startblock without keys, you need two services running:
 
-## Docker Deployment
+1.  **Frontend Service (`sb serve`)**: Hosts the web UI and generates LiveKit tokens.
+2.  **Agent Service**: Runs the Python agent that joins the LiveKit rooms.
 
-We have included a `Dockerfile` to containerize the agent.
+Both services must share the **exact same** LiveKit credentials.
 
-### 1. Build the Image
+---
 
-```bash
-cd sb-cli/agent
-docker build -t onboarding-agent .
-```
+## Part 1: Deploying the Frontend (`sb serve`)
 
-### 2. Run Locally (Testing)
+This service runs the Node.js CLI in server mode.
 
-You need to mount the repository you want to onboard users onto. For example, to onboard onto the current repo:
+### 1. Deployment (Railway)
 
-```bash
-docker run -it \
-  -e LIVEKIT_URL="wss://..." \
-  -e LIVEKIT_API_KEY="AP..." \
-  -e LIVEKIT_API_SECRET="..." \
-  -e OPENAI_API_KEY="sk-..." \
-  -v $(pwd)/../../:/app/repo \
-  onboarding-agent python main.py dev
-```
+1.  Push the `sb-cli` code to your git repository.
+2.  Create a new Service in Railway from the repo.
+3.  Set Root Directory to `sb-cli`.
+4.  Railway will automatically detect the `Dockerfile` we added.
 
-> Note: We map `$(pwd)/../../` (the repo root) to `/app/repo` inside the container.
+### 2. Environment Variables
 
-### 3. Deploy to Production (e.g. Railway)
+Configure these in the Railway dashboard for the frontend service:
 
-1. **Push this code** to your git repository.
-2. **Create a new Service** in Railway from the repo.
-3. **Set Root Directory** to `sb-cli/agent`.
-4. **Configure Environment Variables**:
-   - `LIVEKIT_URL`
-   - `LIVEKIT_API_KEY`
-   - `LIVEKIT_API_SECRET`
-   - `OPENAI_API_KEY`
-   - `REPO_ROOT`: Set this to `/app/repo` (or wherever you put the code).
+| Variable             | Value                                   |
+| -------------------- | --------------------------------------- |
+| `LIVEKIT_URL`        | `wss://your-project.livekit.cloud`      |
+| `LIVEKIT_API_KEY`    | Your LiveKit API key                    |
+| `LIVEKIT_API_SECRET` | Your LiveKit API secret                 |
+| `OPENAI_API_KEY`     | OpenAI API key (for narration features) |
+| `PORT`               | (Railway sets this automatically)       |
+| `REPO_ROOT`          | `/app/repo` (see below)                 |
 
-**Important**: The agent needs access to the code it is explaining.
+### 3. Mounting the Repo
 
-- If you are deploying via Docker, you must **COPY** the target repository into the image or clone it at runtime.
-- For a self-contained "Onboard to Startblock" agent, modify the `Dockerfile` to COPY the `startblock` code into `/app/repo`.
+The server needs access to the knowledge files (`.startblock/knowledge`) to serve them to the UI.
 
-Example modification to `Dockerfile` for a specific repo:
+**Option A: Bake it in (Easiest)**
+Modify `sb-cli/Dockerfile` to copy your target repo:
 
 ```dockerfile
-# ... (after COPY . .)
-
-# Copy the actual code to be explained
-COPY ../.. /app/repo
+# Add this before the CMD line
+COPY ../startblock /app/repo
+ENV REPO_ROOT=/app/repo
 ```
 
-## Running the CLI Script
+**Option B: Clone at runtime**
+Use a startup script to `git clone` your target repo into `/app/repo`.
 
-You were previously trying to run `python3 run.sh` which caused a syntax error. `run.sh` is a Bash script.
+---
 
-**Correct usage:**
+## Part 2: Deploying the Agent
 
-```bash
-./run.sh
-# OR
-bash run.sh
-```
+This service runs the Python agent that actually speaks.
+
+### 1. Deployment (Railway)
+
+1.  Create another Service in Railway from the same repo.
+2.  Set Root Directory to `sb-cli/agent`.
+3.  Railway will detect the `Dockerfile` in the agent directory.
+
+### 2. Environment Variables
+
+| Variable             | Value                                       |
+| -------------------- | ------------------------------------------- |
+| `LIVEKIT_URL`        | **MUST MATCH FRONTEND**                     |
+| `LIVEKIT_API_KEY`    | **MUST MATCH FRONTEND**                     |
+| `LIVEKIT_API_SECRET` | **MUST MATCH FRONTEND**                     |
+| `OPENAI_API_KEY`     | OpenAI API key                              |
+| `REPO_ROOT`          | `/app/repo` (Same repo content as frontend) |
+
+### 3. Mounting the Repo
+
+The agent needs the **same repo files** as the frontend to answer questions about them.
+Ensure you copy/mount the repo into `/app/repo` in the agent's Dockerfile as well.
+
+---
+
+## Part 3: Testing
+
+1.  Visit the **Frontend Service URL** (e.g., `https://sb-cli-production.up.railway.app`).
+2.  Click "Start".
+3.  The frontend generates a token (using server-side keys).
+4.  You join the room.
+5.  The **Agent Service** detects the room and joins.
+6.  Voice conversation starts! 🎙️
