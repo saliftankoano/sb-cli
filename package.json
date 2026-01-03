@@ -1,6 +1,6 @@
 {
   "name": "@startblock-ai/cli",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Automatic knowledge capture for codebases, allowing you to capture knowledge before it's lost.",
   "type": "module",
   "bin": {
