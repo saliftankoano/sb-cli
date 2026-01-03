@@ -126,7 +126,7 @@ When you clone a repository with Startblock enabled and run `npm install`, the `
 
 ### 🖥️ Visual Onboarding Server
 
-Want a more interactive experience? Startblock includes a built-in visual server that turns your knowledge files into a rich, animated dashboard.
+Want a more interactive experience? Startblock includes a built-in visual server that turns your knowledge files into a rich, animated dashboard **with AI voice guidance**.
 
 1.  **Run Server:**
 
@@ -134,13 +134,15 @@ Want a more interactive experience? Startblock includes a built-in visual server
     sb serve
     ```
 
-    _Starts a local server at http://localhost:3939_
+    _Starts a local server at http://localhost:3939 with voice agent ready to guide you!_
 
 2.  **Features:**
     - **Interactive File Tree:** Explore your project structure with knowledge status indicators.
-    - **Voice Narration:** AI guide walks you through file purpose and insights (powered by OpenAI TTS).
+    - **🎙️ AI Voice Agent:** Real-time voice conversations about your codebase (powered by OpenAI + LiveKit).
     - **Dynamic UI:** Smooth animations, expandable dossiers, and "Dynamic Island" player controls.
     - **Dark Mode:** Optimized for developers with a sleek, high-contrast theme.
+
+> **✨ No setup required!** Voice agent credentials are provided automatically. Just run `sb serve` and start talking to your codebase.
 
 ## 📋 Commands
 
@@ -167,41 +169,40 @@ After running `sb init`, you can customize behavior in `.sb-config.json`:
 ```json
 {
   "openai": {
-    "apiKey": "sk-...", // Your OpenAI Key
+    "apiKey": "sk-...", // Your OpenAI Key (required)
     "model": "gpt-4o-mini", // Recommend gpt-4o for best results
     "temperature": 0.3
   },
   "analysis": {
     "excludePatterns": ["*.test.ts", "dist/**"],
     "maxFilesPerAnalysis": 10
-  },
-  "livekit": {
-    "url": "wss://your-project.livekit.cloud",
-    "apiKey": "AP...",
-    "apiSecret": "your-secret-here"
   }
+  // Note: LiveKit config is NOT needed - credentials provided automatically!
 }
 ```
 
 > 🔒 **Security**: Your API keys are stored locally in `.sb-config.json` which is automatically added to `.gitignore`.
 
-### Voice Onboarding (Closed Testing Default)
+### 🎙️ Voice Agent
 
-During closed testing, LiveKit credentials are provided by Startblock on the server side. Users do **not** need to supply LiveKit keys.
+The AI voice agent works **out of the box** - no LiveKit configuration needed!
 
-1. **Run the agent**:
+**To use:**
 
-   ```bash
-   cd agent
-   pip install -r requirements.txt
-   export OPENAI_API_KEY="sk-..."
-   export REPO_ROOT="/path/to/repo"
-   python main.py dev
-   ```
+```bash
+sb serve
+```
 
-2. **Start the server**: `sb serve`
+Then open http://localhost:3939 and click the microphone button to start talking to your codebase.
 
-Optional self-hosting or BYO LiveKit: see [LIVEKIT_SETUP.md](./LIVEKIT_SETUP.md) for configuring your own LiveKit Cloud credentials.
+**How it works:**
+
+- Voice agent credentials are provided automatically by Startblock
+- Your conversations stay private and secure
+- Powered by OpenAI (for STT/LLM/TTS) + LiveKit (for real-time audio)
+
+**Self-hosting (optional):**  
+Want to use your own LiveKit instance? See [LIVEKIT_SETUP.md](./LIVEKIT_SETUP.md) for advanced configuration.
 
 ---
 
