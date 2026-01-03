@@ -1,24 +1,65 @@
 import { ReactNode } from "react";
+import NavRail from "./NavRail";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface LayoutProps {
   children: ReactNode;
-  sidebar?: ReactNode;
+  activeMode: "journey" | "explore" | "knowledge";
+  onModeChange: (mode: "journey" | "explore" | "knowledge") => void;
+  onSearchClick?: () => void;
+  sidebarContent?: ReactNode; // For the Explore/Journey specific sidebars
+  topBar?: ReactNode;
 }
 
-export default function Layout({ children, sidebar }: LayoutProps) {
+export default function Layout({
+  children,
+  activeMode,
+  onModeChange,
+  onSearchClick,
+  sidebarContent,
+  topBar,
+}: LayoutProps) {
   return (
-    <div className="flex flex-col h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 overflow-hidden font-sans">
-      <div className="flex flex-1 overflow-hidden relative">
-        {/* Sidebar */}
-            {sidebar}
+    <div className="flex h-screen w-screen bg-[#0d1117] text-[#e6edf3] overflow-hidden font-sans selection:bg-blue-500/20 selection:text-blue-400">
+      {/* 1. Navigation Rail (Fixed Left) */}
+      <NavRail
+        activeMode={activeMode}
+        onModeChange={onModeChange}
+        onSearchClick={onSearchClick || (() => {})}
+      />
 
-        {/* Main Content */}
-        <main className="flex-1 overflow-y-auto relative scroll-smooth">
-          <div className="max-w-5xl mx-auto p-8 pb-32 min-h-full">
+      {/* 2. Secondary Sidebar (Collapsible/Mode-specific) */}
+      <AnimatePresence mode="wait">
+        {sidebarContent && (
+          <motion.div
+            initial={{ width: 0, opacity: 0 }}
+            animate={{ width: 280, opacity: 1 }}
+            exit={{ width: 0, opacity: 0 }}
+            className="h-full border-r border-[#30363d] bg-[#161b22] overflow-hidden flex flex-col"
+          >
+            {sidebarContent}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* 3. Main Content Area */}
+      <div className="flex-1 flex flex-col h-full min-w-0 bg-[#0d1117] relative">
+        {/* Top Bar (Context/Command) */}
+        {topBar && (
+          <div className="h-14 border-b border-[#30363d] bg-[#0d1117]/80 backdrop-blur-sm flex items-center px-6 sticky top-0 z-30">
+            {topBar}
+          </div>
+        )}
+
+        {/* Scrollable Content */}
+        <main className="flex-1 overflow-y-auto relative scroll-smooth flex flex-col">
+          <div className="flex-1 w-full max-w-[1600px] mx-auto p-4 lg:p-6">
             {children}
           </div>
         </main>
       </div>
+
+      {/* Global Overlays (Search, Voice Panel, etc) would go here */}
     </div>
   );
 }

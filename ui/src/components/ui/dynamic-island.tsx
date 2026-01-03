@@ -231,11 +231,11 @@ const DynamicIslandProvider: React.FC<DynamicIslandProviderProps> = ({
 
   const setSize = useCallback(
     (newSize: SizePresets) => {
-      if (state.previousSize !== newSize && newSize !== state.size) {
+      if (newSize !== state.size) {
         dispatch({ type: "SET_SIZE", newSize });
       }
     },
-    [state.previousSize, state.size, dispatch]
+    [state.size, dispatch]
   );
 
   const scheduleAnimation = useCallback(
@@ -369,7 +369,7 @@ const DynamicIslandContent = ({
   return (
     <motion.div
       id={id}
-      className="mx-auto h-0 w-0 items-center justify-center border border-black/10 bg-black text-center text-black transition duration-300 ease-in-out focus-within:bg-neutral-900 hover:shadow-md dark:bg-neutral-900 dark:border dark:border-white/20 dark:focus-within:bg-black"
+      className="mx-auto h-0 w-0 items-center justify-center border border-black/10 bg-black text-center text-black transition duration-300 ease-in-out focus-within:bg-neutral-900 hover:shadow-lg dark:bg-[#161b22] dark:border dark:border-white/30 dark:focus-within:bg-black"
       animate={{
         width: dimensions.width,
         height: dimensions.height,
@@ -378,10 +378,6 @@ const DynamicIslandContent = ({
           type: "spring",
           stiffness,
           damping,
-        },
-        clipPath: `none`,
-        transitionEnd: {
-          clipPath: `url(#squircle-${state.size})`,
         },
       }}
       style={{ willChange }}

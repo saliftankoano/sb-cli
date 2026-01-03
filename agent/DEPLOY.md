@@ -21,7 +21,7 @@ This service runs the Node.js CLI in server mode.
 
 1.  Push the `sb-cli` code to your git repository.
 2.  Create a new Service in Railway from the repo.
-3.  Set Root Directory to `sb-cli`.
+3.  Set Root Directory to `sb-cli`.ie
 4.  Railway will automatically detect the `Dockerfile` we added.
 
 ### 2. Environment Variables

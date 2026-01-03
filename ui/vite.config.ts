@@ -5,6 +5,9 @@ import { resolve } from "path";
 export default defineConfig({
   base: "./",
   plugins: [react()],
+  optimizeDeps: {
+    include: ["d3-sankey"],
+  },
   build: {
     outDir: "../dist/ui",
     emptyOutDir: true,
@@ -26,7 +29,8 @@ export default defineConfig({
             id.includes("react-markdown") ||
             id.includes("remark-") ||
             id.includes("rehype-") ||
-            id.includes("mermaid")
+            id.includes("mermaid") ||
+            id.includes("d3-sankey")
           ) {
             return "markdown-vendor";
           }
@@ -44,6 +48,10 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": resolve(__dirname, "./src"),
+      "d3-sankey": resolve(
+        __dirname,
+        "node_modules/d3-sankey/dist/d3-sankey.min.js"
+      ),
     },
   },
 });

@@ -8,11 +8,15 @@ import {
   WarningIcon,
   GitBranchIcon,
   LightbulbIcon,
-  CaretDownIcon,
-  CaretRightIcon,
+  ArrowsInLineHorizontalIcon,
+  ArrowsOutLineHorizontalIcon,
+  BookOpenIcon,
+  CodeIcon,
 } from "@phosphor-icons/react";
+import { motion, AnimatePresence } from "framer-motion";
+import MarkdownRenderer from "./MarkdownRenderer";
 
-// Map file extensions to Prism language names (TypeScript, JavaScript, Python only)
+// Map file extensions to Prism language names
 function getLanguageFromFile(filePath: string): string {
   const ext = filePath.split(".").pop()?.toLowerCase();
   const languageMap: Record<string, string> = {
@@ -24,6 +28,8 @@ function getLanguageFromFile(filePath: string): string {
     cjs: "javascript",
     py: "python",
     json: "json",
+    css: "css",
+    md: "markdown",
   };
   return languageMap[ext || ""] || "typescript";
 }
@@ -40,15 +46,24 @@ export interface GuidedViewState {
 
 interface GuidedViewProps {
   state: GuidedViewState;
+  defaultCollapsed?: boolean;
 }
 
-export default function GuidedView({ state }: GuidedViewProps) {
+export default function GuidedView({
+  state,
+  defaultCollapsed = false,
+}: GuidedViewProps) {
   const { knowledge } = useKnowledge();
   const [codeLines, setCodeLines] = useState<FileContentLine[]>([]);
   const [codeLoading, setCodeLoading] = useState(false);
-  const [expandedSections, setExpandedSections] = useState<Set<string>>(
-    new Set(["code"])
-  );
+  const [isKnowledgeCollapsed, setIsKnowledgeCollapsed] =
+    useState(defaultCollapsed);
+  const [viewMode, setViewMode] = useState<"source" | "knowledge">("source");
+
+  // Reset collapse state when defaultCollapsed changes or state.file changes (new file)
+  useEffect(() => {
+    setIsKnowledgeCollapsed(defaultCollapsed);
+  }, [defaultCollapsed, state.file]);
 
   const fileKnowledge = knowledge.find(
     (k) => k.sourceFile === state.file || state.file.endsWith(k.sourceFile)
@@ -56,33 +71,22 @@ export default function GuidedView({ state }: GuidedViewProps) {
 
   // Fetch code when file or line range changes
   useEffect(() => {
-    if (state.startLine && state.endLine) {
-      setCodeLoading(true);
-      fetchFileContent(state.file, state.startLine, state.endLine)
-        .then((data) => {
-          setCodeLines(data.lines);
-          setCodeLoading(false);
-        })
-        .catch((err) => {
-          console.error("Failed to fetch code:", err);
-          setCodeLoading(false);
-        });
-    } else {
-      setCodeLines([]);
-    }
-  }, [state.file, state.startLine, state.endLine]);
+    // If we're exploring, fetch a large chunk or the whole file
+    // For now, let's fetch first 500 lines to allow "full exploration"
+    const start = state.startLine || 1;
+    const end = state.endLine || 500;
 
-  const toggleSection = (section: string) => {
-    setExpandedSections((prev) => {
-      const next = new Set(prev);
-      if (next.has(section)) {
-        next.delete(section);
-      } else {
-        next.add(section);
-      }
-      return next;
-    });
-  };
+    setCodeLoading(true);
+    fetchFileContent(state.file, start, end)
+      .then((data) => {
+        setCodeLines(data.lines);
+        setCodeLoading(false);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch code:", err);
+        setCodeLoading(false);
+      });
+  }, [state.file, state.startLine, state.endLine]);
 
   const isHighlighted = (lineNum: number) =>
     state.highlightLines?.includes(lineNum) ?? false;
@@ -95,61 +99,84 @@ export default function GuidedView({ state }: GuidedViewProps) {
   const language = useMemo(() => getLanguageFromFile(state.file), [state.file]);
 
   return (
-    <div className="space-y-6 max-w-4xl">
-      {/* Header */}
-      <div className="flex items-start gap-4">
-        <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-xl">
-          <FileCodeIcon
-            size={28}
-            className="text-blue-600 dark:text-blue-400"
-          />
-        </div>
-        <div className="flex-1">
-          <div className="flex items-center gap-2 mb-1">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-              {state.title}
-            </h1>
+    <div className="h-full flex flex-col lg:flex-row gap-6 overflow-hidden">
+      {/* LEFT PANE: Content View (Source or Knowledge) */}
+      <div
+        className={`flex-1 flex flex-col min-h-0 bg-[#161b22] border border-[#30363d] rounded-xl overflow-hidden shadow-sm transition-all duration-300 ${
+          isKnowledgeCollapsed ? "lg:flex-[3]" : "lg:flex-[1.5]"
+        }`}
+      >
+        {/* Header with Mode Toggle */}
+        <div className="flex items-center justify-between px-4 py-2.5 border-b border-[#30363d] bg-[#0d1117]">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 overflow-hidden">
+              {viewMode === "source" ? (
+                <FileCodeIcon size={18} className="text-blue-400 shrink-0" />
+              ) : (
+                <BookOpenIcon size={18} className="text-purple-400 shrink-0" />
+              )}
+              <span className="text-sm font-semibold text-[#e6edf3] truncate max-w-[200px]">
+                {state.file.split("/").pop()}
+              </span>
+            </div>
+
+            {/* Mode Tabs */}
+            <div className="flex items-center bg-[#21262d] p-0.5 rounded-lg border border-[#30363d]">
+              <button
+                onClick={() => setViewMode("source")}
+                className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-medium transition-all ${
+                  viewMode === "source"
+                    ? "bg-[#30363d] text-white shadow-sm"
+                    : "text-gray-400 hover:text-gray-200"
+                }`}
+              >
+                <CodeIcon size={14} />
+                Source
+              </button>
+              <button
+                onClick={() => setViewMode("knowledge")}
+                className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-medium transition-all ${
+                  viewMode === "knowledge"
+                    ? "bg-[#30363d] text-white shadow-sm"
+                    : "text-gray-400 hover:text-gray-200"
+                }`}
+                disabled={!fileKnowledge}
+              >
+                <BookOpenIcon size={14} />
+                Knowledge
+              </button>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
             {state.featureName && (
-              <span className="px-2 py-0.5 text-xs font-medium bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-full">
+              <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest bg-purple-500/10 text-purple-400 border border-purple-500/20 rounded-full">
                 {state.featureName}
               </span>
             )}
+            <button
+              onClick={() => setIsKnowledgeCollapsed(!isKnowledgeCollapsed)}
+              className="p-1.5 hover:bg-[#21262d] rounded text-gray-400 hover:text-white transition-colors lg:block hidden ml-2"
+              title={isKnowledgeCollapsed ? "Show Insights" : "Expand View"}
+            >
+              {isKnowledgeCollapsed ? (
+                <ArrowsInLineHorizontalIcon size={18} />
+              ) : (
+                <ArrowsOutLineHorizontalIcon size={18} />
+              )}
+            </button>
           </div>
-          <p className="text-sm text-gray-500 dark:text-gray-400 font-mono">
-            {state.file}
-          </p>
         </div>
-      </div>
 
-      {/* Agent Explanation */}
-      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 border border-blue-200 dark:border-blue-800 rounded-xl p-5">
-        <div className="flex items-start gap-3">
-          <LightbulbIcon
-            size={20}
-            weight="fill"
-            className="text-amber-500 mt-0.5 flex-shrink-0"
-          />
-          <p className="text-gray-800 dark:text-gray-200 leading-relaxed">
-            {state.explanation}
-          </p>
-        </div>
-      </div>
-
-      {/* Code Excerpt with Syntax Highlighting */}
-      {(state.startLine || codeLines.length > 0) && (
-        <div className="bg-[#1e1e1e] rounded-xl overflow-hidden border border-gray-800">
-          <div className="flex items-center justify-between px-4 py-2 bg-[#252526] border-b border-gray-700">
-            <span className="text-sm font-medium text-gray-300">
-              Lines {state.startLine}-{state.endLine}
-            </span>
-            <span className="text-xs text-gray-500 font-mono">
-              {state.file.split("/").pop()}
-            </span>
-          </div>
-          <div className="overflow-x-auto">
-            {codeLoading ? (
-              <div className="p-4 text-gray-400 animate-pulse">
-                Loading code...
+        {/* Content Body */}
+        <div className="flex-1 overflow-auto bg-[#0d1117] relative scroll-smooth custom-scrollbar">
+          {viewMode === "source" ? (
+            codeLoading ? (
+              <div className="flex flex-col items-center justify-center h-full text-gray-500 gap-3">
+                <div className="w-6 h-6 border-2 border-blue-500/30 border-t-blue-500 rounded-full animate-spin" />
+                <span className="text-sm font-mono tracking-tight">
+                  Loading source...
+                </span>
               </div>
             ) : (
               <Highlight
@@ -159,8 +186,13 @@ export default function GuidedView({ state }: GuidedViewProps) {
               >
                 {({ style, tokens, getLineProps, getTokenProps }) => (
                   <pre
-                    style={{ ...style, margin: 0, padding: "1rem" }}
-                    className="text-sm"
+                    style={{
+                      ...style,
+                      margin: 0,
+                      padding: "1.5rem",
+                      background: "transparent",
+                    }}
+                    className="text-[13px] leading-6 font-mono"
                   >
                     {tokens.map((line, i) => {
                       const lineNumber = (state.startLine || 1) + i;
@@ -169,16 +201,22 @@ export default function GuidedView({ state }: GuidedViewProps) {
                         <div
                           key={i}
                           {...getLineProps({ line })}
-                          className={`flex ${
+                          className={`flex group ${
                             highlighted
-                              ? "bg-yellow-500/20 -mx-4 px-4 border-l-2 border-yellow-400"
-                              : ""
+                              ? "bg-blue-500/10 -mx-6 px-6 border-l-2 border-blue-500"
+                              : "hover:bg-[#1f2428] -mx-6 px-6 border-l-2 border-transparent"
                           }`}
                         >
-                          <span className="w-12 text-gray-500 text-right pr-4 select-none flex-shrink-0 text-xs leading-6">
+                          <span
+                            className={`w-10 text-right pr-6 select-none flex-shrink-0 text-xs opacity-20 group-hover:opacity-40 transition-opacity ${
+                              highlighted
+                                ? "text-blue-400 opacity-100 font-bold"
+                                : ""
+                            }`}
+                          >
                             {lineNumber}
                           </span>
-                          <span className="leading-6">
+                          <span className="table-cell">
                             {line.map((token, key) => (
                               <span key={key} {...getTokenProps({ token })} />
                             ))}
@@ -189,111 +227,152 @@ export default function GuidedView({ state }: GuidedViewProps) {
                   </pre>
                 )}
               </Highlight>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Knowledge Sections */}
-      {fileKnowledge && (
-        <div className="space-y-3">
-          {/* Purpose */}
-          {fileKnowledge.content.purpose && (
-            <div className="bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden">
-              <button
-                onClick={() => toggleSection("purpose")}
-                className="w-full px-5 py-3 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
-              >
-                <div className="flex items-center gap-3">
-                  <BrainIcon size={18} className="text-blue-500" />
-                  <span className="font-medium text-gray-900 dark:text-white">
-                    Purpose
-                  </span>
-                </div>
-                {expandedSections.has("purpose") ? (
-                  <CaretDownIcon size={16} className="text-gray-400" />
-                ) : (
-                  <CaretRightIcon size={16} className="text-gray-400" />
-                )}
-              </button>
-              {expandedSections.has("purpose") && (
-                <div className="px-5 pb-4">
-                  <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
-                    {fileKnowledge.content.purpose}
-                  </p>
+            )
+          ) : (
+            <div className="p-8 max-w-4xl mx-auto prose prose-invert prose-blue prose-sm prose-pre:bg-[#161b22] prose-pre:border prose-pre:border-[#30363d]">
+              {fileKnowledge ? (
+                <MarkdownRenderer content={fileKnowledge.content.raw} />
+              ) : (
+                <div className="text-center py-20 opacity-50">
+                  No knowledge file found.
                 </div>
               )}
             </div>
           )}
+        </div>
+      </div>
 
-          {/* Gotchas */}
-          {fileKnowledge.content.gotchas && (
-            <div className="bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden">
-              <button
-                onClick={() => toggleSection("gotchas")}
-                className="w-full px-5 py-3 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
-              >
-                <div className="flex items-center gap-3">
-                  <WarningIcon size={18} className="text-amber-500" />
-                  <span className="font-medium text-gray-900 dark:text-white">
-                    Gotchas
-                  </span>
+      {/* RIGHT PANE: Insights View */}
+      <AnimatePresence>
+        {!isKnowledgeCollapsed && (
+          <motion.div
+            initial={{ opacity: 0, width: 0 }}
+            animate={{ opacity: 1, width: "auto" }}
+            exit={{ opacity: 0, width: 0 }}
+            className="lg:flex-1 flex flex-col gap-6 overflow-y-auto min-w-[380px] custom-scrollbar"
+          >
+            {/* AI Insight Card */}
+            <div className="bg-gradient-to-br from-blue-900/20 to-purple-900/20 border border-blue-500/20 rounded-xl p-5 relative overflow-hidden group shadow-xl">
+              <div className="absolute -top-4 -right-4 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                <LightbulbIcon size={120} weight="fill" />
+              </div>
+              <div className="flex items-start gap-4 relative z-10">
+                <div className="p-2.5 bg-blue-500/20 rounded-xl shrink-0 shadow-inner">
+                  <LightbulbIcon
+                    size={22}
+                    className="text-blue-400"
+                    weight="fill"
+                  />
                 </div>
-                {expandedSections.has("gotchas") ? (
-                  <CaretDownIcon size={16} className="text-gray-400" />
-                ) : (
-                  <CaretRightIcon size={16} className="text-gray-400" />
-                )}
-              </button>
-              {expandedSections.has("gotchas") && (
-                <div className="px-5 pb-4">
-                  <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/50 rounded-lg p-3">
-                    <p className="text-sm text-amber-800 dark:text-amber-200">
-                      {fileKnowledge.content.gotchas}
+                <div>
+                  <h3 className="text-sm font-bold text-white mb-1.5 flex items-center gap-2">
+                    AI Insight
+                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+                  </h3>
+                  <p className="text-[13px] text-gray-300 leading-relaxed font-medium">
+                    {state.explanation}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Access Sections */}
+            {fileKnowledge ? (
+              <div className="space-y-4">
+                {/* Purpose */}
+                {fileKnowledge.content.purpose && (
+                  <div
+                    className="bg-[#161b22] border border-[#30363d] rounded-xl p-5 hover:border-gray-600 transition-colors cursor-pointer group"
+                    onClick={() => setViewMode("knowledge")}
+                  >
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2 text-[#e6edf3]">
+                        <BrainIcon
+                          size={18}
+                          className="text-green-400"
+                          weight="duotone"
+                        />
+                        <h3 className="font-semibold text-sm">Purpose</h3>
+                      </div>
+                      <span className="text-[10px] text-gray-500 font-bold uppercase tracking-tighter opacity-0 group-hover:opacity-100 transition-opacity">
+                        View Full Docs →
+                      </span>
+                    </div>
+                    <p className="text-[13px] text-gray-400 leading-relaxed">
+                      {fileKnowledge.content.purpose}
                     </p>
                   </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Dependencies */}
-          {fileKnowledge.content.dependencies && (
-            <div className="bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden">
-              <button
-                onClick={() => toggleSection("dependencies")}
-                className="w-full px-5 py-3 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
-              >
-                <div className="flex items-center gap-3">
-                  <GitBranchIcon size={18} className="text-purple-500" />
-                  <span className="font-medium text-gray-900 dark:text-white">
-                    Dependencies
-                  </span>
-                </div>
-                {expandedSections.has("dependencies") ? (
-                  <CaretDownIcon size={16} className="text-gray-400" />
-                ) : (
-                  <CaretRightIcon size={16} className="text-gray-400" />
                 )}
-              </button>
-              {expandedSections.has("dependencies") && (
-                <div className="px-5 pb-4">
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {fileKnowledge.content.dependencies}
-                  </p>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      )}
 
-      {/* No knowledge fallback */}
-      {!fileKnowledge && (
-        <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-          <p>No additional knowledge available for this file yet.</p>
-        </div>
-      )}
+                {/* Gotchas */}
+                {fileKnowledge.content.gotchas && (
+                  <div
+                    className="bg-[#161b22] border border-[#30363d] rounded-xl p-5 relative overflow-hidden hover:border-gray-600 transition-colors cursor-pointer group"
+                    onClick={() => setViewMode("knowledge")}
+                  >
+                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-orange-500/50" />
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2 text-[#e6edf3]">
+                        <WarningIcon
+                          size={18}
+                          className="text-orange-400"
+                          weight="duotone"
+                        />
+                        <h3 className="font-semibold text-sm">
+                          Gotchas & Warnings
+                        </h3>
+                      </div>
+                      <span className="text-[10px] text-gray-500 font-bold uppercase tracking-tighter opacity-0 group-hover:opacity-100 transition-opacity">
+                        View Full Docs →
+                      </span>
+                    </div>
+                    <div className="bg-orange-950/10 rounded-lg p-3 border border-orange-900/20">
+                      <p className="text-[13px] text-orange-200/70 leading-relaxed">
+                        {fileKnowledge.content.gotchas}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Dependencies */}
+                {fileKnowledge.content.dependencies && (
+                  <div
+                    className="bg-[#161b22] border border-[#30363d] rounded-xl p-5 hover:border-gray-600 transition-colors cursor-pointer group"
+                    onClick={() => setViewMode("knowledge")}
+                  >
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2 text-[#e6edf3]">
+                        <GitBranchIcon
+                          size={18}
+                          className="text-purple-400"
+                          weight="duotone"
+                        />
+                        <h3 className="font-semibold text-sm">Dependencies</h3>
+                      </div>
+                      <span className="text-[10px] text-gray-500 font-bold uppercase tracking-tighter opacity-0 group-hover:opacity-100 transition-opacity">
+                        View Full Docs →
+                      </span>
+                    </div>
+                    <p className="text-[13px] text-gray-400 leading-relaxed font-mono text-xs truncate">
+                      {fileKnowledge.content.dependencies}
+                    </p>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-16 text-gray-500 border border-dashed border-[#30363d] rounded-2xl bg-[#0d1117]/50">
+                <BrainIcon size={40} className="mb-4 opacity-20" />
+                <p className="text-sm font-medium">
+                  No knowledge graph data found
+                </p>
+                <p className="text-xs opacity-40 mt-1">
+                  Ask the AI to analyze this file
+                </p>
+              </div>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

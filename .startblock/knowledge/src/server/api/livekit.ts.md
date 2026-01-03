@@ -1,7 +1,7 @@
 ---
 filePath: src/server/api/livekit.ts
-fileVersion: c766688c23eea47221c7fbd5175bbbd63c3c579f
-lastUpdated: '2025-12-17T01:30:42.349Z'
+fileVersion: 47a0fae09d8add3f6e041cab60a1cfc07b8b24c0
+lastUpdated: '2026-01-03T02:24:27.861Z'
 updatedBy: sb-cli
 tags:
   - src
@@ -12,34 +12,34 @@ importance: low
 extractedBy: sb-cli@1.0.0
 model: gpt-4o-mini
 humanVerified: false
-feature: livekit-setup
+feature: livekit
 featureRole: entry_point
 userFlows:
-  - User can generate a LiveKit token for onboarding sessions
-  - User can create or join a LiveKit room for real-time communication
+  - User can generate a LiveKit token for real-time communication
+  - User can create or join a communication room
 relatedFiles:
-  - ../../config/loader.js
+  - src/server/api/livekit.ts
+  - src/server/api/anotherFile.ts
 ---
 ## Purpose
-This file sets up API routes for generating LiveKit tokens and managing rooms for real-time communication.
+This file sets up API routes for generating LiveKit tokens necessary for real-time communication sessions.
 
 ## Key Functionality
-- `setupLiveKitRoutes(repoRoot: string): Router`: Configures the Express router with a POST endpoint for generating LiveKit tokens.
+- `setupLiveKitRoutes(repoRoot: string, config?: { url?: string; apiKey?: string; apiSecret?: string }): Router`: Configures the router with a POST endpoint to generate LiveKit tokens.
 
 ## Gotchas
-- LiveKit credentials are now strictly sourced from environment variables, and users of the CLI do not need to provide them, which can lead to confusion if not documented properly.
-- The room creation process is designed to be idempotent; if a room already exists, the error is caught and ignored, which may lead to unexpected behavior if not understood.
-- The access token generation includes permissions that allow users to join and interact with the room, which is crucial for ensuring proper access control during onboarding sessions.
-- The room name generation uses the current timestamp if no session ID is provided, which may lead to non-unique room names if multiple requests are made in quick succession.
+- Credentials can be provided via environment variables or a config object; ensure both are validated to prevent errors.
+- If a room already exists, the error from creating the room is caught and ignored, which can lead to confusion if the room creation fails silently.
+- Room names are generated using session IDs or timestamps, which may lead to collisions if not managed properly.
+- The AccessToken identity is based on timestamps, which may not be unique across different sessions.
 
 ## Dependencies
-- `express`: Used for creating the API routes.
-- `livekit-server-sdk`: Provides the necessary classes for generating access tokens and managing rooms in LiveKit.
+- `express`: Used for routing and handling HTTP requests.
+- `livekit-server-sdk`: Provides the necessary classes to interact with LiveKit services for room creation and token generation.
 
 ## Architecture Context
-This file is part of the server-side implementation for handling real-time communication features, specifically focusing on token generation and room management for onboarding sessions.
+This file is part of the server-side API that facilitates real-time communication features in the application, integrating with LiveKit for managing sessions and tokens.
 
 ## Implementation Notes
-- The decision to source LiveKit credentials from environment variables simplifies configuration for end users but requires clear documentation to avoid confusion.
-- The use of `Date.now()` for generating room names ensures that room names are unique unless multiple requests occur at the same millisecond, which could be a potential edge case to monitor for.
-- The implementation handles errors gracefully, logging them and responding with a 500 status code, which is important for maintaining a good user experience during failures.
+- The addition of the config parameter allows for more flexible deployment configurations.
+- Ensure that error handling is robust, especially for token generation and room creation, to avoid runtime issues during high load or unexpected states.

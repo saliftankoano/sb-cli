@@ -44,7 +44,7 @@ export async function startServer(
   app.use("/api/session", setupSessionRoutes(repoRoot));
   app.use("/api/tree", setupTreeRoutes(repoRoot));
   app.use("/api/narration", setupNarrationRoutes(repoRoot, { noVoice }));
-  app.use("/api/livekit", setupLiveKitRoutes(repoRoot));
+  app.use("/api/livekit", setupLiveKitRoutes(repoRoot, options.livekitConfig));
   app.use("/api/features", setupFeaturesRoutes(repoRoot));
   app.use("/api/files", setupFilesRoutes(repoRoot));
 

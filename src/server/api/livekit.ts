@@ -5,21 +5,24 @@ interface LiveKitTokenRequest {
   sessionId?: string;
 }
 
-export function setupLiveKitRoutes(repoRoot: string): Router {
+export function setupLiveKitRoutes(
+  repoRoot: string,
+  config?: { url?: string; apiKey?: string; apiSecret?: string }
+): Router {
   const router = Router();
 
   router.post("/token", async (req, res) => {
     try {
-      // LiveKit credentials are provided by the Startblock service env vars only.
-      // Users of the CLI do NOT need to supply keys during closed testing.
-      const livekitUrl = process.env.LIVEKIT_URL;
-      const livekitApiKey = process.env.LIVEKIT_API_KEY;
-      const livekitApiSecret = process.env.LIVEKIT_API_SECRET;
+      // LiveKit credentials can be provided by env vars or config
+      const livekitUrl = process.env.LIVEKIT_URL || config?.url;
+      const livekitApiKey = process.env.LIVEKIT_API_KEY || config?.apiKey;
+      const livekitApiSecret =
+        process.env.LIVEKIT_API_SECRET || config?.apiSecret;
 
       if (!livekitUrl || !livekitApiKey || !livekitApiSecret) {
         return res.status(400).json({
           error:
-            "LiveKit configuration missing. Set LIVEKIT_URL, LIVEKIT_API_KEY, and LIVEKIT_API_SECRET on the server (end users do not need to configure these).",
+            "LiveKit configuration missing. Set LIVEKIT_URL, LIVEKIT_API_KEY, and LIVEKIT_API_SECRET on the server or in .sb-config.json.",
         });
       }
 

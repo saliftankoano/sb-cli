@@ -62,5 +62,6 @@ echo "🌐 LiveKit URL: $LIVEKIT_URL"
 echo ""
 
 # Run the agent
+export PYTHONUNBUFFERED=1
 python "$SCRIPT_DIR/main.py" dev
 

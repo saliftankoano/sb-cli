@@ -1,13 +1,12 @@
 ---
 filePath: src/server/index.ts
-fileVersion: 58f84348b1e49d79670af734ad811a0504f9e922
-lastUpdated: '2025-12-17T01:34:20.646Z'
+fileVersion: 8d19981434afad46c6ee9594de898c5a04b8c9c2
+lastUpdated: '2026-01-03T02:24:27.862Z'
 updatedBy: sb-cli
 tags:
   - src
   - server
   - typescript
-  - new
 importance: low
 extractedBy: sb-cli@1.0.0
 model: gpt-4o-mini
@@ -18,38 +17,38 @@ userFlows:
   - >-
     User can access API endpoints for knowledge, session, tree, narration,
     livekit, features, and files.
-  - User can serve and interact with the web application's UI.
+  - User can view the UI served by the Express server.
 relatedFiles:
-  - src/api/knowledge.js
-  - src/api/session.js
-  - src/api/tree.js
-  - src/api/narration.js
-  - src/api/livekit.js
-  - src/api/features.js
-  - src/api/files.js
+  - ./api/knowledge.js
+  - ./api/session.js
+  - ./api/tree.js
+  - ./api/narration.js
+  - ./api/livekit.js
+  - ./api/features.js
+  - ./api/files.js
   - ../commands/serve.js
 ---
 ## Purpose
-This file initializes and starts an Express server to handle API requests and serve static files for a web application.
+This file sets up and starts an Express server that serves API routes and static UI files for the application.
 
 ## Key Functionality
-- `startServer(repoRoot: string, options: ServeOptions)`: Main function to set up and start the Express server, configure routes, and handle server lifecycle events.
+- `startServer(repoRoot: string, options: ServeOptions)`: Initializes the Express app, sets up middleware, defines API routes, and starts the HTTP server.
 
 ## Gotchas
-- CORS is set to allow all origins, which is fine for development but should be restricted in production to avoid security risks.
-- The server's graceful shutdown process includes a force exit after 2 seconds, which may not allow ongoing requests to complete, potentially leading to data inconsistency.
-- If the specified port is in use, the server provides a user-friendly error message, but this can still lead to confusion if not addressed by the user.
-- The static file serving assumes a specific directory structure; any changes to this structure may break the application.
+- The CORS middleware is configured for development and should not be used in production without modification.
+- The server's shutdown process is designed to be graceful, but if it exceeds 2 seconds, it will forcefully terminate, which could lead to incomplete requests being processed.
+- Ensure that `livekitConfig` is properly validated before being passed to `setupLiveKitRoutes`, as incorrect configurations may lead to unexpected behaviors.
+- The static file serving relies on a specific directory structure; any changes to the UI build process or output paths will require updates to this code.
 
 ## Dependencies
-- `express`: Used for setting up the web server and handling routing.
-- `chalk`: Provides colored console output for better readability of logs.
-- `open`: Automatically opens the browser to the server URL, enhancing user experience during development.
+- `express`: Used for setting up the web server and handling requests.
+- `chalk`: Utilized for colored console output, improving readability of logs.
+- `open`: Automatically opens the server URL in the default browser unless specified otherwise.
 
 ## Architecture Context
-This file serves as the entry point for the server-side application, coordinating various API routes and static file serving, thus forming the backbone of the server's functionality in the overall system architecture.
+This file serves as the entry point for the server-side application, coordinating various API routes and serving the frontend UI. It integrates multiple route setups that handle different aspects of the application, ensuring a modular architecture.
 
 ## Implementation Notes
-- The server is configured to listen on a default port of 3939, which can be overridden via options.
-- The use of promises for server start and error handling ensures that the server can manage startup failures gracefully.
-- The shutdown logic is designed to handle both SIGINT and SIGTERM signals, which is crucial for cloud deployments where these signals are commonly used for graceful termination.
+- The server defaults to port 3939, which can be overridden via the `options` parameter. This should be documented for users who may want to run multiple instances.
+- The CORS configuration allows all origins, which is convenient for development but should be restricted in production.
+- The promise-based server start allows for error handling and logging, ensuring that startup issues are communicated effectively to the developer.

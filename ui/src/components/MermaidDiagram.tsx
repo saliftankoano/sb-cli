@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import mermaid from "mermaid";
+import "d3-sankey";
 
 interface MermaidDiagramProps {
   diagram: string;

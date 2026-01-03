@@ -1,63 +1,58 @@
 ---
 filePath: ui/src/App.tsx
-fileVersion: e79e872063ecc7ae9518cd8ed987b60af3b96e2f
-lastUpdated: '2025-12-17T01:38:41.901Z'
+fileVersion: 0bae6537356e19ed555671925e6cf9551cd0bde6
+lastUpdated: '2026-01-03T02:24:27.864Z'
 updatedBy: sb-cli
 tags:
   - ui
   - src
   - typescript
-  - new
 importance: low
 extractedBy: sb-cli@1.0.0
 model: gpt-4o-mini
 humanVerified: false
-feature: livekit-integration
+feature: app
 featureRole: entry_point
 userFlows:
-  - User can join a live audio session
-  - User can navigate through onboarding documents
-  - User can view features and details about the application
-  - User can access guided assistance from an agent
+  - User can navigate through different journey steps
+  - User can explore files and view details
+  - User can interact with voice controls
+  - User can access onboarding documents
 relatedFiles:
   - ./components/Layout
   - ./hooks/useSession
   - ./hooks/useJourney
   - ./lib/api
-  - ./components/JourneyView
-  - ./components/FileFocus
-  - ./components/ConnectionView
-  - ./components/FileSidebar
   - ./components/WelcomeScreen
   - ./components/VoiceControlIsland
-  - ./components/ContentHeader
-  - ./components/FeaturesView
-  - ./components/OnboardingDocsView
   - ./components/GuidedView
+  - ./components/SmartFileBrowser
+  - ./components/JourneyProgress
+  - ./components/StepNavigator
+  - ./components/CommandBar
   - ./hooks/useAgentCommands
 ---
 ## Purpose
-This file serves as the main entry point for the application, managing user sessions and rendering different views based on the journey state.
+This file serves as the main entry point for the application, managing both the LiveKit and non-LiveKit UI states.
 
 ## Key Functionality
-- `App`: Main component that initializes the application, manages session state, and conditionally renders either LiveKit-enabled or regular content.
-- `LiveKitContent`: Inner component that handles rendering when LiveKit is active, including sidebar and main content.
-- `RegularContent`: Fallback component for rendering when LiveKit is not available.
+- **useAppState**: A custom hook that centralizes state management for journey steps, view states, and active modes.
+- **MainUI**: Renders the main application UI, adapting based on the active mode (journey, explore, knowledge).
+- **LiveKitContent**: A component that integrates LiveKit functionality, rendering the UI with voice control features.
+- **RegularContent**: A fallback component that renders the UI without LiveKit integration.
 
 ## Gotchas
-- The LiveKit integration is conditional and relies on the availability of a session; if the session isn't present, the app falls back to a regular content view without live audio capabilities.
-- The sidebar state management is crucial for user navigation, especially on smaller screens where it closes automatically after selection.
-- The useEffect hooks for fetching onboarding docs and LiveKit tokens are asynchronous, and the app's behavior depends on their successful completion, which can lead to race conditions if not handled correctly.
-- The component prioritizes agent-guided views when active, which can lead to unexpected UI states if the journey state is not managed properly.
+- The useAppState hook synchronizes the active mode with the view state, but if viewState is not updated correctly, it can lead to unexpected UI behavior.
+- The rendering logic is mode-dependent; switching modes without ensuring the correct view state can result in inconsistencies in the displayed content.
+- Developers should be cautious with the journeySteps array, as large datasets can affect performance during rendering and navigation.
 
 ## Dependencies
-- The app uses `@livekit/components-react` for real-time audio features, which are essential for the application's interactive capabilities.
-- Custom hooks like `useSession`, `useJourney`, and `useAgentCommands` manage state and side effects related to user sessions and navigation.
+- **@livekit/components-react**: Used for real-time audio and video features, essential for the application's interactive capabilities.
+- **hooks/useJourney**: Central to managing the application's state related to user journeys, ensuring that the UI reflects the current user context.
 
 ## Architecture Context
-This file is central to the application's architecture, serving as the entry point that integrates various components and manages the overall user experience based on the journey state and session availability.
+This file is integral to the application's architecture, serving as the main interface for users to interact with the journey and file exploration features. It connects various components and manages state transitions effectively.
 
 ## Implementation Notes
-- The component structure separates concerns between LiveKit-enabled content and regular content, allowing for a clean fallback mechanism.
-- The use of hooks for state management and side effects is consistent with React best practices, promoting reusability and separation of logic.
-- Performance considerations include the handling of asynchronous data fetching, which should be monitored to prevent UI blocking during loading states.
+- The separation of LiveKit and Regular content into distinct components enhances maintainability and clarity in the codebase. This pattern allows for easier updates and debugging.
+- Careful consideration of performance is necessary when handling large arrays like journeySteps, as inefficient rendering can lead to a sluggish user experience. Consider memoization or virtualization techniques if performance issues arise.

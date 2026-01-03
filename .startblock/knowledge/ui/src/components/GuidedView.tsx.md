@@ -1,14 +1,13 @@
 ---
 filePath: ui/src/components/GuidedView.tsx
-fileVersion: unknown
-lastUpdated: '2025-12-17T01:38:41.907Z'
+fileVersion: 0bae6537356e19ed555671925e6cf9551cd0bde6
+lastUpdated: '2026-01-03T02:24:27.867Z'
 updatedBy: sb-cli
 tags:
   - ui
   - src
   - components
   - typescript
-  - new
 importance: low
 extractedBy: sb-cli@1.0.0
 model: gpt-4o-mini
@@ -16,37 +15,33 @@ humanVerified: false
 feature: guided-view
 featureRole: component
 userFlows:
-  - User can view code snippets with explanations
-  - >-
-    User can toggle additional knowledge sections for better understanding of
-    the code
+  - User can toggle between viewing source code and knowledge documentation
+  - User can expand or collapse the knowledge section for insights
 relatedFiles:
-  - hooks/useKnowledge.ts
-  - lib/api.ts
+  - ../hooks/useKnowledge.ts
+  - ../lib/api.ts
+  - ./MarkdownRenderer.tsx
 ---
 ## Purpose
-The GuidedView component displays code snippets along with explanations and related knowledge, facilitating better understanding of the code for users.
+The GuidedView component provides a dual-pane interface for users to view source code alongside related knowledge documentation, facilitating better understanding and exploration of code files.
 
 ## Key Functionality
 - **getLanguageFromFile**: Maps file extensions to Prism language names for syntax highlighting.
-- **useEffect**: Fetches file content based on provided line numbers, updating the displayed code.
-- **toggleSection**: Manages the expanded/collapsed state of knowledge sections (Purpose, Gotchas, Dependencies).
-- **isHighlighted**: Checks if a line should be highlighted based on provided highlight lines.
+- **GuidedView**: Main component that manages state for displaying either the source code or knowledge documentation, fetching file content as needed.
 
 ## Gotchas
-- If `startLine` and `endLine` are not provided or invalid, the component will not fetch or display any code, which may lead to confusion for users expecting to see content.
-- The component does not handle errors from the `fetchFileContent` function gracefully beyond logging to the console; consider adding user feedback for failed fetch attempts.
-- The `expandedSections` state is managed using a Set, which is efficient but requires careful handling to avoid direct mutations.
+- The component fetches the first 500 lines of code by default, which may not be suitable for very large files and can lead to performance degradation.
+- The collapse state of the knowledge section resets whenever the defaultCollapsed prop or the state.file changes, which could lead to unexpected behavior for users.
+- The button for toggling the knowledge section visibility is hidden on smaller screens, which might limit accessibility for users on mobile devices.
 
 ## Dependencies
-- **useKnowledge**: This hook is essential for retrieving contextual knowledge about the file, which enriches the user experience by providing additional insights.
-- **fetchFileContent**: Used to retrieve the actual code lines from the server, crucial for the component's primary function of displaying code snippets.
-- **prism-react-renderer**: Provides syntax highlighting for the code, improving readability and comprehension.
+- **framer-motion**: Used for animations, enhancing user experience but may require performance considerations if overused.
+- **MarkdownRenderer**: Renders markdown content for knowledge documentation, ensuring that the documentation is displayed correctly and is user-friendly.
 
 ## Architecture Context
-The GuidedView component is part of a larger knowledge management system that aims to enhance developer understanding of code through contextual information and explanations. It integrates closely with the knowledge retrieval system and serves as a visual aid for users navigating complex codebases.
+This component is part of a larger knowledge management system that integrates code exploration with contextual insights, allowing users to learn from code directly and understand its implications through documentation.
 
 ## Implementation Notes
-- The decision to use `useMemo` for `codeString` and `language` calculations helps optimize performance by preventing unnecessary recalculations on re-renders.
-- Consider implementing pagination or lazy loading for large files to improve performance and user experience, as rendering many lines of code at once can lead to delays.
-- The component's design allows for easy expansion with additional knowledge sections, making it flexible for future enhancements.
+- The component utilizes React hooks for state management and side effects, ensuring a responsive UI.
+- The decision to fetch a fixed number of lines (500) was made for simplicity but could be revisited for scalability.
+- The removal of the Set for managing expanded sections simplifies the state but may require future enhancements if more sections are added.

@@ -5,239 +5,244 @@ import { useJourney } from "./hooks/useJourney";
 import { fetchLiveKitToken, fetchOnboardingDocs } from "./lib/api";
 import { LiveKitRoom, RoomAudioRenderer } from "@livekit/components-react";
 import "@livekit/components-styles";
-import JourneyView from "./components/JourneyView";
-import FileFocus from "./components/FileFocus";
-import ConnectionView from "./components/ConnectionView";
-import FileSidebar from "./components/FileSidebar";
 import WelcomeScreen from "./components/WelcomeScreen";
 import VoiceControlIsland from "./components/VoiceControlIsland";
-import ContentHeader from "./components/ContentHeader";
-import FeaturesView from "./components/FeaturesView";
-import OnboardingDocsView from "./components/OnboardingDocsView";
-import GuidedView from "./components/GuidedView";
+import GuidedView, { type GuidedViewState } from "./components/GuidedView";
+import SmartFileBrowser from "./components/SmartFileBrowser";
+import JourneyProgress from "./components/JourneyProgress";
+import StepNavigator from "./components/StepNavigator";
+import CommandBar from "./components/CommandBar";
 import { useAgentCommands } from "./hooks/useAgentCommands";
 
-// Inner component that uses LiveKit hooks (must be inside LiveKitRoom)
-function LiveKitContent({
-  sidebarOpen,
-  setSidebarOpen,
-  isAgentActive,
-  setIsAgentActive,
+// Shared UI logic - extracted to avoid duplication
+function useAppState() {
+  const {
+    journeySteps,
+    currentFileIndex,
+    viewState,
+    setViewState,
+    goToFile,
+    nextStep,
+    previousStep,
+  } = useJourney();
+
+  const [activeMode, setActiveMode] = useState<
+    "journey" | "explore" | "knowledge"
+  >("journey");
+  const [isCommandBarOpen, setIsCommandBarOpen] = useState(false);
+
+  // Sync NavRail mode with internal view state
+  useEffect(() => {
+    if (viewState.type === "explore" || viewState.type === "features") {
+      setActiveMode("explore");
+    } else if (viewState.type === "onboarding-docs") {
+      setActiveMode("knowledge");
+    } else {
+      setActiveMode("journey");
+    }
+  }, [viewState.type]);
+
+  return {
+    journeySteps,
+    currentFileIndex,
+    viewState,
+    setViewState,
+    goToFile,
+    nextStep,
+    previousStep,
+    activeMode,
+    setActiveMode,
+    isCommandBarOpen,
+    setIsCommandBarOpen,
+  };
+}
+
+// Main content renderer - shared between LiveKit and Regular modes
+function MainUI({
+  guidedState,
+  showVoiceControls = false,
+  isAgentActive = false,
+  onToggleAgent,
 }: {
-  sidebarOpen: boolean;
-  setSidebarOpen: (open: boolean) => void;
-  isAgentActive: boolean;
-  setIsAgentActive: (active: boolean) => void;
+  guidedState: GuidedViewState | null;
+  showVoiceControls?: boolean;
+  isAgentActive?: boolean;
+  onToggleAgent?: () => void;
 }) {
-  const journey = useJourney();
-  const { guidedState, clearGuidedState } = useAgentCommands();
+  const state = useAppState();
+  const {
+    journeySteps,
+    currentFileIndex,
+    viewState,
+    setViewState,
+    goToFile,
+    nextStep,
+    previousStep,
+    activeMode,
+    setActiveMode,
+    isCommandBarOpen,
+    setIsCommandBarOpen,
+  } = state;
 
-  const Sidebar = (
-    <FileSidebar
-      open={sidebarOpen}
-      onClose={() => setSidebarOpen(false)}
-      selectedId={
-        journey.viewState.type === "feature-details"
-          ? journey.viewState.featureId
-          : journey.viewState.type === "onboarding-docs"
-          ? journey.viewState.docId
-          : guidedState?.file
-      }
-      onDocSelect={(docId) => {
-        clearGuidedState(); // Exit guided mode when user navigates manually
-        journey.setViewState({ type: "onboarding-docs", docId });
-        if (window.innerWidth < 1024) setSidebarOpen(false);
-      }}
-      onFeatureSelect={(featureId) => {
-        clearGuidedState(); // Exit guided mode when user navigates manually
-        journey.setViewState({ type: "feature-details", featureId });
-        if (window.innerWidth < 1024) setSidebarOpen(false);
-      }}
-    />
-  );
+  const currentFile = journeySteps[currentFileIndex];
 
-  // Show GuidedView when agent sends a showFile command
-  const showGuided = guidedState !== null;
+  // Merge agent-driven state with local state
+  const viewState_: GuidedViewState | null =
+    guidedState ||
+    (currentFile
+      ? {
+          file: currentFile.file,
+          title: currentFile.title,
+          explanation: currentFile.description,
+          featureName: "Architecture",
+        }
+      : null);
 
-  const MainContent = (
-    <>
-      <ContentHeader
-        onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
-        sidebarOpen={sidebarOpen}
-      />
+  const topBar =
+    activeMode === "journey" ? (
+      <div className="w-full flex items-center justify-between">
+        <JourneyProgress
+          currentStep={currentFileIndex}
+          totalSteps={journeySteps.length}
+          completedSteps={currentFileIndex + 1}
+          title={currentFile?.title || "Welcome"}
+        />
+      </div>
+    ) : null;
 
-      {/* Agent-guided view takes priority when active */}
-      {showGuided && <GuidedView state={guidedState} />}
-
-      {/* Regular views when not in guided mode */}
-      {!showGuided && journey.viewState.type === "onboarding-docs" && (
-        <OnboardingDocsView
-          docId={
-            journey.viewState.type === "onboarding-docs"
-              ? journey.viewState.docId
-              : undefined
+  const sidebarContent =
+    activeMode === "explore" ? (
+      <SmartFileBrowser
+        selectedFile={viewState_?.file}
+        onFileSelect={(path) => {
+          const isInJourney = journeySteps.some((s) => s.file === path);
+          if (isInJourney) {
+            goToFile(path);
+            setActiveMode("journey");
+          } else {
+            setViewState({ type: "focus", file: path });
           }
-          onNavigate={(docId) => {
-            journey.setViewState({ type: "onboarding-docs", docId });
-          }}
-        />
-      )}
-      {!showGuided &&
-        (journey.viewState.type === "features" ||
-          journey.viewState.type === "feature-details") && (
-          <FeaturesView
-            featureId={
-              journey.viewState.type === "feature-details"
-                ? journey.viewState.featureId
-                : undefined
-            }
+        }}
+      />
+    ) : null;
+
+  const renderMainContent = () => {
+    if (activeMode === "journey") {
+      if (journeySteps.length === 0) return <WelcomeScreen />;
+
+      return (
+        <div className="flex flex-col h-full gap-4">
+          <div className="flex-1 min-h-0">
+            {viewState_ && <GuidedView state={viewState_} />}
+          </div>
+          <StepNavigator
+            onNext={nextStep}
+            onPrev={previousStep}
+            canGoNext={currentFileIndex < journeySteps.length - 1}
+            canGoPrev={currentFileIndex > 0}
+            nextTitle={journeySteps[currentFileIndex + 1]?.title}
+            prevTitle={journeySteps[currentFileIndex - 1]?.title}
+            isCompleted={currentFileIndex === journeySteps.length - 1}
           />
-        )}
-      {!showGuided &&
-        journey.viewState.type === "journey" &&
-        (journey.journeySteps.length === 0 ? (
-          <WelcomeScreen />
-        ) : (
-          <JourneyView />
-        ))}
-      {!showGuided && journey.viewState.type === "focus" && (
-        <FileFocus file={journey.viewState.file} />
-      )}
-      {!showGuided && journey.viewState.type === "connections" && (
-        <ConnectionView
-          file={journey.viewState.file}
-          onBack={() => {
-            const file =
-              journey.viewState.type === "connections"
-                ? journey.viewState.file
-                : "";
-            journey.setViewState({ type: "focus", file });
-          }}
-        />
-      )}
-    </>
-  );
+        </div>
+      );
+    }
+
+    if (activeMode === "explore") {
+      if (viewState.type === "focus" || viewState.type === "feature-details") {
+        return (
+          <div className="flex flex-col h-full">
+            {viewState_ ? (
+              <GuidedView state={viewState_} defaultCollapsed={true} />
+            ) : (
+              <div className="flex items-center justify-center h-full text-gray-500">
+                Select a file to view
+              </div>
+            )}
+          </div>
+        );
+      }
+      return (
+        <div className="flex items-center justify-center h-full text-gray-500">
+          <p>Select a file from the explorer to view details</p>
+        </div>
+      );
+    }
+
+    return <div>Knowledge Mode (Coming Soon)</div>;
+  };
 
   return (
     <>
-      <RoomAudioRenderer />
-      <VoiceControlIsland
-        isActive={isAgentActive}
-        onToggle={() => setIsAgentActive(!isAgentActive)}
+      <Layout
+        activeMode={activeMode}
+        onModeChange={(mode) => {
+          setActiveMode(mode);
+          if (mode === "journey") setViewState({ type: "journey" });
+          if (mode === "explore") setViewState({ type: "explore" });
+        }}
+        onSearchClick={() => setIsCommandBarOpen(true)}
+        sidebarContent={sidebarContent}
+        topBar={topBar}
+      >
+        {renderMainContent()}
+      </Layout>
+
+      <CommandBar
+        isOpen={isCommandBarOpen}
+        onClose={() => setIsCommandBarOpen(false)}
+        files={journeySteps.map((s) => s.file)}
+        onSelect={(file) => {
+          goToFile(file);
+          setActiveMode("journey");
+        }}
       />
-      <Layout sidebar={Sidebar}>{MainContent}</Layout>
+
+      {showVoiceControls && onToggleAgent && (
+        <VoiceControlIsland isActive={isAgentActive} onToggle={onToggleAgent} />
+      )}
     </>
   );
 }
 
-// Regular content (without LiveKit hooks)
-function RegularContent({
-  sidebarOpen,
-  setSidebarOpen,
+// Component that uses LiveKit hooks (must be inside LiveKitRoom)
+function LiveKitContent({
+  isAgentActive,
+  onToggleAgent,
 }: {
-  sidebarOpen: boolean;
-  setSidebarOpen: (open: boolean) => void;
+  isAgentActive: boolean;
+  onToggleAgent: () => void;
 }) {
-  const journey = useJourney();
+  // This hook uses useDataChannel which requires LiveKit context
+  const { guidedState } = useAgentCommands();
 
-  const Sidebar = (
-    <FileSidebar
-      open={sidebarOpen}
-      onClose={() => setSidebarOpen(false)}
-      selectedId={
-        journey.viewState.type === "feature-details"
-          ? journey.viewState.featureId
-          : journey.viewState.type === "onboarding-docs"
-          ? journey.viewState.docId
-          : undefined
-      }
-      onDocSelect={(docId) => {
-        journey.setViewState({ type: "onboarding-docs", docId });
-        if (window.innerWidth < 1024) setSidebarOpen(false);
-      }}
-      onFeatureSelect={(featureId) => {
-        journey.setViewState({ type: "feature-details", featureId });
-        if (window.innerWidth < 1024) setSidebarOpen(false);
-      }}
+  return (
+    <MainUI
+      guidedState={guidedState}
+      showVoiceControls={true}
+      isAgentActive={isAgentActive}
+      onToggleAgent={onToggleAgent}
     />
   );
+}
 
-  const MainContent = (
-    <>
-      <ContentHeader
-        onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
-        sidebarOpen={sidebarOpen}
-      />
-      {journey.viewState.type === "onboarding-docs" && (
-        <OnboardingDocsView
-          docId={
-            journey.viewState.type === "onboarding-docs"
-              ? journey.viewState.docId
-              : undefined
-          }
-          onNavigate={(docId) => {
-            journey.setViewState({ type: "onboarding-docs", docId });
-          }}
-        />
-      )}
-      {(journey.viewState.type === "features" ||
-        journey.viewState.type === "feature-details") && (
-        <FeaturesView
-          featureId={
-            journey.viewState.type === "feature-details"
-              ? journey.viewState.featureId
-              : undefined
-          }
-        />
-      )}
-      {journey.viewState.type === "journey" &&
-        (journey.journeySteps.length === 0 ? (
-          <WelcomeScreen />
-        ) : (
-          <JourneyView />
-        ))}
-      {journey.viewState.type === "focus" && (
-        <FileFocus file={journey.viewState.file} />
-      )}
-      {journey.viewState.type === "connections" && (
-        <ConnectionView
-          file={journey.viewState.file}
-          onBack={() => {
-            const file =
-              journey.viewState.type === "connections"
-                ? journey.viewState.file
-                : "";
-            journey.setViewState({ type: "focus", file });
-          }}
-        />
-      )}
-    </>
-  );
-
-  return <Layout sidebar={Sidebar}>{MainContent}</Layout>;
+// Fallback component without LiveKit hooks
+function RegularContent() {
+  return <MainUI guidedState={null} showVoiceControls={false} />;
 }
 
 export default function App() {
   const { session } = useSession();
-  const journey = useJourney();
   const [liveKitToken, setLiveKitToken] = useState<string | null>(null);
   const [liveKitRoom, setLiveKitRoom] = useState<string | null>(null);
   const [liveKitUrl, setLiveKitUrl] = useState<string | null>(null);
   const [liveKitLoading, setLiveKitLoading] = useState(true);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [isAgentActive, setIsAgentActive] = useState(true);
 
-  // Check for onboarding docs on mount
   useEffect(() => {
-    fetchOnboardingDocs().then((docs) => {
-      if (docs.length > 0) {
-        const defaultDoc = docs.includes("INDEX.md") ? "INDEX.md" : docs[0];
-        journey.setViewState({ type: "onboarding-docs", docId: defaultDoc });
-      }
-    });
+    fetchOnboardingDocs();
   }, []);
 
-  // Fetch LiveKit token when session is available
   useEffect(() => {
     if (session) {
       fetchLiveKitToken()
@@ -269,20 +274,17 @@ export default function App() {
           adaptiveStream: true,
           dynacast: true,
         }}
-        className="h-screen w-screen"
+        className="h-screen w-screen bg-[#0d1117]"
       >
+        <RoomAudioRenderer />
         <LiveKitContent
-          sidebarOpen={sidebarOpen}
-          setSidebarOpen={setSidebarOpen}
           isAgentActive={isAgentActive}
-          setIsAgentActive={setIsAgentActive}
+          onToggleAgent={() => setIsAgentActive(!isAgentActive)}
         />
       </LiveKitRoom>
     );
   }
 
-  // Fallback UI without LiveKit
-  return (
-    <RegularContent sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-  );
+  // No LiveKit: render without voice controls (no LiveKit hooks used)
+  return <RegularContent />;
 }

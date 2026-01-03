@@ -269,7 +269,14 @@ Keep it celebratory but brief (2-3 sentences)."""
         
         print(f"[DEBUG] User: {user_name}, Goal: {goal}")
         print(f"[DEBUG] First file to discuss: {first_file}")
-        await self.session.generate_reply(instructions=greeting_prompt)
+        print("[DEBUG] Calling generate_reply for greeting...")
+        try:
+            await self.session.generate_reply(instructions=greeting_prompt)
+            print("[DEBUG] generate_reply completed")
+        except Exception as e:
+            print(f"[ERROR] generate_reply failed: {e}")
+            import traceback
+            traceback.print_exc()
 
 
 async def entrypoint(ctx: JobContext):

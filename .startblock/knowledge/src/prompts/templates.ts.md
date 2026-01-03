@@ -1,7 +1,7 @@
 ---
 filePath: src/prompts/templates.ts
-fileVersion: d41e59db13aa62aec5746fa874be5a4422d7eb22
-lastUpdated: '2025-12-28T17:47:07.408Z'
+fileVersion: 46244646df75c99f7a1f53b04527252ac10fb4e7
+lastUpdated: '2026-01-03T02:24:27.860Z'
 updatedBy: sb-cli
 tags:
   - src
@@ -14,28 +14,26 @@ humanVerified: false
 feature: prompts-templates
 featureRole: helper
 userFlows:
-  - User can generate documentation for code changes
-  - User can analyze the context of a file in a repository
+  - Developers can generate structured documentation for code analysis
+  - Users can understand the rationale behind code decisions
+  - Team members can onboard more effectively with clear documentation
 relatedFiles: []
 ---
 ## Purpose
-This file defines the structure and functionality for generating user prompts for OpenAI analysis based on the context of a file's state in a code repository.
+This file provides a template for generating knowledge documentation for code analysis, focusing on the story behind the code, including the problem it solves, how it solves it, and its impact.
 
-## Key Functionality
-- `PromptContext`: Interface that outlines the context required for generating prompts, including file path, language, and commit details.
-- `generateUserPrompt`: Function that constructs a detailed prompt string for OpenAI, incorporating various contextual elements like existing documentation and changes in the commit.
+## Problem
+Before this file existed, there was no standardized way to document code that effectively conveyed the rationale behind its existence. This often led to misunderstandings and a lack of clarity in how different parts of the codebase interacted.
 
-## Gotchas
-- The `existingDocumentation` field is optional; if not provided, the prompt will not include prior documentation, which may lead to loss of context.
-- The function assumes that the `commitContext` is well-formed; if any fields are missing, it could lead to incomplete or malformed prompts.
-- Care must be taken when passing `gitDiff`, as it is only relevant for modified files; passing it for new files may lead to confusion in the output.
+## Solution
+The file introduces a structured prompt that guides users in documenting code by emphasizing the capture of problem, solution, and impact. It also includes contextual information such as commit history and existing documentation to enrich the documentation process.
 
-## Dependencies
-- The file relies on the structure of the `PromptContext` interface to ensure that all necessary data is provided for prompt generation. This structure is crucial for maintaining clarity and consistency in the generated prompts.
+## Impact
+Users and developers can now produce more meaningful documentation that not only describes what the code does but also explains why it exists and how it fits into the larger system. This improves knowledge transfer and aids in onboarding new team members.
 
 ## Architecture Context
-This file plays a critical role in the documentation and analysis workflow by providing a structured way to generate prompts that facilitate understanding and insights into code changes and context.
+This file fits into the larger system by serving as a foundational component for documentation generation. It interacts with various parts of the codebase by referencing dependencies and dependents, which helps in understanding the flow of data and control within the application.
 
-## Implementation Notes
-- The addition of the `existingDocumentation` field was made to enhance the ability to preserve and enrich prior documentation, reflecting a decision to improve the documentation process.
-- The prompt generation logic is designed to be extensible, allowing for future enhancements without significant refactoring.
+## Gotchas (If Applicable)
+- Ensure that the context provided in the prompt is accurate; otherwise, it may mislead users about the code's purpose.
+- Be cautious when modifying the structure of the prompt, as changes can affect the clarity and usefulness of the generated documentation.

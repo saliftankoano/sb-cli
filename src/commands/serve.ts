@@ -3,11 +3,17 @@ import * as path from "path";
 import { fileExists } from "../utils/file-utils.js";
 import { startServer } from "../server/index.js";
 import { brandColor } from "../utils/intro.js";
+import { loadConfig } from "../config/loader.js";
 
 export interface ServeOptions {
   port?: number;
   noOpen?: boolean;
   noVoice?: boolean;
+  livekitConfig?: {
+    url?: string;
+    apiKey?: string;
+    apiSecret?: string;
+  };
 }
 
 export async function serveCommand(): Promise<void> {
@@ -24,6 +30,9 @@ export async function serveCommand(): Promise<void> {
     process.exit(1);
   }
 
+  // Load config
+  const config = await loadConfig(repoRoot);
+
   // Parse CLI flags
   const args = process.argv.slice(2);
   const portIndex = args.indexOf("--port");
@@ -39,6 +48,7 @@ export async function serveCommand(): Promise<void> {
     port,
     noOpen,
     noVoice,
+    livekitConfig: config.livekit,
   };
 
   console.log(
