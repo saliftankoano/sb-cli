@@ -139,6 +139,11 @@ function showHelp() {
   );
   console.log(
     "  " +
+      chalk.cyan("sb gitflash --from <SHA>") +
+      "   Document commits after a specific commit"
+  );
+  console.log(
+    "  " +
       chalk.cyan("sb gitflash --all") +
       "       Document ALL commits (careful!)"
   );

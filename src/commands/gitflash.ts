@@ -30,6 +30,7 @@ interface GitflashOptions {
   dryRun: boolean;
   allCommits: boolean;
   commitHash?: string;
+  fromCommit?: string;
 }
 
 interface DocumentedEntry {
@@ -70,10 +71,17 @@ export async function gitflashCommand(): Promise<void> {
   // Pre-load all files for dependency graph if possible
   // For historical analysis, this is an approximation based on current files
   // but better than nothing.
-  const allFiles = await filterRelevantFiles(["."], config, repoRoot, {
-    skipExistenceCheck: true,
-  });
-  const graph = await buildDependencyGraph(allFiles, repoRoot);
+  let graph;
+  try {
+    const allFiles = await filterRelevantFiles(["."], config, repoRoot, {
+      skipExistenceCheck: true,
+    });
+    graph = await buildDependencyGraph(allFiles, repoRoot);
+  } catch (error) {
+    // If pre-loading fails (e.g., with invalid path), continue with empty graph
+    // Dependency context is an enhancement, not critical for gitflash to work
+    graph = await buildDependencyGraph([], repoRoot);
+  }
 
   const history = createGitHistoryOperations(repoRoot);
   const spinner = createSpinner("Collecting git history...").start();
@@ -83,11 +91,19 @@ export async function gitflashCommand(): Promise<void> {
     if (options.allCommits) {
       throw new Error("Cannot use --all and --hash together.");
     }
+    if (options.fromCommit) {
+      throw new Error("Cannot use --from and --hash together.");
+    }
     const commit = await history.getCommit(options.commitHash);
     if (!commit) {
       throw new Error(`Commit "${options.commitHash}" not found.`);
     }
     commits = [commit];
+  } else if (options.fromCommit) {
+    if (options.allCommits) {
+      throw new Error("Cannot use --all and --from together.");
+    }
+    commits = await history.getCommitsFrom(options.fromCommit);
   } else if (options.allCommits) {
     commits = await history.getAllCommits();
   } else {
@@ -397,6 +413,7 @@ function parseGitflashOptions(args: string[]): GitflashOptions {
   let dryRun = false;
   let allCommits = false;
   let commitHash: string | undefined;
+  let fromCommit: string | undefined;
 
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
@@ -416,6 +433,16 @@ function parseGitflashOptions(args: string[]): GitflashOptions {
         throw new Error("--hash flag requires a commit hash");
       }
       commitHash = value;
+      i++;
+      continue;
+    }
+
+    if (arg === "--from" || arg === "--since") {
+      const value = args[i + 1];
+      if (!value) {
+        throw new Error("--from flag requires a commit hash");
+      }
+      fromCommit = value;
       i++;
       continue;
     }
@@ -459,14 +486,22 @@ function parseGitflashOptions(args: string[]): GitflashOptions {
         continue;
       }
 
+      if (flagPart === "--from" || flagPart === "--since") {
+        if (!value) {
+          throw new Error("--from flag requires a commit hash");
+        }
+        fromCommit = value;
+        continue;
+      }
+
       throw new Error(
-        `Unknown flag "${flagPart}". Supported flags: --commits/--commit/--last (-c, -n), --all (-a), --hash/-h, --dry-run/--preview (-p).`
+        `Unknown flag "${flagPart}". Supported flags: --commits/--commit/--last (-c, -n), --all (-a), --hash/-h, --from/--since, --dry-run/--preview (-p).`
       );
     }
 
     if (arg.startsWith("-") && !isRecognizedFlag(arg)) {
       throw new Error(
-        `Unknown flag "${arg}". Supported flags: --commits/--commit/--last (-c, -n), --all (-a), --hash/-h, --dry-run/--preview (-p).`
+        `Unknown flag "${arg}". Supported flags: --commits/--commit/--last (-c, -n), --all (-a), --hash/-h, --from/--since, --dry-run/--preview (-p).`
       );
     }
   }
@@ -476,6 +511,7 @@ function parseGitflashOptions(args: string[]): GitflashOptions {
     dryRun,
     allCommits,
     commitHash,
+    fromCommit,
   };
 }
 
@@ -502,6 +538,8 @@ function isRecognizedFlag(flag: string): boolean {
     "-a",
     "--hash",
     "-h",
+    "--from",
+    "--since",
   ].includes(flagWithoutValue);
 }
 

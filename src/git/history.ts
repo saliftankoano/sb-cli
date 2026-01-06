@@ -33,6 +33,7 @@ export interface GitHistoryOperations {
   getFileDiffInCommit(hash: string, filePath: string): Promise<string | null>;
   getChangedFilesInCommit(hash: string): Promise<ChangedFiles>;
   getAllCommits(): Promise<CommitInfo[]>;
+  getCommitsFrom(hash: string): Promise<CommitInfo[]>;
 }
 
 export function createGitHistoryOperations(
@@ -154,6 +155,52 @@ export function createGitHistoryOperations(
         date: entry.date,
         message: entry.message,
       }));
+    },
+
+    async getCommitsFrom(hash: string): Promise<CommitInfo[]> {
+      try {
+        // Get all commits from the specified commit (exclusive) to HEAD
+        // Using hash..HEAD gets commits after the specified commit
+        const output = await git.raw([
+          "log",
+          "--format=%H%n%h%n%an%n%ad%n%s%n---END---",
+          `${hash}..HEAD`,
+        ]);
+
+        if (!output.trim()) {
+          return [];
+        }
+
+        const commits: CommitInfo[] = [];
+        const commitBlocks = output
+          .split("---END---")
+          .map((block) => block.trim())
+          .filter(Boolean);
+
+        for (const block of commitBlocks) {
+          const [fullHash, shortHash, author, date, ...messageParts] = block
+            .split("\n")
+            .filter(Boolean);
+
+          if (fullHash) {
+            commits.push({
+              hash: fullHash,
+              shortHash: shortHash || fullHash.substring(0, 7),
+              author: author || "Unknown Author",
+              date: date || "",
+              message: messageParts.join("\n") || "",
+            });
+          }
+        }
+
+        return commits;
+      } catch (error) {
+        throw new Error(
+          `Failed to get commits from ${hash}: ${
+            error instanceof Error ? error.message : "unknown error"
+          }`
+        );
+      }
     },
   };
 }
