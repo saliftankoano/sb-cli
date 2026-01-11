@@ -102,6 +102,10 @@
   @apply bg-muted-foreground/30;
 }
 
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
 /* Hide mermaid error elements */
 #d,
 .error-icon,

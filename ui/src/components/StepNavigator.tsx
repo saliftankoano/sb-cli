@@ -52,27 +52,25 @@ export default function StepNavigator({
       <button
         onClick={onPrev}
         disabled={!canGoPrev}
-        className={`group flex items-center gap-3 px-4 py-3 rounded-lg border transition-all ${
+        className={`group flex items-center gap-3 px-4 py-3 rounded-lg border transition-all w-[240px] shrink-0 ${
           canGoPrev
             ? "border-[#30363d] hover:bg-[#21262d] hover:border-gray-600 text-[#e6edf3]"
             : "border-transparent text-gray-600 cursor-not-allowed opacity-50"
         }`}
       >
         <ArrowLeftIcon size={20} className={canGoPrev ? "text-blue-400" : ""} />
-        <div className="text-left">
+        <div className="text-left min-w-0 flex-1">
           <div className="text-xs text-gray-500 uppercase font-semibold tracking-wider mb-0.5">
             Previous
           </div>
           {canGoPrev && prevTitle && (
-            <div className="text-sm font-medium max-w-[150px] truncate">
-              {prevTitle}
-            </div>
+            <div className="text-sm font-medium truncate">{prevTitle}</div>
           )}
         </div>
       </button>
 
       {/* Keyboard Hints */}
-      <div className="hidden lg:flex gap-2 text-xs text-gray-600 font-mono">
+      <div className="hidden lg:flex gap-2 text-xs text-gray-600 font-mono shrink-0">
         <span className="bg-[#21262d] border border-[#30363d] px-1.5 py-0.5 rounded">
           ←
         </span>
@@ -86,7 +84,7 @@ export default function StepNavigator({
       <button
         onClick={onNext}
         disabled={!canGoNext && !isCompleted}
-        className={`group flex items-center gap-3 px-5 py-3 rounded-lg border transition-all ${
+        className={`group flex items-center justify-end gap-3 px-5 py-3 rounded-lg border transition-all w-[240px] shrink-0 ${
           canGoNext
             ? "bg-blue-600 hover:bg-blue-500 border-blue-500 text-white shadow-lg shadow-blue-900/20"
             : isCompleted
@@ -94,14 +92,12 @@ export default function StepNavigator({
             : "border-[#30363d] text-gray-600 cursor-not-allowed opacity-50"
         }`}
       >
-        <div className="text-right">
+        <div className="text-right min-w-0 flex-1">
           <div className="text-xs text-blue-100/70 uppercase font-semibold tracking-wider mb-0.5">
             {isCompleted ? "Finish" : "Next Step"}
           </div>
           {canGoNext && nextTitle && (
-            <div className="text-sm font-bold max-w-[150px] truncate">
-              {nextTitle}
-            </div>
+            <div className="text-sm font-bold truncate">{nextTitle}</div>
           )}
         </div>
         {isCompleted ? (

@@ -51,9 +51,9 @@ export default function Layout({
           </div>
         )}
 
-        {/* Scrollable Content */}
-        <main className="flex-1 overflow-y-auto relative scroll-smooth flex flex-col">
-          <div className="flex-1 w-full max-w-[1600px] mx-auto p-4 lg:p-6">
+        {/* Main Content Area */}
+        <main className="flex-1 overflow-y-auto lg:overflow-hidden relative flex flex-col h-full">
+          <div className="flex-1 w-full max-w-[2000px] mx-auto p-4 lg:p-6 flex flex-col h-full min-h-0">
             {children}
           </div>
         </main>

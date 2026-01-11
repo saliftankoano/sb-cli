@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-01-03T02:24:27.878Z",
+  "lastUpdated": "2026-01-11T23:19:32.847Z",
   "features": [
     {
       "id": "startblock-onboarding",
@@ -1270,18 +1270,24 @@
         "User can view code snippets with explanations",
         "User can toggle additional knowledge sections for better understanding of the code",
         "User can toggle between viewing source code and knowledge documentation",
-        "User can expand or collapse the knowledge section for insights"
+        "User can expand or collapse the knowledge section for insights",
+        "User can toggle between viewing source code and knowledge insights",
+        "User can expand or collapse the insights pane for better navigation",
+        "User can view highlighted lines in the code for focused learning"
       ],
-      "mermaidDiagram": "flowchart TD\n  Start([Guided View])\n  guided_view_1[User can toggle between viewing source code and...]\n  guided_view_2[User can expand or collapse the knowledge secti...]\n  Start --> guided_view_1\n  guided_view_1 --> guided_view_2\n  guided_view_2 --> End([Complete])\n",
-      "mermaidJourney": "journey\n  title Guided View\n  section User Actions\n    User can toggle between viewing sourc...: 3: User\n    User can expand or collapse the knowl...: 3: User\n",
-      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant ...ponents/GuidedView.tsx as ...ponents/GuidedView.tsx\n    participant ../hooks/useKnowledge.ts as ../hooks/useKnowledge.ts\n    participant ../lib/api.ts as ../lib/api.ts\n    participant ./MarkdownRenderer.tsx as ./MarkdownRenderer.tsx\n    User->>...ponents/GuidedView.tsx: User can toggle between viewing source code and...\n    ...ponents/GuidedView.tsx->>../hooks/useKnowledge.ts: process\n    ../hooks/useKnowledge.ts->>../lib/api.ts: process\n    ../lib/api.ts->>./MarkdownRenderer.tsx: process\n    ...ponents/GuidedView.tsx->>../hooks/useKnowledge.ts: process\n    ../hooks/useKnowledge.ts->>../lib/api.ts: process\n    ../lib/api.ts->>./MarkdownRenderer.tsx: process\n",
+      "mermaidDiagram": "flowchart TD\n  Start([Guided View])\n  guided_view_1[User can toggle between viewing source code and...]\n  guided_view_2[User can expand or collapse the insights pane f...]\n  guided_view_3[User can view highlighted lines in the code for...]\n  Start --> guided_view_1\n  guided_view_1 --> guided_view_2\n  guided_view_2 --> guided_view_3\n  guided_view_3 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title Guided View\n  section User Actions\n    User can toggle between viewing sourc...: 3: User\n    User can expand or collapse the insig...: 3: User\n    User can view highlighted lines in th...: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant ...ponents/GuidedView.tsx as ...ponents/GuidedView.tsx\n    participant _/hooks/useKnowledge as @/hooks/useKnowledge\n    participant _/lib/api as @/lib/api\n    participant ./MarkdownRenderer as ./MarkdownRenderer\n    User->>...ponents/GuidedView.tsx: User can toggle between viewing source code and...\n    ...ponents/GuidedView.tsx->>_/hooks/useKnowledge: process\n    _/hooks/useKnowledge->>_/lib/api: process\n    _/lib/api->>./MarkdownRenderer: process\n    ...ponents/GuidedView.tsx->>_/hooks/useKnowledge: process\n    _/hooks/useKnowledge->>_/lib/api: process\n    _/lib/api->>./MarkdownRenderer: process\n    ...ponents/GuidedView.tsx->>_/hooks/useKnowledge: process\n    _/hooks/useKnowledge->>_/lib/api: process\n    _/lib/api->>./MarkdownRenderer: process\n",
       "files": [
         "ui/src/components/GuidedView.tsx",
         "hooks/useKnowledge.ts",
         "lib/api.ts",
         "../hooks/useKnowledge.ts",
         "../lib/api.ts",
-        "./MarkdownRenderer.tsx"
+        "./MarkdownRenderer.tsx",
+        "@/hooks/useKnowledge",
+        "@/lib/api",
+        "./MarkdownRenderer"
       ],
       "filesByAction": {
         "User can view code snippets with explanations": [
@@ -1305,6 +1311,24 @@
           "../hooks/useKnowledge.ts",
           "../lib/api.ts",
           "./MarkdownRenderer.tsx"
+        ],
+        "User can toggle between viewing source code and knowledge insights": [
+          "ui/src/components/GuidedView.tsx",
+          "@/hooks/useKnowledge",
+          "@/lib/api",
+          "./MarkdownRenderer"
+        ],
+        "User can expand or collapse the insights pane for better navigation": [
+          "ui/src/components/GuidedView.tsx",
+          "@/hooks/useKnowledge",
+          "@/lib/api",
+          "./MarkdownRenderer"
+        ],
+        "User can view highlighted lines in the code for focused learning": [
+          "ui/src/components/GuidedView.tsx",
+          "@/hooks/useKnowledge",
+          "@/lib/api",
+          "./MarkdownRenderer"
         ]
       },
       "dependencies": [],
@@ -1703,11 +1727,14 @@
         "User can navigate through different journey steps",
         "User can explore files and view details",
         "User can interact with voice controls",
-        "User can access onboarding documents"
+        "User can access onboarding documents",
+        "User can navigate through guided journeys",
+        "User can explore files from a file browser",
+        "User can view onboarding documentation"
       ],
-      "mermaidDiagram": "flowchart TD\n  Start([App])\n  app_1[User can navigate through different journey steps]\n  app_2[User can explore files and view details]\n  app_3[User can interact with voice controls]\n  app_4[User can access onboarding documents]\n  Start --> app_1\n  app_1 --> app_2\n  app_2 --> app_3\n  app_3 --> app_4\n  app_4 --> End([Complete])\n",
-      "mermaidJourney": "journey\n  title App\n  section User Actions\n    User can navigate through different j...: 3: User\n    User can explore files and view details: 3: User\n    User can interact with voice controls: 3: User\n    User can access onboarding documents: 3: User\n",
-      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant ui/src/App.tsx as ui/src/App.tsx\n    participant ./components/Layout as ./components/Layout\n    participant ./hooks/useSession as ./hooks/useSession\n    participant ./hooks/useJourney as ./hooks/useJourney\n    participant ./lib/api as ./lib/api\n    participant ...mponents/WelcomeScreen as ...mponents/WelcomeScreen\n    participant ...nts/VoiceControlIsland as ...nts/VoiceControlIsland\n    participant ./components/GuidedView as ./components/GuidedView\n    User->>ui/src/App.tsx: User can navigate through different journey steps\n    ui/src/App.tsx->>./components/Layout: process\n    ./components/Layout->>./hooks/useSession: process\n    ./hooks/useSession->>./hooks/useJourney: process\n    ./hooks/useJourney->>./lib/api: process\n    ./lib/api->>...mponents/WelcomeScreen: process\n    ...mponents/WelcomeScreen->>...nts/VoiceControlIsland: process\n    ...nts/VoiceControlIsland->>./components/GuidedView: process\n    ./components/GuidedView->>...nents/SmartFileBrowser: process\n    ...nents/SmartFileBrowser->>...onents/JourneyProgress: process\n    ...onents/JourneyProgress->>...mponents/StepNavigator: process\n    ...mponents/StepNavigator->>./components/CommandBar: process\n    ./components/CommandBar->>./hooks/useAgentCommands: process\n    ui/src/App.tsx->>./components/Layout: process\n    ./components/Layout->>./hooks/useSession: process\n    ./hooks/useSession->>./hooks/useJourney: process\n    ./hooks/useJourney->>./lib/api: process\n    ./lib/api->>...mponents/WelcomeScreen: process\n    ...mponents/WelcomeScreen->>...nts/VoiceControlIsland: process\n    ...nts/VoiceControlIsland->>./components/GuidedView: process\n    ./components/GuidedView->>...nents/SmartFileBrowser: process\n    ...nents/SmartFileBrowser->>...onents/JourneyProgress: process\n    ...onents/JourneyProgress->>...mponents/StepNavigator: process\n    ...mponents/StepNavigator->>./components/CommandBar: process\n    ./components/CommandBar->>./hooks/useAgentCommands: process\n    ui/src/App.tsx->>./components/Layout: process\n    ./components/Layout->>./hooks/useSession: process\n    ./hooks/useSession->>./hooks/useJourney: process\n    ./hooks/useJourney->>./lib/api: process\n    ./lib/api->>...mponents/WelcomeScreen: process\n    ...mponents/WelcomeScreen->>...nts/VoiceControlIsland: process\n    ...nts/VoiceControlIsland->>./components/GuidedView: process\n    ./components/GuidedView->>...nents/SmartFileBrowser: process\n    ...nents/SmartFileBrowser->>...onents/JourneyProgress: process\n    ...onents/JourneyProgress->>...mponents/StepNavigator: process\n    ...mponents/StepNavigator->>./components/CommandBar: process\n    ./components/CommandBar->>./hooks/useAgentCommands: process\n    ui/src/App.tsx->>./components/Layout: process\n    ./components/Layout->>./hooks/useSession: process\n    ./hooks/useSession->>./hooks/useJourney: process\n    ./hooks/useJourney->>./lib/api: process\n    ./lib/api->>...mponents/WelcomeScreen: process\n    ...mponents/WelcomeScreen->>...nts/VoiceControlIsland: process\n    ...nts/VoiceControlIsland->>./components/GuidedView: process\n    ./components/GuidedView->>...nents/SmartFileBrowser: process\n    ...nents/SmartFileBrowser->>...onents/JourneyProgress: process\n    ...onents/JourneyProgress->>...mponents/StepNavigator: process\n    ...mponents/StepNavigator->>./components/CommandBar: process\n    ./components/CommandBar->>./hooks/useAgentCommands: process\n",
+      "mermaidDiagram": "flowchart TD\n  Start([App])\n  app_1[User can navigate through guided journeys]\n  app_2[User can explore files from a file browser]\n  app_3[User can view onboarding documentation]\n  app_4[User can interact with voice controls]\n  Start --> app_1\n  app_1 --> app_2\n  app_2 --> app_3\n  app_3 --> app_4\n  app_4 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title App\n  section User Actions\n    User can navigate through guided jour...: 3: User\n    User can explore files from a file br...: 3: User\n    User can view onboarding documentation: 3: User\n    User can interact with voice controls: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant ui/src/App.tsx as ui/src/App.tsx\n    participant ./components/Layout as ./components/Layout\n    participant ./hooks/useSession as ./hooks/useSession\n    participant ./hooks/useJourney as ./hooks/useJourney\n    participant ./lib/api as ./lib/api\n    participant ...mponents/WelcomeScreen as ...mponents/WelcomeScreen\n    participant ...nts/VoiceControlIsland as ...nts/VoiceControlIsland\n    participant ./components/GuidedView as ./components/GuidedView\n    User->>ui/src/App.tsx: User can navigate through guided journeys\n    ui/src/App.tsx->>./components/Layout: process\n    ./components/Layout->>./hooks/useSession: process\n    ./hooks/useSession->>./hooks/useJourney: process\n    ./hooks/useJourney->>./lib/api: process\n    ./lib/api->>...mponents/WelcomeScreen: process\n    ...mponents/WelcomeScreen->>...nts/VoiceControlIsland: process\n    ...nts/VoiceControlIsland->>./components/GuidedView: process\n    ./components/GuidedView->>...nents/SmartFileBrowser: process\n    ...nents/SmartFileBrowser->>...onents/JourneyProgress: process\n    ...onents/JourneyProgress->>...mponents/StepNavigator: process\n    ...mponents/StepNavigator->>./components/CommandBar: process\n    ./components/CommandBar->>./hooks/useAgentCommands: process\n    ui/src/App.tsx->>./components/Layout: process\n    ./components/Layout->>./hooks/useSession: process\n    ./hooks/useSession->>./hooks/useJourney: process\n    ./hooks/useJourney->>./lib/api: process\n    ./lib/api->>...mponents/WelcomeScreen: process\n    ...mponents/WelcomeScreen->>...nts/VoiceControlIsland: process\n    ...nts/VoiceControlIsland->>./components/GuidedView: process\n    ./components/GuidedView->>...nents/SmartFileBrowser: process\n    ...nents/SmartFileBrowser->>...onents/JourneyProgress: process\n    ...onents/JourneyProgress->>...mponents/StepNavigator: process\n    ...mponents/StepNavigator->>./components/CommandBar: process\n    ./components/CommandBar->>./hooks/useAgentCommands: process\n    ui/src/App.tsx->>./components/Layout: process\n    ./components/Layout->>./hooks/useSession: process\n    ./hooks/useSession->>./hooks/useJourney: process\n    ./hooks/useJourney->>./lib/api: process\n    ./lib/api->>...mponents/WelcomeScreen: process\n    ...mponents/WelcomeScreen->>...nts/VoiceControlIsland: process\n    ...nts/VoiceControlIsland->>./components/GuidedView: process\n    ./components/GuidedView->>...nents/SmartFileBrowser: process\n    ...nents/SmartFileBrowser->>...onents/JourneyProgress: process\n    ...onents/JourneyProgress->>...mponents/StepNavigator: process\n    ...mponents/StepNavigator->>./components/CommandBar: process\n    ./components/CommandBar->>./hooks/useAgentCommands: process\n    ui/src/App.tsx->>./components/Layout: process\n    ./components/Layout->>./hooks/useSession: process\n    ./hooks/useSession->>./hooks/useJourney: process\n    ./hooks/useJourney->>./lib/api: process\n    ./lib/api->>...mponents/WelcomeScreen: process\n    ...mponents/WelcomeScreen->>...nts/VoiceControlIsland: process\n    ...nts/VoiceControlIsland->>./components/GuidedView: process\n    ./components/GuidedView->>...nents/SmartFileBrowser: process\n    ...nents/SmartFileBrowser->>...onents/JourneyProgress: process\n    ...onents/JourneyProgress->>...mponents/StepNavigator: process\n    ...mponents/StepNavigator->>./components/CommandBar: process\n    ./components/CommandBar->>./hooks/useAgentCommands: process\n",
       "files": [
         "ui/src/App.tsx",
         "./components/Layout",
@@ -1770,6 +1797,51 @@
           "./hooks/useAgentCommands"
         ],
         "User can access onboarding documents": [
+          "ui/src/App.tsx",
+          "./components/Layout",
+          "./hooks/useSession",
+          "./hooks/useJourney",
+          "./lib/api",
+          "./components/WelcomeScreen",
+          "./components/VoiceControlIsland",
+          "./components/GuidedView",
+          "./components/SmartFileBrowser",
+          "./components/JourneyProgress",
+          "./components/StepNavigator",
+          "./components/CommandBar",
+          "./hooks/useAgentCommands"
+        ],
+        "User can navigate through guided journeys": [
+          "ui/src/App.tsx",
+          "./components/Layout",
+          "./hooks/useSession",
+          "./hooks/useJourney",
+          "./lib/api",
+          "./components/WelcomeScreen",
+          "./components/VoiceControlIsland",
+          "./components/GuidedView",
+          "./components/SmartFileBrowser",
+          "./components/JourneyProgress",
+          "./components/StepNavigator",
+          "./components/CommandBar",
+          "./hooks/useAgentCommands"
+        ],
+        "User can explore files from a file browser": [
+          "ui/src/App.tsx",
+          "./components/Layout",
+          "./hooks/useSession",
+          "./hooks/useJourney",
+          "./lib/api",
+          "./components/WelcomeScreen",
+          "./components/VoiceControlIsland",
+          "./components/GuidedView",
+          "./components/SmartFileBrowser",
+          "./components/JourneyProgress",
+          "./components/StepNavigator",
+          "./components/CommandBar",
+          "./hooks/useAgentCommands"
+        ],
+        "User can view onboarding documentation": [
           "ui/src/App.tsx",
           "./components/Layout",
           "./hooks/useSession",
@@ -1876,19 +1948,24 @@
       "userFlows": [
         "User can navigate between different modes (journey, explore, knowledge)",
         "User can view and interact with the main content area",
-        "User can access the sidebar for additional context or options"
+        "User can access the sidebar for additional context or options",
+        "User can view and interact with content in a responsive layout",
+        "User can access mode-specific sidebar content"
       ],
-      "mermaidDiagram": "flowchart TD\n  Start([Layout])\n  layout_1[User can navigate between different modes (jour...]\n  layout_2[User can view and interact with the main conten...]\n  layout_3[User can access the sidebar for additional cont...]\n  Start --> layout_1\n  layout_1 --> layout_2\n  layout_2 --> layout_3\n  layout_3 --> End([Complete])\n",
-      "mermaidJourney": "journey\n  title Layout\n  section User Actions\n    User can navigate between different m...: 3: User\n    User can view and interact with the m...: 3: User\n    User can access the sidebar for addit...: 3: User\n",
-      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant .../components/Layout.tsx as .../components/Layout.tsx\n    participant ...components/NavRail.tsx as ...components/NavRail.tsx\n    User->>.../components/Layout.tsx: User can navigate between different modes (jour...\n    .../components/Layout.tsx->>...components/NavRail.tsx: process\n    .../components/Layout.tsx->>...components/NavRail.tsx: process\n    .../components/Layout.tsx->>...components/NavRail.tsx: process\n",
+      "mermaidDiagram": "flowchart TD\n  Start([Layout])\n  layout_1[User can navigate between different modes (jour...]\n  layout_2[User can view and interact with content in a re...]\n  layout_3[User can access mode-specific sidebar content]\n  Start --> layout_1\n  layout_1 --> layout_2\n  layout_2 --> layout_3\n  layout_3 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title Layout\n  section User Actions\n    User can navigate between different m...: 3: User\n    User can view and interact with conte...: 3: User\n    User can access mode-specific sidebar...: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant .../components/Layout.tsx as .../components/Layout.tsx\n    participant ./NavRail as ./NavRail\n    participant ./framer-motion as ./framer-motion\n    User->>.../components/Layout.tsx: User can navigate between different modes (jour...\n    .../components/Layout.tsx->>./NavRail: process\n    ./NavRail->>./framer-motion: process\n    .../components/Layout.tsx->>./NavRail: process\n    ./NavRail->>./framer-motion: process\n    .../components/Layout.tsx->>./NavRail: process\n    ./NavRail->>./framer-motion: process\n",
       "files": [
         "ui/src/components/Layout.tsx",
-        "ui/src/components/NavRail.tsx"
+        "ui/src/components/NavRail.tsx",
+        "./NavRail",
+        "./framer-motion"
       ],
       "filesByAction": {
         "User can navigate between different modes (journey, explore, knowledge)": [
           "ui/src/components/Layout.tsx",
-          "ui/src/components/NavRail.tsx"
+          "./NavRail",
+          "./framer-motion"
         ],
         "User can view and interact with the main content area": [
           "ui/src/components/Layout.tsx",
@@ -1897,6 +1974,16 @@
         "User can access the sidebar for additional context or options": [
           "ui/src/components/Layout.tsx",
           "ui/src/components/NavRail.tsx"
+        ],
+        "User can view and interact with content in a responsive layout": [
+          "ui/src/components/Layout.tsx",
+          "./NavRail",
+          "./framer-motion"
+        ],
+        "User can access mode-specific sidebar content": [
+          "ui/src/components/Layout.tsx",
+          "./NavRail",
+          "./framer-motion"
         ]
       },
       "dependencies": [],
@@ -1999,11 +2086,14 @@
       "userFlows": [
         "User can navigate to the next step in a process",
         "User can navigate to the previous step in a process",
-        "User can use keyboard shortcuts to navigate between steps"
+        "User can use keyboard shortcuts to navigate between steps",
+        "User can navigate to the previous step in a multi-step process",
+        "User can navigate to the next step in a multi-step process",
+        "User can use keyboard shortcuts to navigate steps"
       ],
-      "mermaidDiagram": "flowchart TD\n  Start([Step Navigator])\n  step_navigator_1[User can navigate to the next step in a process]\n  step_navigator_2[User can navigate to the previous step in a pro...]\n  step_navigator_3[User can use keyboard shortcuts to navigate bet...]\n  Start --> step_navigator_1\n  step_navigator_1 --> step_navigator_2\n  step_navigator_2 --> step_navigator_3\n  step_navigator_3 --> End([Complete])\n",
-      "mermaidJourney": "journey\n  title Step Navigator\n  section User Actions\n    User can navigate to the next step in...: 3: User\n    User can navigate to the previous ste...: 3: User\n    User can use keyboard shortcuts to na...: 3: User\n",
-      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant ...ents/StepNavigator.tsx as ...ents/StepNavigator.tsx\n    participant _phosphor-icons/react as @phosphor-icons/react\n    User->>...ents/StepNavigator.tsx: User can navigate to the next step in a process\n    ...ents/StepNavigator.tsx->>_phosphor-icons/react: process\n    ...ents/StepNavigator.tsx->>_phosphor-icons/react: process\n    ...ents/StepNavigator.tsx->>_phosphor-icons/react: process\n",
+      "mermaidDiagram": "flowchart TD\n  Start([Step Navigator])\n  step_navigator_1[User can navigate to the previous step in a mul...]\n  step_navigator_2[User can navigate to the next step in a multi-s...]\n  step_navigator_3[User can use keyboard shortcuts to navigate steps]\n  Start --> step_navigator_1\n  step_navigator_1 --> step_navigator_2\n  step_navigator_2 --> step_navigator_3\n  step_navigator_3 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title Step Navigator\n  section User Actions\n    User can navigate to the previous ste...: 3: User\n    User can navigate to the next step in...: 3: User\n    User can use keyboard shortcuts to na...: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant ...ents/StepNavigator.tsx as ...ents/StepNavigator.tsx\n    participant _phosphor-icons/react as @phosphor-icons/react\n    User->>...ents/StepNavigator.tsx: User can navigate to the previous step in a mul...\n    ...ents/StepNavigator.tsx->>_phosphor-icons/react: process\n    ...ents/StepNavigator.tsx->>_phosphor-icons/react: process\n    ...ents/StepNavigator.tsx->>_phosphor-icons/react: process\n",
       "files": [
         "ui/src/components/StepNavigator.tsx",
         "@phosphor-icons/react"
@@ -2018,6 +2108,18 @@
           "@phosphor-icons/react"
         ],
         "User can use keyboard shortcuts to navigate between steps": [
+          "ui/src/components/StepNavigator.tsx",
+          "@phosphor-icons/react"
+        ],
+        "User can navigate to the previous step in a multi-step process": [
+          "ui/src/components/StepNavigator.tsx",
+          "@phosphor-icons/react"
+        ],
+        "User can navigate to the next step in a multi-step process": [
+          "ui/src/components/StepNavigator.tsx",
+          "@phosphor-icons/react"
+        ],
+        "User can use keyboard shortcuts to navigate steps": [
           "ui/src/components/StepNavigator.tsx",
           "@phosphor-icons/react"
         ]
@@ -2245,6 +2347,46 @@
       "dependencies": [],
       "tags": [
         "ui",
+        "typescript",
+        "new"
+      ]
+    },
+    {
+      "id": "welcome-screen",
+      "name": "Welcome Screen",
+      "description": "",
+      "category": "UI",
+      "userFlows": [
+        "User can view the onboarding welcome screen",
+        "User can initiate the onboarding process via terminal command",
+        "User can learn about the features of the application"
+      ],
+      "mermaidDiagram": "flowchart TD\n  Start([Welcome Screen])\n  welcome_screen_1[User can view the onboarding welcome screen]\n  welcome_screen_2[User can initiate the onboarding process via te...]\n  welcome_screen_3[User can learn about the features of the applic...]\n  Start --> welcome_screen_1\n  welcome_screen_1 --> welcome_screen_2\n  welcome_screen_2 --> welcome_screen_3\n  welcome_screen_3 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title Welcome Screen\n  section User Actions\n    User can view the onboarding welcome ...: 3: User\n    User can initiate the onboarding proc...: 3: User\n    User can learn about the features of ...: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant ...ents/WelcomeScreen.tsx as ...ents/WelcomeScreen.tsx\n    participant _phosphor-icons/react as @phosphor-icons/react\n    User->>...ents/WelcomeScreen.tsx: User can view the onboarding welcome screen\n    ...ents/WelcomeScreen.tsx->>_phosphor-icons/react: process\n    ...ents/WelcomeScreen.tsx->>_phosphor-icons/react: process\n    ...ents/WelcomeScreen.tsx->>_phosphor-icons/react: process\n",
+      "files": [
+        "ui/src/components/WelcomeScreen.tsx",
+        "@phosphor-icons/react"
+      ],
+      "filesByAction": {
+        "User can view the onboarding welcome screen": [
+          "ui/src/components/WelcomeScreen.tsx",
+          "@phosphor-icons/react"
+        ],
+        "User can initiate the onboarding process via terminal command": [
+          "ui/src/components/WelcomeScreen.tsx",
+          "@phosphor-icons/react"
+        ],
+        "User can learn about the features of the application": [
+          "ui/src/components/WelcomeScreen.tsx",
+          "@phosphor-icons/react"
+        ]
+      },
+      "dependencies": [],
+      "tags": [
+        "ui",
+        "src",
+        "components",
         "typescript",
         "new"
       ]

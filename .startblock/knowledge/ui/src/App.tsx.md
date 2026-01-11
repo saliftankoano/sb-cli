@@ -1,7 +1,7 @@
 ---
 filePath: ui/src/App.tsx
-fileVersion: 0bae6537356e19ed555671925e6cf9551cd0bde6
-lastUpdated: '2026-01-03T02:24:27.864Z'
+fileVersion: 9674f2f871b9b2558c7acd2b813bcfa34f2cea42
+lastUpdated: '2026-01-11T23:19:32.837Z'
 updatedBy: sb-cli
 tags:
   - ui
@@ -14,10 +14,10 @@ humanVerified: false
 feature: app
 featureRole: entry_point
 userFlows:
-  - User can navigate through different journey steps
-  - User can explore files and view details
+  - User can navigate through guided journeys
+  - User can explore files from a file browser
+  - User can view onboarding documentation
   - User can interact with voice controls
-  - User can access onboarding documents
 relatedFiles:
   - ./components/Layout
   - ./hooks/useSession
@@ -33,26 +33,20 @@ relatedFiles:
   - ./hooks/useAgentCommands
 ---
 ## Purpose
-This file serves as the main entry point for the application, managing both the LiveKit and non-LiveKit UI states.
+This file serves as the main entry point for the application, managing the overall layout and user interface logic for different modes of interaction.
 
-## Key Functionality
-- **useAppState**: A custom hook that centralizes state management for journey steps, view states, and active modes.
-- **MainUI**: Renders the main application UI, adapting based on the active mode (journey, explore, knowledge).
-- **LiveKitContent**: A component that integrates LiveKit functionality, rendering the UI with voice control features.
-- **RegularContent**: A fallback component that renders the UI without LiveKit integration.
+## Problem
+The application needed a cohesive way to manage different user interactions (journey, explore, knowledge) while maintaining a responsive and intuitive UI. Prior to this implementation, users may have faced confusion navigating between different functionalities, leading to a disjointed experience.
 
-## Gotchas
-- The useAppState hook synchronizes the active mode with the view state, but if viewState is not updated correctly, it can lead to unexpected UI behavior.
-- The rendering logic is mode-dependent; switching modes without ensuring the correct view state can result in inconsistencies in the displayed content.
-- Developers should be cautious with the journeySteps array, as large datasets can affect performance during rendering and navigation.
+## Solution
+This file implements a dynamic UI that leverages React's state management and hooks to adapt to the user's current mode. By using `useMemo`, it optimizes the rendering of the view state based on the current context, ensuring that the UI remains performant and responsive. The `MainUI` component orchestrates the rendering of various subcomponents based on the active mode, providing a seamless transition between different functionalities.
 
-## Dependencies
-- **@livekit/components-react**: Used for real-time audio and video features, essential for the application's interactive capabilities.
-- **hooks/useJourney**: Central to managing the application's state related to user journeys, ensuring that the UI reflects the current user context.
+## Impact
+Users can now easily switch between guided journeys and file exploration, enhancing their ability to interact with the application. This flexibility allows for a more engaging experience, as users can focus on their current task without unnecessary distractions. Developers benefit from a more organized structure that clearly separates concerns and enhances maintainability.
 
 ## Architecture Context
-This file is integral to the application's architecture, serving as the main interface for users to interact with the journey and file exploration features. It connects various components and manages state transitions effectively.
+This file integrates with various components such as `Layout`, `GuidedView`, and `StepNavigator`, and hooks like `useSession` and `useJourney` to manage application state and user interactions. The data flow is centralized, allowing for a clear understanding of how user actions affect the UI.
 
-## Implementation Notes
-- The separation of LiveKit and Regular content into distinct components enhances maintainability and clarity in the codebase. This pattern allows for easier updates and debugging.
-- Careful consideration of performance is necessary when handling large arrays like journeySteps, as inefficient rendering can lead to a sluggish user experience. Consider memoization or virtualization techniques if performance issues arise.
+## Gotchas (If Applicable)
+- Ensure that the `viewState` is correctly updated to avoid displaying stale information, especially when switching modes rapidly.
+- Be cautious with the memoization in `useMemo`; incorrect dependencies could lead to performance issues or stale data being rendered.

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Layout from "./components/Layout";
 import { useSession } from "./hooks/useSession";
 import { useJourney } from "./hooks/useJourney";
@@ -87,16 +87,36 @@ function MainUI({
   const currentFile = journeySteps[currentFileIndex];
 
   // Merge agent-driven state with local state
-  const viewState_: GuidedViewState | null =
-    guidedState ||
-    (currentFile
-      ? {
-          file: currentFile.file,
-          title: currentFile.title,
-          explanation: currentFile.description,
-          featureName: "Architecture",
-        }
-      : null);
+  const viewState_: GuidedViewState | null = useMemo(() => {
+    if (guidedState) return guidedState;
+
+    // If we have an explicit focus file (from explorer or search)
+    if (viewState.type === "focus" || viewState.type === "question") {
+      const journeyStep = journeySteps.find((s) => s.file === viewState.file);
+      return {
+        file: viewState.file,
+        title:
+          journeyStep?.title ||
+          viewState.file.split("/").pop() ||
+          viewState.file,
+        explanation:
+          journeyStep?.description || "Exploring file content and knowledge.",
+        featureName: journeyStep ? "Architecture" : "Exploration",
+      };
+    }
+
+    // Default to journey step if in journey mode
+    if (activeMode === "journey" && currentFile) {
+      return {
+        file: currentFile.file,
+        title: currentFile.title,
+        explanation: currentFile.description,
+        featureName: "Architecture",
+      };
+    }
+
+    return null;
+  }, [guidedState, viewState, journeySteps, activeMode, currentFile]);
 
   const topBar =
     activeMode === "journey" ? (
@@ -128,22 +148,29 @@ function MainUI({
 
   const renderMainContent = () => {
     if (activeMode === "journey") {
-      if (journeySteps.length === 0) return <WelcomeScreen />;
+      if (journeySteps.length === 0)
+        return (
+          <div className="flex-1 overflow-y-auto -m-4 lg:-m-6">
+            <WelcomeScreen />
+          </div>
+        );
 
       return (
-        <div className="flex flex-col h-full gap-4">
-          <div className="flex-1 min-h-0">
+        <div className="flex-1 flex flex-col gap-4 h-full">
+          <div className="flex-1 min-h-[400px] lg:min-h-[600px] overflow-hidden">
             {viewState_ && <GuidedView state={viewState_} />}
           </div>
-          <StepNavigator
-            onNext={nextStep}
-            onPrev={previousStep}
-            canGoNext={currentFileIndex < journeySteps.length - 1}
-            canGoPrev={currentFileIndex > 0}
-            nextTitle={journeySteps[currentFileIndex + 1]?.title}
-            prevTitle={journeySteps[currentFileIndex - 1]?.title}
-            isCompleted={currentFileIndex === journeySteps.length - 1}
-          />
+          <div className="shrink-0">
+            <StepNavigator
+              onNext={nextStep}
+              onPrev={previousStep}
+              canGoNext={currentFileIndex < journeySteps.length - 1}
+              canGoPrev={currentFileIndex > 0}
+              nextTitle={journeySteps[currentFileIndex + 1]?.title}
+              prevTitle={journeySteps[currentFileIndex - 1]?.title}
+              isCompleted={currentFileIndex === journeySteps.length - 1}
+            />
+          </div>
         </div>
       );
     }
@@ -151,9 +178,11 @@ function MainUI({
     if (activeMode === "explore") {
       if (viewState.type === "focus" || viewState.type === "feature-details") {
         return (
-          <div className="flex flex-col h-full">
+          <div className="flex-1 flex flex-col h-full">
             {viewState_ ? (
-              <GuidedView state={viewState_} defaultCollapsed={true} />
+              <div className="flex-1 min-h-[400px] lg:min-h-[600px] overflow-hidden">
+                <GuidedView state={viewState_} defaultCollapsed={true} />
+              </div>
             ) : (
               <div className="flex items-center justify-center h-full text-gray-500">
                 Select a file to view
@@ -163,13 +192,17 @@ function MainUI({
         );
       }
       return (
-        <div className="flex items-center justify-center h-full text-gray-500">
+        <div className="flex-1 flex items-center justify-center h-full text-gray-500">
           <p>Select a file from the explorer to view details</p>
         </div>
       );
     }
 
-    return <div>Knowledge Mode (Coming Soon)</div>;
+    return (
+      <div className="flex-1 overflow-y-auto">
+        <div>Knowledge Mode (Coming Soon)</div>
+      </div>
+    );
   };
 
   return (

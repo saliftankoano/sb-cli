@@ -99,11 +99,11 @@ export default function GuidedView({
   const language = useMemo(() => getLanguageFromFile(state.file), [state.file]);
 
   return (
-    <div className="h-full flex flex-col lg:flex-row gap-6 overflow-hidden">
+    <div className="h-full min-h-[400px] lg:min-h-[600px] flex flex-col lg:flex-row gap-6 overflow-hidden">
       {/* LEFT PANE: Content View (Source or Knowledge) */}
       <div
-        className={`flex-1 flex flex-col min-h-0 bg-[#161b22] border border-[#30363d] rounded-xl overflow-hidden shadow-sm transition-all duration-300 ${
-          isKnowledgeCollapsed ? "lg:flex-[3]" : "lg:flex-[1.5]"
+        className={`flex-1 flex flex-col bg-[#161b22] border border-[#30363d] rounded-xl overflow-hidden shadow-sm transition-all duration-300 ${
+          isKnowledgeCollapsed ? "lg:flex-[5]" : "lg:flex-[2.5]"
         }`}
       >
         {/* Header with Mode Toggle */}
@@ -191,6 +191,7 @@ export default function GuidedView({
                       margin: 0,
                       padding: "1.5rem",
                       background: "transparent",
+                      overflow: "hidden",
                     }}
                     className="text-[13px] leading-6 font-mono"
                   >
@@ -249,7 +250,7 @@ export default function GuidedView({
             initial={{ opacity: 0, width: 0 }}
             animate={{ opacity: 1, width: "auto" }}
             exit={{ opacity: 0, width: 0 }}
-            className="lg:flex-1 flex flex-col gap-6 overflow-y-auto min-w-[380px] custom-scrollbar"
+            className="lg:flex-[1.5] flex flex-col gap-6 overflow-y-auto min-w-[450px] custom-scrollbar"
           >
             {/* AI Insight Card */}
             <div className="bg-gradient-to-br from-blue-900/20 to-purple-900/20 border border-blue-500/20 rounded-xl p-5 relative overflow-hidden group shadow-xl">

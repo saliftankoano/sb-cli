@@ -1,14 +1,13 @@
 ---
 filePath: ui/src/components/Layout.tsx
-fileVersion: e79e872063ecc7ae9518cd8ed987b60af3b96e2f
-lastUpdated: '2026-01-03T02:24:27.869Z'
+fileVersion: 9674f2f871b9b2558c7acd2b813bcfa34f2cea42
+lastUpdated: '2026-01-11T23:19:32.843Z'
 updatedBy: sb-cli
 tags:
   - ui
   - src
   - components
   - typescript
-  - new
 importance: low
 extractedBy: sb-cli@1.0.0
 model: gpt-4o-mini
@@ -17,28 +16,28 @@ feature: layout
 featureRole: component
 userFlows:
   - 'User can navigate between different modes (journey, explore, knowledge)'
-  - User can view and interact with the main content area
-  - User can access the sidebar for additional context or options
+  - User can view and interact with content in a responsive layout
+  - User can access mode-specific sidebar content
 relatedFiles:
-  - ui/src/components/NavRail.tsx
+  - ./NavRail
+  - ./framer-motion
 ---
 ## Purpose
-This file defines a layout component that organizes the main structure of the application, including a navigation rail, sidebars, and a main content area.
+This file defines the Layout component, which serves as the primary structure for the application's user interface, managing navigation and content display.
 
-## Key Functionality
-- `Layout`: A functional component that accepts children and various props to manage the layout's appearance and behavior.
+## Problem
+Prior to this component, the application lacked a cohesive layout that could handle various modes and content types effectively. Users faced difficulties navigating through different sections, and the UI was not responsive enough to accommodate various screen sizes and content types.
 
-## Gotchas
-- The sidebar content is conditionally rendered and animated, which could lead to performance issues if the animations are not optimized or if the sidebar content is complex.
-- The `onSearchClick` prop defaults to a no-op function if not provided, which prevents potential errors when the search functionality is not used.
+## Solution
+The Layout component solves these issues by implementing a flexible structure using Flexbox, which allows for a responsive design. It includes a navigation rail, a collapsible sidebar for mode-specific content, and a main content area that adjusts based on the active mode. The use of `AnimatePresence` from Framer Motion enhances the user experience by providing smooth transitions when the sidebar is shown or hidden.
 
-## Dependencies
-- `NavRail`: Provides navigation functionality and mode switching.
-- `framer-motion`: Used for animating the sidebar, enhancing user experience with smooth transitions.
+## Impact
+With this component, users can seamlessly navigate between different modes (journey, explore, knowledge) while accessing relevant content. Developers benefit from a modular design that simplifies the integration of new features and content types, leading to improved maintainability and scalability of the application.
 
 ## Architecture Context
-This layout component serves as a foundational structure for various pages within the application, allowing for a consistent user interface and experience across different modes (journey, explore, knowledge).
+This component is part of the UI layer of the application, relying on React for rendering and Framer Motion for animations. It integrates with other components like `NavRail` and can accommodate various children components, making it adaptable to different contexts within the app.
 
-## Implementation Notes
-- The layout is designed to be responsive and adaptable to different modes, which requires careful management of state and props to ensure the correct content is displayed.
-- The use of `AnimatePresence` from Framer Motion is crucial for managing the lifecycle of the sidebar animations, but it may introduce complexity in managing the component's state.
+## Gotchas (If Applicable)
+- Ensure that the sidebar content is properly managed to avoid layout shifts during mode changes.
+- Be cautious of performance impacts when using animations; excessive animations can lead to lag on lower-end devices.
+- The layout assumes that all child components will respect the flex properties; improper styling of children can lead to unexpected layout issues.

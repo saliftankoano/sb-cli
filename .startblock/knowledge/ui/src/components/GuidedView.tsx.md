@@ -1,7 +1,7 @@
 ---
 filePath: ui/src/components/GuidedView.tsx
-fileVersion: 0bae6537356e19ed555671925e6cf9551cd0bde6
-lastUpdated: '2026-01-03T02:24:27.867Z'
+fileVersion: 9674f2f871b9b2558c7acd2b813bcfa34f2cea42
+lastUpdated: '2026-01-11T23:19:32.842Z'
 updatedBy: sb-cli
 tags:
   - ui
@@ -15,33 +15,29 @@ humanVerified: false
 feature: guided-view
 featureRole: component
 userFlows:
-  - User can toggle between viewing source code and knowledge documentation
-  - User can expand or collapse the knowledge section for insights
+  - User can toggle between viewing source code and knowledge insights
+  - User can expand or collapse the insights pane for better navigation
+  - User can view highlighted lines in the code for focused learning
 relatedFiles:
-  - ../hooks/useKnowledge.ts
-  - ../lib/api.ts
-  - ./MarkdownRenderer.tsx
+  - '@/hooks/useKnowledge'
+  - '@/lib/api'
+  - ./MarkdownRenderer
 ---
 ## Purpose
-The GuidedView component provides a dual-pane interface for users to view source code alongside related knowledge documentation, facilitating better understanding and exploration of code files.
+This file provides a guided view component that allows users to explore source code alongside contextual knowledge insights.
 
-## Key Functionality
-- **getLanguageFromFile**: Maps file extensions to Prism language names for syntax highlighting.
-- **GuidedView**: Main component that manages state for displaying either the source code or knowledge documentation, fetching file content as needed.
+## Problem
+Before this file existed, users had difficulty understanding the context and purpose of specific code segments, leading to confusion and inefficiencies during code reviews or learning sessions. There was no integrated way to view both the source code and related documentation or insights, which hindered the learning process for new developers and made it challenging to maintain code quality.
 
-## Gotchas
-- The component fetches the first 500 lines of code by default, which may not be suitable for very large files and can lead to performance degradation.
-- The collapse state of the knowledge section resets whenever the defaultCollapsed prop or the state.file changes, which could lead to unexpected behavior for users.
-- The button for toggling the knowledge section visibility is hidden on smaller screens, which might limit accessibility for users on mobile devices.
+## Solution
+The GuidedView component solves this problem by implementing a dual-pane layout that allows users to switch between viewing the source code and associated knowledge insights. It fetches code dynamically based on user actions and highlights specific lines for better visibility. The component also manages state for loading and collapsing sections, ensuring a responsive and interactive user experience.
 
-## Dependencies
-- **framer-motion**: Used for animations, enhancing user experience but may require performance considerations if overused.
-- **MarkdownRenderer**: Renders markdown content for knowledge documentation, ensuring that the documentation is displayed correctly and is user-friendly.
+## Impact
+With this file, users can now easily toggle between source code and knowledge insights, enhancing their understanding of the codebase. This feature supports better onboarding for new developers and facilitates more effective code reviews, ultimately improving team productivity and code quality.
 
 ## Architecture Context
-This component is part of a larger knowledge management system that integrates code exploration with contextual insights, allowing users to learn from code directly and understand its implications through documentation.
+The GuidedView component is part of the UI layer, integrating with hooks for knowledge retrieval and API calls for fetching file content. It relies on state management for user interactions and employs libraries like `framer-motion` for animations, ensuring a smooth user experience. The component interacts with knowledge data to provide contextual insights, enhancing the overall functionality of the application.
 
-## Implementation Notes
-- The component utilizes React hooks for state management and side effects, ensuring a responsive UI.
-- The decision to fetch a fixed number of lines (500) was made for simplicity but could be revisited for scalability.
-- The removal of the Set for managing expanded sections simplifies the state but may require future enhancements if more sections are added.
+## Gotchas (If Applicable)
+- Ensure that the file paths used for fetching knowledge insights are correct to avoid missing data.
+- The component's performance may be impacted by the size of the code being fetched; consider optimizing the fetch logic for larger files.

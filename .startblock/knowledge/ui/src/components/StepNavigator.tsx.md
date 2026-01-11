@@ -1,14 +1,13 @@
 ---
 filePath: ui/src/components/StepNavigator.tsx
-fileVersion: unknown
-lastUpdated: '2026-01-03T02:24:27.872Z'
+fileVersion: 9674f2f871b9b2558c7acd2b813bcfa34f2cea42
+lastUpdated: '2026-01-11T23:19:32.845Z'
 updatedBy: sb-cli
 tags:
   - ui
   - src
   - components
   - typescript
-  - new
 importance: low
 extractedBy: sb-cli@1.0.0
 model: gpt-4o-mini
@@ -16,30 +15,27 @@ humanVerified: false
 feature: step-navigator
 featureRole: component
 userFlows:
-  - User can navigate to the next step in a process
-  - User can navigate to the previous step in a process
-  - User can use keyboard shortcuts to navigate between steps
+  - User can navigate to the previous step in a multi-step process
+  - User can navigate to the next step in a multi-step process
+  - User can use keyboard shortcuts to navigate steps
 relatedFiles:
   - '@phosphor-icons/react'
 ---
 ## Purpose
-The StepNavigator component provides a user interface for navigating between steps in a multi-step process, including keyboard navigation support.
+The `StepNavigator` component provides a user interface for navigating between steps in a multi-step process, allowing users to move forward or backward through the steps easily.
 
-## Key Functionality
-- **StepNavigator**: A React component that renders previous and next buttons, allowing users to navigate through steps. It supports keyboard shortcuts for navigation and displays dynamic titles based on props.
+## Problem
+Before the `StepNavigator` existed, users faced challenges in navigating through multi-step forms or processes, often leading to confusion and frustration. There was no consistent way to move between steps, and users had to rely on manual input or unclear visual cues, which hindered the overall user experience.
 
-## Gotchas
-- Keyboard shortcuts will not work if the user is focused on an input or textarea, which may lead to confusion if users expect to navigate using the keyboard in those contexts.
-- The Next button can be disabled if both `canGoNext` is false and `isCompleted` is false, which could lead to a situation where users are unsure why they cannot proceed.
-- Ensure that the `onNext` and `onPrev` functions are properly defined and passed as props, as failing to do so will lead to runtime errors when buttons are clicked.
+## Solution
+The `StepNavigator` solves this problem by providing clearly labeled buttons for previous and next steps, along with visual feedback based on the user's ability to navigate (enabled/disabled states). It also implements keyboard shortcuts for arrow key navigation, enhancing accessibility. The component is designed to be responsive, ensuring usability across different devices and screen sizes.
 
-## Dependencies
-- The component uses icons from `@phosphor-icons/react` for visual representation of navigation actions, which enhances the user interface but requires that the library is included in the project.
+## Impact
+With the `StepNavigator`, users can seamlessly navigate through multi-step processes, improving their experience and reducing the likelihood of errors. Developers can easily integrate this component into forms, ensuring a consistent navigation experience across the application. This enhances overall user satisfaction and engagement with the application.
 
 ## Architecture Context
-The StepNavigator fits into a larger multi-step process UI, serving as a critical component for user navigation. It allows for a seamless transition between steps, which is essential for user engagement in forms or wizards.
+The `StepNavigator` fits into the larger system as a reusable component that can be integrated into various multi-step forms or workflows. It relies on props for its functionality, allowing it to be flexible and adaptable to different contexts. The component listens for keyboard events to facilitate navigation, making it a key part of the user interaction layer.
 
-## Implementation Notes
-- The component uses `useEffect` to manage keyboard event listeners, which is a common pattern in React for handling side effects. This ensures that listeners are cleaned up properly to avoid memory leaks.
-- The styling of buttons is conditionally applied based on the state of `canGoNext` and `canGoPrev`, which is a good practice for maintaining a responsive UI that reflects the current state of the application. 
-- Consider performance implications when using dynamic props, as frequent re-renders can occur if the parent component updates state often. It's advisable to memoize functions passed as props if they are defined inline.
+## Gotchas (If Applicable)
+- Ensure that the `onNext` and `onPrev` functions are correctly implemented to handle navigation logic; otherwise, the buttons may not function as expected.
+- Be mindful of the focus state when using keyboard navigation, as it may interfere with text input fields if not handled properly.
