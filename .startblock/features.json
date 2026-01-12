@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-01-12T11:21:57.997Z",
+  "lastUpdated": "2026-01-12T21:37:30.852Z",
   "features": [
     {
       "id": "startblock-onboarding",
@@ -237,11 +237,14 @@
         "User can interactively learn about different files and features in the codebase",
         "User can interact with the codebase using voice commands",
         "User can receive guided assistance while exploring the codebase",
-        "User can navigate through files and features with voice prompts"
+        "User can navigate through files and features with voice prompts",
+        "User can receive personalized onboarding guidance while exploring the codebase.",
+        "User can navigate through files with contextual assistance from the agent.",
+        "User can interact with the onboarding agent using voice commands."
       ],
-      "mermaidDiagram": "flowchart TD\n  Start([Onboarding Agent])\n  onboarding_agent_1[User can interact with the codebase using voice...]\n  onboarding_agent_2[User can receive guided assistance while explor...]\n  onboarding_agent_3[User can navigate through files and features wi...]\n  Start --> onboarding_agent_1\n  onboarding_agent_1 --> onboarding_agent_2\n  onboarding_agent_2 --> onboarding_agent_3\n  onboarding_agent_3 --> End([Complete])\n",
-      "mermaidJourney": "journey\n  title Onboarding Agent\n  section User Actions\n    User can interact with the codebase u...: 3: User\n    User can receive guided assistance wh...: 3: User\n    User can navigate through files and f...: 3: User\n",
-      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant agent/main.py as agent/main.py\n    participant livekit/plugins/openai.py as livekit/plugins/openai.py\n    participant livekit/plugins/silero.py as livekit/plugins/silero.py\n    participant knowledge_loader.py as knowledge_loader.py\n    participant prompts.py as prompts.py\n    participant commands.py as commands.py\n    User->>agent/main.py: User can interact with the codebase using voice...\n    agent/main.py->>livekit/plugins/openai.py: process\n    livekit/plugins/openai.py->>livekit/plugins/silero.py: process\n    livekit/plugins/silero.py->>knowledge_loader.py: process\n    knowledge_loader.py->>prompts.py: process\n    prompts.py->>commands.py: process\n    agent/main.py->>livekit/plugins/openai.py: process\n    livekit/plugins/openai.py->>livekit/plugins/silero.py: process\n    livekit/plugins/silero.py->>knowledge_loader.py: process\n    knowledge_loader.py->>prompts.py: process\n    prompts.py->>commands.py: process\n    agent/main.py->>livekit/plugins/openai.py: process\n    livekit/plugins/openai.py->>livekit/plugins/silero.py: process\n    livekit/plugins/silero.py->>knowledge_loader.py: process\n    knowledge_loader.py->>prompts.py: process\n    prompts.py->>commands.py: process\n",
+      "mermaidDiagram": "flowchart TD\n  Start([Onboarding Agent])\n  onboarding_agent_1[User can receive personalized onboarding guidan...]\n  onboarding_agent_2[User can navigate through files with contextual...]\n  onboarding_agent_3[User can interact with the onboarding agent usi...]\n  Start --> onboarding_agent_1\n  onboarding_agent_1 --> onboarding_agent_2\n  onboarding_agent_2 --> onboarding_agent_3\n  onboarding_agent_3 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title Onboarding Agent\n  section User Actions\n    User can receive personalized onboard...: 3: User\n    User can navigate through files with ...: 3: User\n    User can interact with the onboarding...: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant agent/main.py as agent/main.py\n    participant ...at_features_summary.py as ...at_features_summary.py\n    participant ...build_system_prompt.py as ...build_system_prompt.py\n    participant ...ild_greeting_prompt.py as ...ild_greeting_prompt.py\n    participant ...d_transition_prompt.py as ...d_transition_prompt.py\n    participant ...nds/NavigateCommand.py as ...nds/NavigateCommand.py\n    participant ...nds/ShowFileCommand.py as ...nds/ShowFileCommand.py\n    participant ...s/serialize_command.py as ...s/serialize_command.py\n    User->>agent/main.py: User can receive personalized onboarding guidan...\n    agent/main.py->>...at_features_summary.py: process\n    ...at_features_summary.py->>...build_system_prompt.py: process\n    ...build_system_prompt.py->>...ild_greeting_prompt.py: process\n    ...ild_greeting_prompt.py->>...d_transition_prompt.py: process\n    ...d_transition_prompt.py->>...nds/NavigateCommand.py: process\n    ...nds/NavigateCommand.py->>...nds/ShowFileCommand.py: process\n    ...nds/ShowFileCommand.py->>...s/serialize_command.py: process\n    agent/main.py->>...at_features_summary.py: process\n    ...at_features_summary.py->>...build_system_prompt.py: process\n    ...build_system_prompt.py->>...ild_greeting_prompt.py: process\n    ...ild_greeting_prompt.py->>...d_transition_prompt.py: process\n    ...d_transition_prompt.py->>...nds/NavigateCommand.py: process\n    ...nds/NavigateCommand.py->>...nds/ShowFileCommand.py: process\n    ...nds/ShowFileCommand.py->>...s/serialize_command.py: process\n    agent/main.py->>...at_features_summary.py: process\n    ...at_features_summary.py->>...build_system_prompt.py: process\n    ...build_system_prompt.py->>...ild_greeting_prompt.py: process\n    ...ild_greeting_prompt.py->>...d_transition_prompt.py: process\n    ...d_transition_prompt.py->>...nds/NavigateCommand.py: process\n    ...nds/NavigateCommand.py->>...nds/ShowFileCommand.py: process\n    ...nds/ShowFileCommand.py->>...s/serialize_command.py: process\n",
       "files": [
         "agent/main.py",
         "knowledge_loader.py",
@@ -579,6 +582,36 @@
           "knowledge_loader.py",
           "prompts.py",
           "commands.py"
+        ],
+        "User can receive personalized onboarding guidance while exploring the codebase.": [
+          "agent/main.py",
+          "knowledge_loader/format_features_summary.py",
+          "prompts/build_system_prompt.py",
+          "prompts/build_greeting_prompt.py",
+          "prompts/build_transition_prompt.py",
+          "commands/NavigateCommand.py",
+          "commands/ShowFileCommand.py",
+          "commands/serialize_command.py"
+        ],
+        "User can navigate through files with contextual assistance from the agent.": [
+          "agent/main.py",
+          "knowledge_loader/format_features_summary.py",
+          "prompts/build_system_prompt.py",
+          "prompts/build_greeting_prompt.py",
+          "prompts/build_transition_prompt.py",
+          "commands/NavigateCommand.py",
+          "commands/ShowFileCommand.py",
+          "commands/serialize_command.py"
+        ],
+        "User can interact with the onboarding agent using voice commands.": [
+          "agent/main.py",
+          "knowledge_loader/format_features_summary.py",
+          "prompts/build_system_prompt.py",
+          "prompts/build_greeting_prompt.py",
+          "prompts/build_transition_prompt.py",
+          "commands/NavigateCommand.py",
+          "commands/ShowFileCommand.py",
+          "commands/serialize_command.py"
         ]
       },
       "dependencies": [],

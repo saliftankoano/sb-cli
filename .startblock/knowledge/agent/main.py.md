@@ -1,7 +1,7 @@
 ---
 filePath: agent/main.py
-fileVersion: 4b52c4fa6fa629ffceb4380e3645508827ed2679
-lastUpdated: '2026-01-12T11:21:57.991Z'
+fileVersion: 03fe4ddce2f75c83267bce483ab0b1b19aa5ced5
+lastUpdated: '2026-01-12T21:37:30.844Z'
 updatedBy: sb-cli
 tags:
   - agent
@@ -10,17 +10,16 @@ importance: low
 extractedBy: sb-cli@1.0.0
 model: gpt-4o-mini
 humanVerified: false
-feature: codebase-onboarding
+feature: onboarding-agent
 featureRole: component
 userFlows:
-  - User can receive real-time guidance during codebase exploration
   - >-
-    User can navigate through different files in the codebase using voice
-    commands
-  - User can ask questions and receive answers about the codebase
+    User can receive personalized onboarding guidance while exploring the
+    codebase.
+  - User can navigate through files with contextual assistance from the agent.
+  - User can interact with the onboarding agent using voice commands.
 relatedFiles:
   - knowledge_loader/format_features_summary.py
-  - knowledge_loader/get_feature_for_file.py
   - prompts/build_system_prompt.py
   - prompts/build_greeting_prompt.py
   - prompts/build_transition_prompt.py
@@ -29,21 +28,20 @@ relatedFiles:
   - commands/serialize_command.py
 ---
 ## Purpose
-This file implements a voice agent for onboarding users through a codebase, facilitating real-time interactions during the onboarding process.
+This file implements a voice agent that facilitates onboarding for users interacting with a codebase, providing personalized guidance during the process.
 
 ## Problem
-Before this file existed, onboarding users to a codebase was a manual and often confusing process. Users lacked guidance and context, leading to a steep learning curve and potential frustration. The need for an interactive solution that could provide real-time assistance and context during onboarding prompted the creation of this agent.
+Before this file, onboarding users to a codebase was often a disjointed experience, lacking personalized guidance and context. New users faced challenges in understanding the codebase structure and features, leading to frustration and inefficiency. The need for a cohesive onboarding solution that could adapt to individual user sessions and provide relevant information prompted the creation of this file.
 
 ## Solution
-The file defines an `OnboardingAgent` class that connects to a local server to receive context and file content dynamically. It listens for data messages, updates its internal context store, and provides voice interactions to guide users through the codebase. The agent uses a combination of speech-to-text (STT), language model (LLM), and text-to-speech (TTS) technologies to facilitate natural conversations with users.
+This file introduces the `ContextStore` class, which manages the onboarding context by storing session data, features, and the current file being explored. It ensures that the onboarding agent only proceeds when a complete context is available, enhancing the personalization of interactions. The agent listens for context updates and file content, allowing it to adapt its guidance based on user input and the current state of the onboarding process.
 
 ## Impact
-With this file, users can now receive personalized guidance as they explore the codebase, making the onboarding process more intuitive and efficient. Developers can leverage the voice agent to enhance user experience, leading to quicker onboarding times and better retention of information.
+With this implementation, users can now receive tailored onboarding experiences that adapt to their specific needs and progress through the codebase. Developers benefit from a structured approach to onboarding, leading to faster ramp-up times for new team members and improved overall satisfaction with the onboarding process.
 
 ## Architecture Context
-This file is part of a larger system that includes a local server for context management and file content delivery. It integrates with various LiveKit plugins for voice processing and utilizes asynchronous programming to handle real-time interactions. The data flow involves receiving messages from the server and responding to user inputs through a voice interface.
+This file is part of a larger system that integrates voice interaction capabilities with a local server. It relies on asynchronous communication to handle context updates and user input, ensuring a responsive experience. The `OnboardingAgent` class utilizes the `ContextStore` to manage state and provide personalized feedback based on the user's journey through the codebase.
 
 ## Gotchas (If Applicable)
-- Ensure that the server is properly configured to send context and file updates; otherwise, the agent may timeout waiting for data.
-- The agent's performance can be affected by network latency, especially during context requests; consider adjusting timeout settings if users experience delays.
-- The recent change to handle a single DataPacket object may require updates in how data is structured on the server side to ensure compatibility.
+- The system requires all three key components (session, features, current file) to be present before it can proceed with personalized interactions, which may lead to timeouts if not managed correctly.
+- Asynchronous context updates can introduce complexity, especially if multiple updates occur simultaneously, potentially leading to race conditions or inconsistent states.

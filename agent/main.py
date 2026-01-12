@@ -43,21 +43,29 @@ class ContextStore:
 
     def update_context(self, data: Dict[str, Any]):
         """Update store with initial context payload."""
-        self.session = data.get("session")
+        if data.get("session"):
+            self.session = data.get("session")
+            print(f"[ContextStore] Received session. User: {self.session.get('userName')}")
+            
         if data.get("features"):
             self.features = data.get("features", [])
             self.features_summary = format_features_summary(self.features)
+            print(f"[ContextStore] Received features ({len(self.features)} items)")
         
         if data.get("knowledgeFiles"):
             self.knowledge_files.update(data.get("knowledgeFiles", {}))
+            print(f"[ContextStore] Received knowledge files")
             
         if data.get("currentFile"):
             self.current_file = data.get("currentFile")
+            print(f"[ContextStore] Received current file: {self.current_file.get('path')}")
         
-        # Mark as ready if we have the session
-        if self.session and not self._context_ready.is_set():
-            self._context_ready.set()
-            print(f"[ContextStore] Initial context received. User: {self.session.get('userName')}")
+        # Mark as ready ONLY if we have the critical trinity: Session, Features, and First File
+        # This ensures the greeting is fully personalized.
+        if self.session and self.features and self.current_file:
+            if not self._context_ready.is_set():
+                self._context_ready.set()
+                print(f"[ContextStore] FULL CONTEXT READY. Firing ready event.")
 
     def update_file(self, data: Dict[str, Any]):
         """Update store with file content response."""
@@ -69,14 +77,30 @@ class ContextStore:
         else:
             # Also handle spontaneous file updates (like the initial file push)
             self.current_file = data
+            print(f"[ContextStore] Initial file content received: {data.get('path')}")
+            
+            # If we were just waiting for this to be fully ready
+            if self.session and self.features and not self._context_ready.is_set():
+                self._context_ready.set()
+                print(f"[ContextStore] FULL CONTEXT READY (via file update). Firing ready event.")
 
     async def wait_for_context(self, timeout: float = 10.0):
         """Wait for initial context push."""
         try:
+            print(f"[ContextStore] Waiting for full context (Session+Features+File)...")
             await asyncio.wait_for(self._context_ready.wait(), timeout)
             return True
         except asyncio.TimeoutError:
-            print("[ContextStore] Timeout waiting for context from server")
+            status = []
+            if not self.session: status.append("Session")
+            if not self.features: status.append("Features")
+            if not self.current_file: status.append("FirstFile")
+            print(f"[ContextStore] Timeout waiting for: {', '.join(status)}")
+            
+            # Fallback: if we at least have the session, we can proceed but it will be generic
+            if self.session:
+                print("[ContextStore] Proceeding with partial context (Session only)")
+                return True
             return False
 
 
@@ -361,7 +385,14 @@ async def entrypoint(ctx: JobContext):
     if agent.context.session:
         await agent.greet_user()
 
-    await asyncio.sleep(1)
+    # Wait for the room to disconnect to keep the worker task alive
+    disconnect_event = asyncio.Event()
+    @ctx.room.on("disconnected")
+    def on_disconnect():
+        disconnect_event.set()
+        
+    await disconnect_event.wait()
+    print("[Agent] Room disconnected, shutting down.")
 
 
 async def classify_and_handle_intent(agent, user_text: str):
