@@ -321,16 +321,25 @@ async def entrypoint(ctx: JobContext):
     # Listen for context messages from local server
     @ctx.room.on("data_received")
     def on_data(payload: bytes, participant: Any, kind: Any, topic: str):
-        if topic != "server-context": return
+        print(f"[Agent] Received data on topic '{topic}' from {participant.identity if participant else 'unknown'}")
         
         try:
-            data = json.loads(payload.decode("utf-8"))
-            if data.get("type") == "onboarding-context":
-                agent.context.update_context(data)
-            elif data.get("type") == "file-content":
-                agent.context.update_file(data)
+            decoded = payload.decode("utf-8")
+            print(f"[Agent] Payload preview (first 50 chars): {decoded[:50]}...")
+            data = json.loads(decoded)
+            
+            if topic == "server-context":
+                if data.get("type") == "onboarding-context":
+                    agent.context.update_context(data)
+                elif data.get("type") == "file-content":
+                    agent.context.update_file(data)
+            else:
+                # Debug: check if context was sent on wrong topic
+                if data.get("type") == "onboarding-context":
+                    print(f"[Agent] WARNING: Received context on WRONG topic: {topic}")
+                    agent.context.update_context(data)
         except Exception as e:
-            print(f"[Agent] Error parsing server data: {e}")
+            print(f"[Agent] Error parsing data message: {e}")
 
     await session.start(agent=agent, room=ctx.room)
     await asyncio.sleep(1)

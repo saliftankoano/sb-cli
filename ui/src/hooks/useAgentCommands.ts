@@ -46,9 +46,10 @@ export function useAgentCommands(): UseAgentCommandsReturn {
 
   // Push initial context when agent joins
   useEffect(() => {
-    const onParticipantConnected = async (participant: any) => {
-      if (participant.identity.toLowerCase().includes("agent")) {
-        console.log("[ContextBridge] Agent joined. Preparing context...");
+    const sendContext = async (participant: any) => {
+      console.log(`[ContextBridge] Checking participant: ${participant.identity}`);
+      if (participant.identity.toLowerCase().includes("agent") || participant.identity.toLowerCase().includes("python")) {
+        console.log("[ContextBridge] Target agent detected. Preparing context...");
         try {
           const [session, features, knowledgeFiles] = await Promise.all([
             fetchSession(),
@@ -57,13 +58,11 @@ export function useAgentCommands(): UseAgentCommandsReturn {
           ]);
 
           if (session) {
-            // Map knowledge to path -> content for the agent
             const knowledgeMap: Record<string, string> = {};
             knowledgeFiles.forEach(k => {
               knowledgeMap[k.sourceFile] = k.content.raw;
             });
 
-            // Get first file content
             let currentFile = undefined;
             if (session.selectedFiles.length > 0) {
               const fileData = await fetchFileContent(session.selectedFiles[0]);
@@ -83,16 +82,31 @@ export function useAgentCommands(): UseAgentCommandsReturn {
               currentFile
             };
 
-            await send(new TextEncoder().encode(JSON.stringify(context)), {
+            const payload = new TextEncoder().encode(JSON.stringify(context));
+            console.log(`[ContextBridge] Sending context to ${participant.identity} (Topic: server-context)...`);
+            
+            await send(payload, {
               reliable: true,
               destinationIdentities: [participant.identity]
             });
-            console.log("[ContextBridge] Initial context sent to agent");
+            console.log("[ContextBridge] Initial context sent successfully");
           }
         } catch (err) {
           console.error("[ContextBridge] Failed to send context:", err);
         }
       }
+    };
+
+    // 1. Check participants already in the room
+    Array.from(room.remoteParticipants.values()).forEach(p => {
+      console.log(`[ContextBridge] Found existing participant: ${p.identity}`);
+      sendContext(p);
+    });
+
+    // 2. Listen for new joins
+    const onParticipantConnected = (participant: any) => {
+      console.log(`[ContextBridge] New participant joined: ${participant.identity}`);
+      sendContext(participant);
     };
 
     room.on("participantConnected", onParticipantConnected);

@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-01-12T00:31:53.115Z",
+  "lastUpdated": "2026-01-12T00:54:24.052Z",
   "features": [
     {
       "id": "startblock-onboarding",
@@ -208,11 +208,14 @@
         "User can get real-time feedback on their progress during onboarding",
         "User can interactively explore the codebase via voice commands",
         "User can receive real-time updates and context about files",
-        "User can navigate through onboarding materials seamlessly"
+        "User can navigate through onboarding materials seamlessly",
+        "User can interact with a voice agent for onboarding guidance",
+        "User can navigate through codebase files with voice commands",
+        "User can ask questions and receive contextual answers about the codebase"
       ],
-      "mermaidDiagram": "flowchart TD\n  Start([Onboarding Agent])\n  onboarding_agent_1[User can interactively explore the codebase via...]\n  onboarding_agent_2[User can receive real-time updates and context ...]\n  onboarding_agent_3[User can navigate through onboarding materials ...]\n  Start --> onboarding_agent_1\n  onboarding_agent_1 --> onboarding_agent_2\n  onboarding_agent_2 --> onboarding_agent_3\n  onboarding_agent_3 --> End([Complete])\n",
-      "mermaidJourney": "journey\n  title Onboarding Agent\n  section User Actions\n    User can interactively explore the co...: 3: User\n    User can receive real-time updates an...: 3: User\n    User can navigate through onboarding ...: 3: User\n",
-      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant agent/main.py as agent/main.py\n    participant ...at_features_summary.py as ...at_features_summary.py\n    participant ...et_feature_for_file.py as ...et_feature_for_file.py\n    participant ...build_system_prompt.py as ...build_system_prompt.py\n    participant ...ild_greeting_prompt.py as ...ild_greeting_prompt.py\n    participant ...d_transition_prompt.py as ...d_transition_prompt.py\n    participant ...nds/NavigateCommand.py as ...nds/NavigateCommand.py\n    participant ...nds/ShowFileCommand.py as ...nds/ShowFileCommand.py\n    User->>agent/main.py: User can interactively explore the codebase via...\n    agent/main.py->>...at_features_summary.py: process\n    ...at_features_summary.py->>...et_feature_for_file.py: process\n    ...et_feature_for_file.py->>...build_system_prompt.py: process\n    ...build_system_prompt.py->>...ild_greeting_prompt.py: process\n    ...ild_greeting_prompt.py->>...d_transition_prompt.py: process\n    ...d_transition_prompt.py->>...nds/NavigateCommand.py: process\n    ...nds/NavigateCommand.py->>...nds/ShowFileCommand.py: process\n    ...nds/ShowFileCommand.py->>...s/serialize_command.py: process\n    ...s/serialize_command.py->>livekit/plugins/openai.py: process\n    livekit/plugins/openai.py->>livekit/plugins/silero.py: process\n    agent/main.py->>...at_features_summary.py: process\n    ...at_features_summary.py->>...et_feature_for_file.py: process\n    ...et_feature_for_file.py->>...build_system_prompt.py: process\n    ...build_system_prompt.py->>...ild_greeting_prompt.py: process\n    ...ild_greeting_prompt.py->>...d_transition_prompt.py: process\n    ...d_transition_prompt.py->>...nds/NavigateCommand.py: process\n    ...nds/NavigateCommand.py->>...nds/ShowFileCommand.py: process\n    ...nds/ShowFileCommand.py->>...s/serialize_command.py: process\n    ...s/serialize_command.py->>livekit/plugins/openai.py: process\n    livekit/plugins/openai.py->>livekit/plugins/silero.py: process\n    agent/main.py->>...at_features_summary.py: process\n    ...at_features_summary.py->>...et_feature_for_file.py: process\n    ...et_feature_for_file.py->>...build_system_prompt.py: process\n    ...build_system_prompt.py->>...ild_greeting_prompt.py: process\n    ...ild_greeting_prompt.py->>...d_transition_prompt.py: process\n    ...d_transition_prompt.py->>...nds/NavigateCommand.py: process\n    ...nds/NavigateCommand.py->>...nds/ShowFileCommand.py: process\n    ...nds/ShowFileCommand.py->>...s/serialize_command.py: process\n    ...s/serialize_command.py->>livekit/plugins/openai.py: process\n    livekit/plugins/openai.py->>livekit/plugins/silero.py: process\n",
+      "mermaidDiagram": "flowchart TD\n  Start([Onboarding Agent])\n  onboarding_agent_1[User can interact with a voice agent for onboar...]\n  onboarding_agent_2[User can navigate through codebase files with v...]\n  onboarding_agent_3[User can ask questions and receive contextual a...]\n  Start --> onboarding_agent_1\n  onboarding_agent_1 --> onboarding_agent_2\n  onboarding_agent_2 --> onboarding_agent_3\n  onboarding_agent_3 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title Onboarding Agent\n  section User Actions\n    User can interact with a voice agent ...: 3: User\n    User can navigate through codebase fi...: 3: User\n    User can ask questions and receive co...: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant agent/main.py as agent/main.py\n    participant ...at_features_summary.py as ...at_features_summary.py\n    participant ...et_feature_for_file.py as ...et_feature_for_file.py\n    participant ...build_system_prompt.py as ...build_system_prompt.py\n    participant ...ild_greeting_prompt.py as ...ild_greeting_prompt.py\n    participant ...d_transition_prompt.py as ...d_transition_prompt.py\n    participant ...nds/NavigateCommand.py as ...nds/NavigateCommand.py\n    participant ...nds/ShowFileCommand.py as ...nds/ShowFileCommand.py\n    User->>agent/main.py: User can interact with a voice agent for onboar...\n    agent/main.py->>...at_features_summary.py: process\n    ...at_features_summary.py->>...et_feature_for_file.py: process\n    ...et_feature_for_file.py->>...build_system_prompt.py: process\n    ...build_system_prompt.py->>...ild_greeting_prompt.py: process\n    ...ild_greeting_prompt.py->>...d_transition_prompt.py: process\n    ...d_transition_prompt.py->>...nds/NavigateCommand.py: process\n    ...nds/NavigateCommand.py->>...nds/ShowFileCommand.py: process\n    ...nds/ShowFileCommand.py->>...s/serialize_command.py: process\n    ...s/serialize_command.py->>livekit/plugins/openai.py: process\n    livekit/plugins/openai.py->>livekit/plugins/silero.py: process\n    agent/main.py->>...at_features_summary.py: process\n    ...at_features_summary.py->>...et_feature_for_file.py: process\n    ...et_feature_for_file.py->>...build_system_prompt.py: process\n    ...build_system_prompt.py->>...ild_greeting_prompt.py: process\n    ...ild_greeting_prompt.py->>...d_transition_prompt.py: process\n    ...d_transition_prompt.py->>...nds/NavigateCommand.py: process\n    ...nds/NavigateCommand.py->>...nds/ShowFileCommand.py: process\n    ...nds/ShowFileCommand.py->>...s/serialize_command.py: process\n    ...s/serialize_command.py->>livekit/plugins/openai.py: process\n    livekit/plugins/openai.py->>livekit/plugins/silero.py: process\n    agent/main.py->>...at_features_summary.py: process\n    ...at_features_summary.py->>...et_feature_for_file.py: process\n    ...et_feature_for_file.py->>...build_system_prompt.py: process\n    ...build_system_prompt.py->>...ild_greeting_prompt.py: process\n    ...ild_greeting_prompt.py->>...d_transition_prompt.py: process\n    ...d_transition_prompt.py->>...nds/NavigateCommand.py: process\n    ...nds/NavigateCommand.py->>...nds/ShowFileCommand.py: process\n    ...nds/ShowFileCommand.py->>...s/serialize_command.py: process\n    ...s/serialize_command.py->>livekit/plugins/openai.py: process\n    livekit/plugins/openai.py->>livekit/plugins/silero.py: process\n",
       "files": [
         "agent/main.py",
         "knowledge_loader.py",
@@ -363,6 +366,45 @@
           "commands/serialize_command.py",
           "livekit/plugins/openai.py",
           "livekit/plugins/silero.py"
+        ],
+        "User can interact with a voice agent for onboarding guidance": [
+          "agent/main.py",
+          "knowledge_loader/format_features_summary.py",
+          "knowledge_loader/get_feature_for_file.py",
+          "prompts/build_system_prompt.py",
+          "prompts/build_greeting_prompt.py",
+          "prompts/build_transition_prompt.py",
+          "commands/NavigateCommand.py",
+          "commands/ShowFileCommand.py",
+          "commands/serialize_command.py",
+          "livekit/plugins/openai.py",
+          "livekit/plugins/silero.py"
+        ],
+        "User can navigate through codebase files with voice commands": [
+          "agent/main.py",
+          "knowledge_loader/format_features_summary.py",
+          "knowledge_loader/get_feature_for_file.py",
+          "prompts/build_system_prompt.py",
+          "prompts/build_greeting_prompt.py",
+          "prompts/build_transition_prompt.py",
+          "commands/NavigateCommand.py",
+          "commands/ShowFileCommand.py",
+          "commands/serialize_command.py",
+          "livekit/plugins/openai.py",
+          "livekit/plugins/silero.py"
+        ],
+        "User can ask questions and receive contextual answers about the codebase": [
+          "agent/main.py",
+          "knowledge_loader/format_features_summary.py",
+          "knowledge_loader/get_feature_for_file.py",
+          "prompts/build_system_prompt.py",
+          "prompts/build_greeting_prompt.py",
+          "prompts/build_transition_prompt.py",
+          "commands/NavigateCommand.py",
+          "commands/ShowFileCommand.py",
+          "commands/serialize_command.py",
+          "livekit/plugins/openai.py",
+          "livekit/plugins/silero.py"
         ]
       },
       "dependencies": [],
@@ -463,17 +505,22 @@
         "User can see connections related to the current context",
         "Agent can receive real-time context when joining a session",
         "Agent can request specific file content dynamically",
-        "Agent can navigate through commands issued by the system"
+        "Agent can navigate through commands issued by the system",
+        "User can receive context updates when an agent joins the session",
+        "User can interact with agents that have immediate access to relevant session data",
+        "User can request specific files through agent commands"
       ],
-      "mermaidDiagram": "flowchart TD\n  Start([Agent Commands])\n  agent_commands_1[Agent can receive real-time context when joinin...]\n  agent_commands_2[Agent can request specific file content dynamic...]\n  agent_commands_3[Agent can navigate through commands issued by t...]\n  Start --> agent_commands_1\n  agent_commands_1 --> agent_commands_2\n  agent_commands_2 --> agent_commands_3\n  agent_commands_3 --> End([Complete])\n",
-      "mermaidJourney": "journey\n  title Agent Commands\n  section User Actions\n    Agent can receive real-time context w...: 3: User\n    Agent can request specific file conte...: 3: User\n    Agent can navigate through commands i...: 3: User\n",
-      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant ...ks/useAgentCommands.ts as ...ks/useAgentCommands.ts\n    participant _livekit/components-react as @livekit/components-react\n    participant _/components/GuidedView as @/components/GuidedView\n    participant _/lib/api as @/lib/api\n    User->>...ks/useAgentCommands.ts: Agent can receive real-time context when joinin...\n    ...ks/useAgentCommands.ts->>_livekit/components-react: process\n    _livekit/components-react->>_/components/GuidedView: process\n    _/components/GuidedView->>_/lib/api: process\n    ...ks/useAgentCommands.ts->>_livekit/components-react: process\n    _livekit/components-react->>_/components/GuidedView: process\n    _/components/GuidedView->>_/lib/api: process\n    ...ks/useAgentCommands.ts->>_livekit/components-react: process\n    _livekit/components-react->>_/components/GuidedView: process\n    _/components/GuidedView->>_/lib/api: process\n",
+      "mermaidDiagram": "flowchart TD\n  Start([Agent Commands])\n  agent_commands_1[User can receive context updates when an agent ...]\n  agent_commands_2[User can interact with agents that have immedia...]\n  agent_commands_3[User can request specific files through agent c...]\n  Start --> agent_commands_1\n  agent_commands_1 --> agent_commands_2\n  agent_commands_2 --> agent_commands_3\n  agent_commands_3 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title Agent Commands\n  section User Actions\n    User can receive context updates when...: 3: User\n    User can interact with agents that ha...: 3: User\n    User can request specific files throu...: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant ...ks/useAgentCommands.ts as ...ks/useAgentCommands.ts\n    participant lib/api.ts as lib/api.ts\n    participant components/GuidedView.ts as components/GuidedView.ts\n    User->>...ks/useAgentCommands.ts: User can receive context updates when an agent ...\n    ...ks/useAgentCommands.ts->>lib/api.ts: process\n    lib/api.ts->>components/GuidedView.ts: process\n    ...ks/useAgentCommands.ts->>lib/api.ts: process\n    lib/api.ts->>components/GuidedView.ts: process\n    ...ks/useAgentCommands.ts->>lib/api.ts: process\n    lib/api.ts->>components/GuidedView.ts: process\n",
       "files": [
         "agent/commands.py",
         "ui/src/hooks/useAgentCommands.ts",
         "@livekit/components-react",
         "@/components/GuidedView",
-        "@/lib/api"
+        "@/lib/api",
+        "lib/api.ts",
+        "components/GuidedView.ts"
       ],
       "filesByAction": {
         "User can navigate between files or steps": [
@@ -526,6 +573,21 @@
           "@livekit/components-react",
           "@/components/GuidedView",
           "@/lib/api"
+        ],
+        "User can receive context updates when an agent joins the session": [
+          "ui/src/hooks/useAgentCommands.ts",
+          "lib/api.ts",
+          "components/GuidedView.ts"
+        ],
+        "User can interact with agents that have immediate access to relevant session data": [
+          "ui/src/hooks/useAgentCommands.ts",
+          "lib/api.ts",
+          "components/GuidedView.ts"
+        ],
+        "User can request specific files through agent commands": [
+          "ui/src/hooks/useAgentCommands.ts",
+          "lib/api.ts",
+          "components/GuidedView.ts"
         ]
       },
       "dependencies": [],

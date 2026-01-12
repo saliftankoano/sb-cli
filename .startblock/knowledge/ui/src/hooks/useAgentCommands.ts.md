@@ -1,7 +1,7 @@
 ---
 filePath: ui/src/hooks/useAgentCommands.ts
-fileVersion: 0bae6537356e19ed555671925e6cf9551cd0bde6
-lastUpdated: '2026-01-12T00:31:53.114Z'
+fileVersion: 865536330a1cc5cf89f436352091701359f959dd
+lastUpdated: '2026-01-12T00:54:24.050Z'
 updatedBy: sb-cli
 tags:
   - ui
@@ -15,30 +15,30 @@ humanVerified: false
 feature: agent-commands
 featureRole: helper
 userFlows:
-  - Agent can receive real-time context when joining a session
-  - Agent can request specific file content dynamically
-  - Agent can navigate through commands issued by the system
+  - User can receive context updates when an agent joins the session
+  - >-
+    User can interact with agents that have immediate access to relevant session
+    data
+  - User can request specific files through agent commands
 relatedFiles:
-  - '@livekit/components-react'
-  - '@/components/GuidedView'
-  - '@/lib/api'
+  - lib/api.ts
+  - components/GuidedView.ts
 ---
 ## Purpose
-This file defines a custom React hook that manages agent commands and context in a collaborative environment, facilitating communication between agents and the system.
+This file provides a custom React hook that manages agent commands and context sharing in a collaborative environment.
 
 ## Problem
-Before this hook was implemented, agents lacked a structured way to receive commands and context information in real-time, leading to inefficiencies and potential miscommunication during collaborative tasks. The need for a dynamic system that could provide agents with relevant information based on their actions prompted the creation of this hook.
+Before this file was implemented, agents joining a collaborative session lacked immediate access to relevant context and data, which hindered their ability to assist users effectively. The need for a mechanism that could dynamically provide context to agents as they joined prompted the creation of this hook.
 
 ## Solution
-The hook leverages the LiveKit data channel to listen for commands from agents and send them relevant context upon connection. It fetches necessary session data, features, and knowledge files asynchronously, allowing agents to receive tailored information as they join the session. The use of command types enables structured interactions, allowing agents to request specific file content or receive instructions on navigating the system.
+The `useAgentCommands` hook solves the problem by listening for participant connections and sending context data to agents when they join. It fetches session details, features, and knowledge files asynchronously and prepares a structured context object to be sent over a data channel. This ensures that agents have the necessary information to engage with users right from the start.
 
 ## Impact
-With this hook, agents can now receive real-time context and commands, improving their efficiency and effectiveness in collaborative tasks. They can dynamically request file content, which enhances their ability to work with the system based on immediate needs. This leads to a smoother user experience and better overall performance of the collaborative environment.
+With this implementation, agents can now receive real-time context as they join a session, improving their ability to assist users. This enhances the overall user experience by ensuring that agents are well-informed and can respond effectively to user commands. Additionally, agents can request specific files, which are then sent back to them, further streamlining interactions.
 
 ## Architecture Context
-This hook is part of a larger system that utilizes LiveKit for real-time communication. It interacts with various APIs to fetch session-related data and integrates with the overall application state through React's context and hooks. The data flow involves receiving commands from agents, processing them, and sending responses back through the data channel.
+This hook integrates with the LiveKit components for real-time communication and relies on several API calls to fetch session and knowledge data. It listens for participant events and manages state related to agent commands, making it a crucial part of the collaborative architecture.
 
 ## Gotchas (If Applicable)
-- Ensure that the command parsing logic is robust to handle unexpected message formats, as this could lead to runtime errors.
-- Be aware of potential delays in fetching data from APIs, which may impact the responsiveness of the agent commands.
-- The hook assumes that the agent's identity will always include the word "agent"; any deviation could lead to unexpected behavior.
+- The hook checks for both 'agent' and 'python' in participant identities, which may lead to unintended context sharing if not properly managed.
+- Asynchronous data fetching can introduce delays; ensure that the UI handles loading states appropriately to improve user experience.

@@ -1,7 +1,7 @@
 ---
 filePath: agent/main.py
-fileVersion: 4285be8799bdc15d12625e1ae00e75a6ff1c46c4
-lastUpdated: '2026-01-12T00:25:41.658Z'
+fileVersion: 1b783e65430147947652a7193cf209ec2b331aa9
+lastUpdated: '2026-01-12T00:54:24.047Z'
 updatedBy: sb-cli
 tags:
   - agent
@@ -11,11 +11,11 @@ extractedBy: sb-cli@1.0.0
 model: gpt-4o-mini
 humanVerified: false
 feature: onboarding-agent
-featureRole: service
+featureRole: component
 userFlows:
-  - User can interactively explore the codebase via voice commands
-  - User can receive real-time updates and context about files
-  - User can navigate through onboarding materials seamlessly
+  - User can interact with a voice agent for onboarding guidance
+  - User can navigate through codebase files with voice commands
+  - User can ask questions and receive contextual answers about the codebase
 relatedFiles:
   - knowledge_loader/format_features_summary.py
   - knowledge_loader/get_feature_for_file.py
@@ -29,21 +29,20 @@ relatedFiles:
   - livekit/plugins/silero.py
 ---
 ## Purpose
-This file implements a voice agent for onboarding users to a codebase, facilitating interactive learning through voice conversations.
+This file implements a voice agent for onboarding users through a codebase, facilitating interactive conversations and context updates during the onboarding process.
 
 ## Problem
-Prior to this implementation, onboarding users to a codebase was a static and often confusing process, lacking interactivity and real-time assistance. Users needed a more engaging way to learn about the codebase, which could adapt to their questions and navigation needs. The absence of a voice-driven assistant made it challenging for users to explore and understand the code effectively.
+Before this file, onboarding users to a codebase was often a static and disjointed experience, lacking real-time interaction and context. Users struggled to understand the codebase structure and relevant files, leading to confusion and inefficiency. This prompted the need for a dynamic solution that could provide immediate context and guidance.
 
 ## Solution
-The `OnboardingAgent` class serves as a voice agent that interacts with users during their onboarding journey. It employs an in-memory `ContextStore` to manage session data, including user details, features, and file knowledge. The agent requests file content dynamically from a local server, ensuring that users receive up-to-date information as they navigate through the codebase. By leveraging asynchronous programming, the agent can handle multiple requests and updates efficiently, providing a smooth user experience.
+The file introduces an `OnboardingAgent` class that listens for user input and context messages from a local server. It updates its internal state based on the received data, allowing it to provide tailored responses and navigate through the codebase effectively. The agent employs asynchronous programming to handle real-time interactions, ensuring a responsive user experience.
 
 ## Impact
-With this implementation, users can now engage in a voice-guided onboarding process that adapts to their learning pace. They can ask questions, navigate through files, and receive contextual information in real-time, significantly enhancing their understanding of the codebase. Developers benefit from a more structured onboarding process that can be easily modified and extended, leading to improved onboarding outcomes.
+With this implementation, users can now engage in voice conversations with the agent, receive contextual information about the codebase, and navigate files seamlessly. This enhances the onboarding process by making it more interactive and informative, ultimately leading to faster acclimatization to the codebase.
 
 ## Architecture Context
-This file is part of a larger system that integrates with LiveKit for real-time communication. It relies on various plugins, including OpenAI for language processing and Silero for voice activity detection. The data flow involves receiving user input, processing it to determine intent, and updating the context store with relevant information from the local server. The agent communicates with the frontend via data channels, sending commands to display files and receive user input.
+The agent integrates with a local server to receive context updates and file content. It utilizes various models for speech-to-text, text-to-speech, and language understanding, ensuring a comprehensive onboarding experience. The data flow involves receiving user input, processing it, and responding with relevant information or actions based on the current context.
 
 ## Gotchas (If Applicable)
-- Ensure the local server is operational; otherwise, the agent will revert to a generic mode, limiting its effectiveness.
-- Network latency can affect the responsiveness of file content requests, so performance may vary based on server conditions.
-- The agent's ability to classify user intent relies on the quality of the input; ambiguous or lengthy messages may lead to misinterpretation of user requests.
+- The agent relies on accurate context messages from the server; if the server sends data on the wrong topic, it may lead to warnings or incorrect context updates.
+- Performance may vary based on network conditions, particularly when requesting file content, which could introduce delays in user interactions.
