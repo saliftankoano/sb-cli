@@ -1,7 +1,7 @@
 ---
 filePath: agent/main.py
-fileVersion: a65fdd93d211569e251d84bda3dc4fd46edf69d4
-lastUpdated: '2026-01-12T04:20:22.718Z'
+fileVersion: 113a58529a16b39fe9be517a01456a804fc0a701
+lastUpdated: '2026-01-12T04:26:56.731Z'
 updatedBy: sb-cli
 tags:
   - agent
@@ -11,36 +11,31 @@ extractedBy: sb-cli@1.0.0
 model: gpt-4o-mini
 humanVerified: false
 feature: onboarding-agent
-featureRole: component
+featureRole: service
 userFlows:
-  - User can navigate through code files using voice commands
-  - User can receive contextual information about the codebase
-  - User can ask questions and get real-time assistance during onboarding
+  - User can receive voice-guided onboarding through the codebase
+  - User can navigate files with contextual assistance
+  - User can ask questions and receive relevant responses during onboarding
 relatedFiles:
-  - knowledge_loader/format_features_summary.py
-  - knowledge_loader/get_feature_for_file.py
-  - prompts/build_system_prompt.py
-  - prompts/build_greeting_prompt.py
-  - prompts/build_transition_prompt.py
-  - commands/NavigateCommand.py
-  - commands/ShowFileCommand.py
-  - commands/serialize_command.py
+  - knowledge_loader.py
+  - prompts.py
+  - commands.py
 ---
 ## Purpose
-This file implements a voice agent for onboarding users to a codebase, facilitating voice conversations and providing context-aware assistance during the onboarding process.
+This file implements a voice agent for onboarding users to a codebase, facilitating voice conversations and providing contextual guidance.
 
 ## Problem
-Before this file, onboarding new developers to the codebase was a manual and potentially confusing process, lacking interactive guidance. Users often struggled to understand the structure and functionality of the codebase, leading to longer ramp-up times and frustration.
+The onboarding process for users interacting with a codebase can be overwhelming, especially for those unfamiliar with its structure and functionality. Prior to this implementation, users lacked a dynamic and interactive way to receive guidance, leading to confusion and a steep learning curve.
 
 ## Solution
-This file introduces an onboarding agent that connects to a local server to receive context about the codebase and facilitate voice interactions. It uses various models for speech-to-text (STT), text-to-speech (TTS), and language understanding (LLM) to provide real-time assistance and guidance. The agent can request file content dynamically and update its instructions based on the current context, ensuring that users receive relevant information as they navigate through the codebase.
+This file introduces the `OnboardingAgent`, a voice agent that communicates with users and guides them through the onboarding process. It listens for context from a local server, updates its internal instructions based on user interactions, and generates personalized responses. Key technical decisions include the use of asynchronous programming to handle real-time interactions and the integration of various models for speech-to-text (STT), text-to-speech (TTS), and language processing (LLM).
 
 ## Impact
-With this file, users can now engage in voice-guided onboarding sessions, allowing for a more interactive and efficient learning experience. Developers can quickly navigate through files, ask questions, and receive contextual information, significantly reducing the time it takes to become productive in the codebase.
+With this implementation, users can now engage with the onboarding process in a more interactive manner. They receive tailored guidance based on their context and can navigate the codebase more effectively. This leads to improved user satisfaction and a more efficient onboarding experience.
 
 ## Architecture Context
-The onboarding agent interacts with a local server to receive context and file data, integrating with various models from the LiveKit and OpenAI libraries. It listens for user input and updates its internal state based on the context received, ensuring a seamless flow of information and interaction.
+The `OnboardingAgent` interacts with a local server to receive context and file content, utilizing a data channel for communication. It integrates with various AI models for processing user input and generating responses, ensuring a seamless flow of information.
 
 ## Gotchas (If Applicable)
-- The change from 'SubscribeOptions' to 'AutoSubscribe' may require developers to review their understanding of subscription mechanisms in the context of this agent.
-- Timeout settings for context retrieval and file requests can lead to delays in onboarding if the server is slow to respond, which may affect user experience.
+- If the context from the server is not received in a timely manner, the agent falls back to a generic mode, which may not provide the desired level of assistance.
+- Users must be aware that the agent's effectiveness relies on the quality of the context provided by the local server, which can vary based on server performance.

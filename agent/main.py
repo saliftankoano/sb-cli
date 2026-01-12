@@ -246,16 +246,9 @@ class OnboardingAgent(VoiceAgent):
         )
         await self._send_ui_command(command)
 
-    async def on_enter(self):
-        """Called when agent enters the room."""
-        print("[Agent] Waiting for context from local server...")
-        
-        if not await self.context.wait_for_context(timeout=15.0):
-            print("[Agent] Failed to receive context. Falling back to generic mode.")
-            await self.session.generate_reply(instructions="Hi! I'm having trouble connecting to your local codebase. Make sure 'sb serve' is running.")
-            return
-
-        print("[Agent] Context ready. Generating greeting...")
+    async def greet_user(self):
+        """Generate the initial greeting once context is ready."""
+        print("[Agent] Generating greeting...")
         self._update_system_instructions()
         
         user_name = self.context.session.get('userName', 'there')
@@ -287,36 +280,6 @@ class OnboardingAgent(VoiceAgent):
         
         await self.session.generate_reply(instructions=greeting_prompt)
 
-
-async def entrypoint(ctx: JobContext):
-    """Entry point for the agent job."""
-    print("Starting onboarding agent (Context-Push mode)...")
-
-    # Audio only for now
-    await ctx.connect(auto_subscribe=AutoSubscribe.AUDIO_ONLY)
-    
-    # Create the agent
-    agent = OnboardingAgent()
-    agent.room = ctx.room
-    
-    # Start session
-    session = AgentSession()
-    
-    @session.on("user_input_transcribed")
-    def on_user_input(event: UserInputTranscribedEvent):
-        if not event.is_final: return
-        user_text = event.transcript.strip()
-        word_count = len(user_text.split())
-        
-        if word_count >= 15: return
-        
-        if word_count <= 3:
-            quick_nav = ["next", "got it", "okay", "continue", "proceed"]
-            if any(nav in user_text.lower() for nav in quick_nav):
-                asyncio.create_task(agent._advance_to_next_file())
-            return
-        
-        asyncio.create_task(classify_and_handle_intent(agent, user_text))
 
 async def entrypoint(ctx: JobContext):
     # Connect with AUDIO_ONLY to reduce overhead, but we need data channels
@@ -365,8 +328,30 @@ async def entrypoint(ctx: JobContext):
         print(f"[Agent] FINAL ROOM MEMBERS: {[p.identity for p in ctx.room.remote_participants.values()]}")
         print("[Agent] Falling back to generic mode.")
 
-    await session.start(agent=agent, room=ctx.room)
-    await asyncio.sleep(1)
+    agent.session = await agent.start(ctx.room)
+    
+    # Listen for transcription for navigation
+    @agent.session.on("user_input_transcribed")
+    def on_user_input(event: UserInputTranscribedEvent):
+        if not event.is_final: return
+        user_text = event.transcript.strip()
+        word_count = len(user_text.split())
+        
+        if word_count >= 15: return
+        
+        if word_count <= 3:
+            quick_nav = ["next", "got it", "okay", "continue", "proceed"]
+            if any(nav in user_text.lower() for nav in quick_nav):
+                asyncio.create_task(agent._advance_to_next_file())
+            return
+        
+        asyncio.create_task(classify_and_handle_intent(agent, user_text))
+
+    # Update UI and Greet
+    if agent.context.session:
+        agent._update_system_instructions()
+        await agent.greet_user()
+
     await asyncio.sleep(1)
 
 
