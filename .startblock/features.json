@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-01-12T11:06:40.055Z",
+  "lastUpdated": "2026-01-12T11:09:49.470Z",
   "features": [
     {
       "id": "startblock-onboarding",
@@ -700,11 +700,13 @@
         "Agent can execute commands to show files or request file contents",
         "Agent can receive onboarding context when joining a session",
         "Agent can request specific file content during a session",
-        "Agent can view relevant features and their descriptions"
+        "Agent can view relevant features and their descriptions",
+        "Agent can request specific file contents during collaboration",
+        "Agent can view features and guided states based on commands"
       ],
-      "mermaidDiagram": "flowchart TD\n  Start([Agent Commands])\n  agent_commands_1[Agent can receive onboarding context when joini...]\n  agent_commands_2[Agent can request specific file content during ...]\n  agent_commands_3[Agent can view relevant features and their desc...]\n  Start --> agent_commands_1\n  agent_commands_1 --> agent_commands_2\n  agent_commands_2 --> agent_commands_3\n  agent_commands_3 --> End([Complete])\n",
-      "mermaidJourney": "journey\n  title Agent Commands\n  section User Actions\n    Agent can receive onboarding context ...: 3: User\n    Agent can request specific file conte...: 3: User\n    Agent can view relevant features and ...: 3: User\n",
-      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant ...ks/useAgentCommands.ts as ...ks/useAgentCommands.ts\n    participant _/components/GuidedView as @/components/GuidedView\n    participant _/lib/api as @/lib/api\n    User->>...ks/useAgentCommands.ts: Agent can receive onboarding context when joini...\n    ...ks/useAgentCommands.ts->>_/components/GuidedView: process\n    _/components/GuidedView->>_/lib/api: process\n    ...ks/useAgentCommands.ts->>_/components/GuidedView: process\n    _/components/GuidedView->>_/lib/api: process\n    ...ks/useAgentCommands.ts->>_/components/GuidedView: process\n    _/components/GuidedView->>_/lib/api: process\n",
+      "mermaidDiagram": "flowchart TD\n  Start([Agent Commands])\n  agent_commands_1[Agent can receive context data upon joining a s...]\n  agent_commands_2[Agent can request specific file contents during...]\n  agent_commands_3[Agent can view features and guided states based...]\n  Start --> agent_commands_1\n  agent_commands_1 --> agent_commands_2\n  agent_commands_2 --> agent_commands_3\n  agent_commands_3 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title Agent Commands\n  section User Actions\n    Agent can receive context data upon j...: 3: User\n    Agent can request specific file conte...: 3: User\n    Agent can view features and guided st...: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant ...ks/useAgentCommands.ts as ...ks/useAgentCommands.ts\n    participant lib/api.ts as lib/api.ts\n    participant components/GuidedView.ts as components/GuidedView.ts\n    User->>...ks/useAgentCommands.ts: Agent can receive context data upon joining a s...\n    ...ks/useAgentCommands.ts->>lib/api.ts: process\n    lib/api.ts->>components/GuidedView.ts: process\n    ...ks/useAgentCommands.ts->>lib/api.ts: process\n    lib/api.ts->>components/GuidedView.ts: process\n    ...ks/useAgentCommands.ts->>lib/api.ts: process\n    lib/api.ts->>components/GuidedView.ts: process\n",
       "files": [
         "agent/commands.py",
         "ui/src/hooks/useAgentCommands.ts",
@@ -857,8 +859,8 @@
         ],
         "Agent can receive context data upon joining a session": [
           "ui/src/hooks/useAgentCommands.ts",
-          "@/components/GuidedView",
-          "@/lib/api"
+          "lib/api.ts",
+          "components/GuidedView.ts"
         ],
         "Agent can execute commands to show files or request file contents": [
           "ui/src/hooks/useAgentCommands.ts",
@@ -879,6 +881,16 @@
           "ui/src/hooks/useAgentCommands.ts",
           "@/components/GuidedView",
           "@/lib/api"
+        ],
+        "Agent can request specific file contents during collaboration": [
+          "ui/src/hooks/useAgentCommands.ts",
+          "lib/api.ts",
+          "components/GuidedView.ts"
+        ],
+        "Agent can view features and guided states based on commands": [
+          "ui/src/hooks/useAgentCommands.ts",
+          "lib/api.ts",
+          "components/GuidedView.ts"
         ]
       },
       "dependencies": [],

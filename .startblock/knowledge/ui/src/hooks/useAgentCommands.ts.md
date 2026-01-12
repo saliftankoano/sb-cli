@@ -1,7 +1,7 @@
 ---
 filePath: ui/src/hooks/useAgentCommands.ts
-fileVersion: 4649027fb56e6801d1443ff8e069c9e238f5387d
-lastUpdated: '2026-01-12T11:02:23.906Z'
+fileVersion: c1df2113c344b329032d9e7a3d0a38f14a32fdfe
+lastUpdated: '2026-01-12T11:09:49.466Z'
 updatedBy: sb-cli
 tags:
   - ui
@@ -15,28 +15,28 @@ humanVerified: false
 feature: agent-commands
 featureRole: helper
 userFlows:
-  - Agent can receive onboarding context when joining a session
-  - Agent can request specific file content during a session
-  - Agent can view relevant features and their descriptions
+  - Agent can receive context data upon joining a session
+  - Agent can request specific file contents during collaboration
+  - Agent can view features and guided states based on commands
 relatedFiles:
-  - '@/components/GuidedView'
-  - '@/lib/api'
+  - lib/api.ts
+  - components/GuidedView.ts
 ---
 ## Purpose
-This file provides a custom React hook that manages the communication of agent commands and context within a collaborative environment, ensuring agents receive necessary onboarding information efficiently.
+This file defines a custom React hook that manages agent commands and context data in a collaborative environment using LiveKit.
 
 ## Problem
-Prior to this implementation, there was no structured way to share onboarding context and relevant features with agents in real-time. This lack of context could lead to confusion and inefficiencies, as agents may not have had the necessary information to assist users effectively. The challenge was to ensure that agents received the right information without exceeding message size limits during communication.
+Before this file, there was no structured way to manage the context and commands for agent participants in a collaborative session. Agents needed relevant session data and commands to interact effectively, but the existing architecture lacked a mechanism to push this information dynamically.
 
 ## Solution
-The `useAgentCommands` hook solves this problem by establishing a data channel for sending structured context to agents when they join the session. It first sends a minimal base context containing essential session information, followed by a separate message for feature details, ensuring that the total payload remains within acceptable limits. This approach allows for efficient communication and helps maintain a responsive user experience.
+The `useAgentCommands` hook addresses this by leveraging LiveKit's data channels to send context data and handle commands from agents. It listens for participant connections, checks their identities to determine if they are agents, and pushes relevant session information, features, and file contents to them. The use of async functions and React state management ensures that updates are handled efficiently.
 
 ## Impact
-With this implementation, agents can now receive timely and relevant onboarding context, which enhances their ability to assist users effectively. This structured communication also improves the overall user experience by ensuring that agents are well-informed about the session details and available features, leading to more effective interactions.
+With this implementation, agents can now receive real-time updates about their session context, including features and file contents, which enhances their ability to make informed decisions during collaboration. This leads to a more interactive and responsive user experience.
 
 ## Architecture Context
-This hook integrates with the LiveKit components for real-time communication, fetching necessary session data, features, and knowledge files from the API. It listens for participant connection events and manages the state of the guided view, ensuring that all agents receive the required context dynamically as they join the session.
+This hook integrates with LiveKit's participant management and data channels. It fetches session data, features, and knowledge files from the API and sends them to agents as they connect to the room. The data flow is initiated upon participant connection and is maintained through periodic checks for new agents.
 
 ## Gotchas (If Applicable)
-- The implementation relies on careful management of message sizes, including truncating descriptions and limiting the number of user flows and files sent to avoid exceeding the 64KB limit.
-- The hook must handle dynamic participant connections, which can introduce complexity in ensuring that all agents receive the context correctly, especially if they join after the initial context push.
+- The debug logging added for tracking context pushes may affect performance if left in production, as it introduces additional network requests.
+- The agent detection logic is permissive, which could lead to false positives if the participant identities are not well-defined, potentially causing missed context pushes.

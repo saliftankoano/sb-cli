@@ -76,11 +76,18 @@ export function useAgentCommands(): UseAgentCommandsReturn {
           "[ContextBridge] TARGET AGENT DETECTED! Starting context push..."
         );
         try {
+          // #region debug log
+          fetch('http://127.0.0.1:7243/ingest/7bdaa666-6bb7-4671-81bb-23ccffbde6dd',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'useAgentCommands.ts:79',message:'Fetching local data',sessionId:'debug-session',hypothesisId:'A'})}).catch(()=>{});
+          // #endregion
           const [session, features, knowledgeFiles] = await Promise.all([
             fetchSession(),
             fetchFeatures(),
             fetchKnowledge(),
           ]);
+
+          // #region debug log
+          fetch('http://127.0.0.1:7243/ingest/7bdaa666-6bb7-4671-81bb-23ccffbde6dd',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'useAgentCommands.ts:84',message:'Data fetched',data:{hasSession:!!session,featuresCount:features?.features?.length,knowledgeCount:knowledgeFiles?.length},sessionId:'debug-session',hypothesisId:'A'})}).catch(()=>{});
+          // #endregion
 
           console.log("[ContextBridge] Local data fetched", {
             hasSession: !!session,
@@ -104,6 +111,11 @@ export function useAgentCommands(): UseAgentCommandsReturn {
             const basePayload = new TextEncoder().encode(
               JSON.stringify(baseContext)
             );
+
+            // #region debug log
+            fetch('http://127.0.0.1:7243/ingest/7bdaa666-6bb7-4671-81bb-23ccffbde6dd',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'useAgentCommands.ts:107',message:'Base context size',data:{size:basePayload.length,context:baseContext},sessionId:'debug-session',hypothesisId:'A'})}).catch(()=>{});
+            // #endregion
+
             console.warn(
               `[ContextBridge] SENDING BASE CONTEXT to ${participant.identity}. Size: ${basePayload.length} bytes`
             );
