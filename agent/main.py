@@ -318,23 +318,36 @@ async def entrypoint(ctx: JobContext):
         
         asyncio.create_task(classify_and_handle_intent(agent, user_text))
 
+async def entrypoint(ctx: JobContext):
+    # Connect with AUDIO_ONLY to reduce overhead, but we need data channels
+    await ctx.connect(auto_subscribe=SubscribeOptions.AUDIO_ONLY)
+    
+    # Identify ourselves
+    me = ctx.room.local_participant
+    print(f"[Agent] CONNECTED | Room: {ctx.room.name}")
+    print(f"[Agent] MY IDENTITY: {me.identity}")
+    print(f"[Agent] MY SID: {me.sid}")
+    print(f"[Agent] CURRENT REMOTE PARTICIPANTS: {[p.identity for p in ctx.room.remote_participants.values()]}")
+
+    agent = OnboardingAgent()
+    
     # Listen for context messages from local server
     @ctx.room.on("data_received")
     def on_data(payload: bytes, participant: Any, kind: Any, topic: str):
         p_identity = participant.identity if participant else 'unknown'
-        print(f"[Agent] Data received | Topic: {topic} | From: {p_identity} | Size: {len(payload)} bytes")
+        print(f"[Agent] DATA RECEIVED | Topic: {topic} | From: {p_identity} | Size: {len(payload)} bytes")
         
         try:
             decoded = payload.decode("utf-8")
             data = json.loads(decoded)
-            print(f"[Agent] Data type: {data.get('type')}")
+            print(f"[Agent] DATA TYPE: {data.get('type')}")
             
             if topic == "server-context":
                 if data.get("type") == "onboarding-context":
-                    print(f"[Agent] Processing onboarding-context from {p_identity}")
+                    print(f"[Agent] SUCCESS: Received onboarding context from {p_identity}")
                     agent.context.update_context(data)
                 elif data.get("type") == "file-content":
-                    print(f"[Agent] Processing file-content for {data.get('path')}")
+                    print(f"[Agent] SUCCESS: Received file content for {data.get('path')}")
                     agent.context.update_file(data)
             else:
                 # Debug: check if context was sent on wrong topic
@@ -342,17 +355,18 @@ async def entrypoint(ctx: JobContext):
                     print(f"[Agent] WARNING: Received context on WRONG topic: {topic}")
                     agent.context.update_context(data)
         except Exception as e:
-            print(f"[Agent] ERROR parsing data: {e}")
+            print(f"[Agent] PARSE ERROR: {e}")
 
     print("Starting onboarding agent (Context-Push mode)...")
-    print(f"[Agent] Waiting up to 20s for context push from {ctx.room.name}...")
+    print(f"[Agent] WAITING for context push (25s timeout)...")
     
-    if not await agent.context.wait_for_context(timeout=20.0):
-        print("[Agent] CRITICAL: Timeout waiting for context. Room members at timeout:")
-        print(f"       {[p.identity for p in ctx.room.remote_participants.values()]}")
+    if not await agent.context.wait_for_context(timeout=25.0):
+        print("[Agent] CRITICAL TIMEOUT: No context received.")
+        print(f"[Agent] FINAL ROOM MEMBERS: {[p.identity for p in ctx.room.remote_participants.values()]}")
         print("[Agent] Falling back to generic mode.")
 
     await session.start(agent=agent, room=ctx.room)
+    await asyncio.sleep(1)
     await asyncio.sleep(1)
 
 

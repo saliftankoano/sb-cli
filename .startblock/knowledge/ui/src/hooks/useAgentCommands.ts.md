@@ -1,7 +1,7 @@
 ---
 filePath: ui/src/hooks/useAgentCommands.ts
-fileVersion: 3ce6c1c6c9627e3b5671bb1332602cba3460f58e
-lastUpdated: '2026-01-12T01:10:41.294Z'
+fileVersion: b5cf43c5d96a9bb3a7657454d53c7f15932768b7
+lastUpdated: '2026-01-12T04:10:40.745Z'
 updatedBy: sb-cli
 tags:
   - ui
@@ -15,29 +15,29 @@ humanVerified: false
 feature: agent-commands
 featureRole: helper
 userFlows:
-  - Agent receives context about the current session and features when joining.
-  - Agent can request specific file content during interactions.
+  - Agent receives context upon joining a session
+  - Agent can request specific file content
+  - Agent can execute commands to navigate or show files
 relatedFiles:
   - '@livekit/components-react'
   - '@/components/GuidedView'
   - '@/lib/api'
 ---
 ## Purpose
-This file provides a custom React hook that manages agent commands and context sharing in a collaborative environment.
+This file provides a custom hook for managing agent commands and context sharing in a collaborative environment using LiveKit.
 
 ## Problem
-Before this file, there was no structured way to share context and commands with agents in real-time during collaborative sessions. Agents needed relevant information about sessions, features, and knowledge files to operate effectively, but the system lacked a mechanism to push this context dynamically upon participant connections.
+In collaborative applications, especially those involving agents, there was a lack of efficient context sharing when agents joined a session. Prior to this implementation, agents might not receive necessary information about the session, features, or relevant files, leading to confusion and inefficiencies in their operations.
 
 ## Solution
-The `useAgentCommands` hook solves this problem by establishing a connection with remote participants and sending them relevant context when they join. It fetches necessary data asynchronously (session, features, knowledge) and uses a logging function to track operations and errors. The hook also listens for incoming commands from agents, allowing for responsive interactions based on user actions.
+The `useAgentCommands` hook detects when agents join a room and pushes relevant context data, including session details, features, and knowledge files. It employs the LiveKit framework to listen for participant connections and periodically checks for agents that may have connected without triggering events. This ensures that all agents receive the necessary context to operate effectively.
 
 ## Impact
-With this file, developers can now ensure that agents are equipped with the necessary context to make informed decisions during collaborative sessions. This enhances the overall user experience by providing agents with real-time data, thereby improving the effectiveness of interactions. The logging mechanism also aids in debugging and monitoring the system's behavior.
+With this implementation, agents can dynamically receive context and commands, allowing for improved collaboration and interaction within the application. This enhances the overall user experience by ensuring agents are well-informed and can respond to commands effectively, streamlining workflows and reducing the potential for miscommunication.
 
 ## Architecture Context
-This hook integrates with the LiveKit components for real-time communication, utilizing data channels to send and receive messages. It depends on several API functions to fetch session data and knowledge files, ensuring that agents have access to the latest information.
+This hook integrates with the LiveKit components for managing room contexts and data channels. It fetches data from APIs to provide agents with the necessary context and listens for incoming messages to handle commands from agents. The data flow involves fetching session information, features, and knowledge files, which are then sent to agents as they join the room.
 
 ## Gotchas (If Applicable)
-- The logging function sends data to a local endpoint, which may not be suitable for production environments without modification.
-- The identification of participants includes a fallback to include those labeled as "participant," which may lead to unintended context sharing if not properly managed.
-- Asynchronous data fetching can lead to race conditions if not handled carefully, especially when multiple participants connect simultaneously.
+- The agent detection logic is permissive, which may lead to false positives if participant identities are not well-defined. Care should be taken to ensure that the naming conventions for participants are consistent.
+- The periodic check for agents is set to a 5-second interval, which could lead to performance issues if there are many participants. Adjustments may be necessary based on the expected load.

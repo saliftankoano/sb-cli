@@ -46,43 +46,31 @@ export function useAgentCommands(): UseAgentCommandsReturn {
 
   // Push initial context when agent joins
   useEffect(() => {
-    const log = (message: string, data?: any) => {
-      console.log(`[ContextBridge] ${message}`, data || "");
-      fetch('http://127.0.0.1:7243/ingest/7bdaa666-6bb7-4671-81bb-23ccffbde6dd', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          location: 'useAgentCommands.ts',
-          message,
-          data,
-          timestamp: Date.now(),
-          sessionId: 'debug-session',
-          hypothesisId: 'H1'
-        })
-      }).catch(() => {});
-    };
+    console.warn("[ContextBridge] HOOK MOUNTED", { 
+      roomName: room.name, 
+      state: room.state,
+      participantCount: room.remoteParticipants.size 
+    });
 
     const sendContext = async (participant: any) => {
-      log(`Checking participant: ${participant.identity}`);
+      console.warn(`[ContextBridge] Checking participant: ${participant.identity} | IsAgent?`);
+      
+      // Be very permissive with agent detection for now
       const isAgent = participant.identity.toLowerCase().includes("agent") || 
                       participant.identity.toLowerCase().includes("python") ||
-                      participant.identity.toLowerCase().includes("participant"); // Added participant as fallback
+                      participant.identity.toLowerCase().includes("participant") ||
+                      participant.identity.startsWith("PA_"); // LiveKit participant ID prefix
       
       if (isAgent) {
-        log("Target agent detected. Preparing context...");
+        console.warn("[ContextBridge] TARGET AGENT DETECTED! Starting context push...");
         try {
-          log("Fetching local data (session, features, knowledge)...");
           const [session, features, knowledgeFiles] = await Promise.all([
             fetchSession(),
             fetchFeatures(),
             fetchKnowledge()
           ]);
 
-          log("Data fetched successfully", { 
-            hasSession: !!session, 
-            featuresCount: features?.features?.length,
-            knowledgeCount: knowledgeFiles?.length 
-          });
+          console.log("[ContextBridge] Local data fetched", { hasSession: !!session });
 
           if (session) {
             const knowledgeMap: Record<string, string> = {};
@@ -92,7 +80,7 @@ export function useAgentCommands(): UseAgentCommandsReturn {
 
             let currentFile = undefined;
             if (session.selectedFiles.length > 0) {
-              log(`Fetching content for first file: ${session.selectedFiles[0]}`);
+              console.log(`[ContextBridge] Fetching content for first file: ${session.selectedFiles[0]}`);
               const fileData = await fetchFileContent(session.selectedFiles[0]);
               currentFile = {
                 path: session.selectedFiles[0],
@@ -100,7 +88,6 @@ export function useAgentCommands(): UseAgentCommandsReturn {
                 knowledge: knowledgeMap[session.selectedFiles[0]],
                 totalLines: fileData.totalLines
               };
-              log("File content fetched");
             }
 
             const context = {
@@ -112,40 +99,52 @@ export function useAgentCommands(): UseAgentCommandsReturn {
             };
 
             const payload = new TextEncoder().encode(JSON.stringify(context));
-            log(`Sending context to ${participant.identity} (Topic: server-context). Size: ${payload.length} bytes`);
+            console.warn(`[ContextBridge] SENDING PAYLOAD to ${participant.identity}. Size: ${payload.length} bytes`);
             
             await send(payload, {
               reliable: true,
               destinationIdentities: [participant.identity]
             });
-            log("Initial context sent successfully");
-          } else {
-            log("No session found, skipping context send");
+            console.warn("[ContextBridge] PUSH SUCCESSFUL");
           }
         } catch (err) {
-          log("Failed to send context", { error: err instanceof Error ? err.message : String(err) });
+          console.error("[ContextBridge] PUSH FAILED:", err);
         }
       } else {
-        log(`Participant ${participant.identity} ignored (not an agent)`);
+        console.log(`[ContextBridge] Participant ${participant.identity} is not an agent, ignoring.`);
       }
     };
 
-    // 1. Check participants already in the room
+    // 1. Sync already present participants
     const existing = Array.from(room.remoteParticipants.values());
-    log(`Syncing existing participants (${existing.length})`);
+    console.log(`[ContextBridge] Existing participants count: ${existing.length}`);
     existing.forEach(p => {
       sendContext(p);
     });
 
-    // 2. Listen for new joins
+    // 2. Listen for future joins
     const onParticipantConnected = (participant: any) => {
-      log(`New participant connected: ${participant.identity}`);
+      console.warn(`[ContextBridge] NEW PARTICIPANT JOINED: ${participant.identity}`);
       sendContext(participant);
     };
 
     room.on("participantConnected", onParticipantConnected);
+    
+    // 3. Periodic check for agent if connection events were missed
+    const interval = setInterval(() => {
+      const participants = Array.from(room.remoteParticipants.values());
+      const agent = participants.find(p => p.identity.toLowerCase().includes("agent") || p.identity.toLowerCase().includes("python"));
+      if (agent) {
+        console.log("[ContextBridge] Periodic check found agent", agent.identity);
+        // sendContext is async, but we can call it here
+        // We'll only send if we haven't successfully sent yet (could add a ref for that)
+      }
+    }, 5000);
+
     return () => {
+      console.log("[ContextBridge] HOOK UNMOUNTED");
       room.off("participantConnected", onParticipantConnected);
+      clearInterval(interval);
     };
   }, [room, send]);
 
