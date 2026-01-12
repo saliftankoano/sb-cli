@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-01-12T11:02:23.907Z",
+  "lastUpdated": "2026-01-12T11:06:40.055Z",
   "features": [
     {
       "id": "startblock-onboarding",
@@ -234,11 +234,14 @@
         "User can receive context-aware guidance during onboarding",
         "User can request specific file content and receive dynamic responses",
         "User can receive personalized guidance based on their current context in the codebase",
-        "User can interactively learn about different files and features in the codebase"
+        "User can interactively learn about different files and features in the codebase",
+        "User can interact with the codebase using voice commands",
+        "User can receive guided assistance while exploring the codebase",
+        "User can navigate through files and features with voice prompts"
       ],
-      "mermaidDiagram": "flowchart TD\n  Start([Onboarding Agent])\n  onboarding_agent_1[User can navigate through the codebase using vo...]\n  onboarding_agent_2[User can receive personalized guidance based on...]\n  onboarding_agent_3[User can interactively learn about different fi...]\n  Start --> onboarding_agent_1\n  onboarding_agent_1 --> onboarding_agent_2\n  onboarding_agent_2 --> onboarding_agent_3\n  onboarding_agent_3 --> End([Complete])\n",
-      "mermaidJourney": "journey\n  title Onboarding Agent\n  section User Actions\n    User can navigate through the codebas...: 3: User\n    User can receive personalized guidanc...: 3: User\n    User can interactively learn about di...: 3: User\n",
-      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant agent/main.py as agent/main.py\n    participant ...kit/agents/__init__.py as ...kit/agents/__init__.py\n    participant knowledge_loader.py as knowledge_loader.py\n    participant prompts.py as prompts.py\n    participant commands.py as commands.py\n    User->>agent/main.py: User can navigate through the codebase using vo...\n    agent/main.py->>...kit/agents/__init__.py: process\n    ...kit/agents/__init__.py->>knowledge_loader.py: process\n    knowledge_loader.py->>prompts.py: process\n    prompts.py->>commands.py: process\n    agent/main.py->>...kit/agents/__init__.py: process\n    ...kit/agents/__init__.py->>knowledge_loader.py: process\n    knowledge_loader.py->>prompts.py: process\n    prompts.py->>commands.py: process\n    agent/main.py->>...kit/agents/__init__.py: process\n    ...kit/agents/__init__.py->>knowledge_loader.py: process\n    knowledge_loader.py->>prompts.py: process\n    prompts.py->>commands.py: process\n",
+      "mermaidDiagram": "flowchart TD\n  Start([Onboarding Agent])\n  onboarding_agent_1[User can interact with the codebase using voice...]\n  onboarding_agent_2[User can receive guided assistance while explor...]\n  onboarding_agent_3[User can navigate through files and features wi...]\n  Start --> onboarding_agent_1\n  onboarding_agent_1 --> onboarding_agent_2\n  onboarding_agent_2 --> onboarding_agent_3\n  onboarding_agent_3 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title Onboarding Agent\n  section User Actions\n    User can interact with the codebase u...: 3: User\n    User can receive guided assistance wh...: 3: User\n    User can navigate through files and f...: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant agent/main.py as agent/main.py\n    participant livekit/plugins/openai.py as livekit/plugins/openai.py\n    participant livekit/plugins/silero.py as livekit/plugins/silero.py\n    participant knowledge_loader.py as knowledge_loader.py\n    participant prompts.py as prompts.py\n    participant commands.py as commands.py\n    User->>agent/main.py: User can interact with the codebase using voice...\n    agent/main.py->>livekit/plugins/openai.py: process\n    livekit/plugins/openai.py->>livekit/plugins/silero.py: process\n    livekit/plugins/silero.py->>knowledge_loader.py: process\n    knowledge_loader.py->>prompts.py: process\n    prompts.py->>commands.py: process\n    agent/main.py->>livekit/plugins/openai.py: process\n    livekit/plugins/openai.py->>livekit/plugins/silero.py: process\n    livekit/plugins/silero.py->>knowledge_loader.py: process\n    knowledge_loader.py->>prompts.py: process\n    prompts.py->>commands.py: process\n    agent/main.py->>livekit/plugins/openai.py: process\n    livekit/plugins/openai.py->>livekit/plugins/silero.py: process\n    livekit/plugins/silero.py->>knowledge_loader.py: process\n    knowledge_loader.py->>prompts.py: process\n    prompts.py->>commands.py: process\n",
       "files": [
         "agent/main.py",
         "knowledge_loader.py",
@@ -549,6 +552,30 @@
         "User can interactively learn about different files and features in the codebase": [
           "agent/main.py",
           "livekit/agents/__init__.py",
+          "knowledge_loader.py",
+          "prompts.py",
+          "commands.py"
+        ],
+        "User can interact with the codebase using voice commands": [
+          "agent/main.py",
+          "livekit/plugins/openai.py",
+          "livekit/plugins/silero.py",
+          "knowledge_loader.py",
+          "prompts.py",
+          "commands.py"
+        ],
+        "User can receive guided assistance while exploring the codebase": [
+          "agent/main.py",
+          "livekit/plugins/openai.py",
+          "livekit/plugins/silero.py",
+          "knowledge_loader.py",
+          "prompts.py",
+          "commands.py"
+        ],
+        "User can navigate through files and features with voice prompts": [
+          "agent/main.py",
+          "livekit/plugins/openai.py",
+          "livekit/plugins/silero.py",
           "knowledge_loader.py",
           "prompts.py",
           "commands.py"

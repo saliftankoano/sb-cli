@@ -15,8 +15,9 @@ from livekit.agents import (
     WorkerOptions,
     cli,
     llm,
+    UserInputTranscribedEvent,
 )
-from livekit.agents.voice import VoiceAssistant
+from livekit.agents.voice import Agent as VoiceAgent, AgentSession
 import livekit.plugins.openai as openai
 import livekit.plugins.silero as silero
 from knowledge_loader import (
@@ -43,14 +44,20 @@ class ContextStore:
     def update_context(self, data: Dict[str, Any]):
         """Update store with initial context payload."""
         self.session = data.get("session")
-        self.features = data.get("features", [])
-        self.knowledge_files = data.get("knowledgeFiles", {})
-        self.current_file = data.get("currentFile")
-        self.features_summary = format_features_summary(self.features)
+        if data.get("features"):
+            self.features = data.get("features", [])
+            self.features_summary = format_features_summary(self.features)
         
-        # Mark as ready
-        self._context_ready.set()
-        print(f"[ContextStore] Initial context received. User: {self.session.get('userName')}")
+        if data.get("knowledgeFiles"):
+            self.knowledge_files.update(data.get("knowledgeFiles", {}))
+            
+        if data.get("currentFile"):
+            self.current_file = data.get("currentFile")
+        
+        # Mark as ready if we have the session
+        if self.session and not self._context_ready.is_set():
+            self._context_ready.set()
+            print(f"[ContextStore] Initial context received. User: {self.session.get('userName')}")
 
     def update_file(self, data: Dict[str, Any]):
         """Update store with file content response."""
@@ -59,6 +66,9 @@ class ContextStore:
             future = self._pending_requests.pop(request_id)
             if not future.done():
                 future.set_result(data)
+        else:
+            # Also handle spontaneous file updates (like the initial file push)
+            self.current_file = data
 
     async def wait_for_context(self, timeout: float = 10.0):
         """Wait for initial context push."""
@@ -70,8 +80,8 @@ class ContextStore:
             return False
 
 
-class OnboardingAgent(VoiceAssistant):
-    """Voice assistant that guides users through codebase onboarding."""
+class OnboardingAgent(VoiceAgent):
+    """Voice agent that guides users through codebase onboarding."""
 
     def __init__(self):
         self.room = None
@@ -84,16 +94,14 @@ class OnboardingAgent(VoiceAssistant):
         tts_model = openai.TTS(voice="nova", model="tts-1")
         vad_model = silero.VAD.load()
 
-        # Initialize the voice assistant
+        # Initialize the voice agent with empty instructions initially
         super().__init__(
-            vad=vad_model,
+            instructions="You are an onboarding assistant. Please wait a moment while I load the codebase context.",
             stt=stt_model,
             llm=llm_model,
             tts=tts_model,
-            chat_ctx=llm.ChatContext().append(
-                role="system",
-                text="You are an onboarding assistant. Please wait a moment while I load the codebase context.",
-            ),
+            vad=vad_model,
+            chat_ctx=llm.ChatContext(),
         )
 
     async def _request_file_from_server(self, file_path: str) -> Optional[Dict[str, Any]]:
@@ -145,11 +153,6 @@ class OnboardingAgent(VoiceAssistant):
         if current_file_path:
             file_knowledge = self.context.knowledge_files.get(current_file_path)
             current_feature = get_feature_for_file(self.context.features, current_file_path)
-            
-            # If the current_file in context matches the one we want, use its data
-            if self.context.current_file and self.context.current_file.get("path") == current_file_path:
-                # You could add actual file content to the prompt here if desired
-                pass
 
         new_instructions = build_system_prompt(
             user_name=self.context.session.get("userName"),
@@ -162,20 +165,12 @@ class OnboardingAgent(VoiceAssistant):
             total_steps=len(selected_files),
             features_summary=self.context.features_summary,
             current_feature=current_feature,
-            # Docs could also be pushed in context if needed
             architecture_doc=None, 
             setup_doc=None,
             tasks_doc=None,
         )
         
-        # Update the system message in chat context
-        for msg in self.chat_ctx.messages:
-            if msg.role == "system":
-                msg.content = new_instructions
-                return
-        
-        # If no system message found, insert one at the beginning
-        self.chat_ctx.messages.insert(0, llm.ChatMessage(role="system", content=new_instructions))
+        self._instructions = new_instructions
 
     async def _advance_to_next_file(self):
         """Advance to the next file in the journey."""
@@ -221,12 +216,12 @@ class OnboardingAgent(VoiceAssistant):
                 to_feature=to_feature,
             )
             
-            self.say(transition_prompt)
+            await self.session.generate_reply(instructions=transition_prompt)
         else:
             # Reached end
             user_name = self.context.session.get("userName", "you")
             completion_prompt = f"Celebrate {user_name} completing the journey! Recp what they learned and encourage them."
-            self.say(completion_prompt)
+            await self.session.generate_reply(instructions=completion_prompt)
     
     async def _send_ui_command(self, command):
         """Send a UI command via data channel."""
@@ -281,7 +276,7 @@ class OnboardingAgent(VoiceAssistant):
             first_file_knowledge=first_file_knowledge,
         )
         
-        self.say(greeting_prompt)
+        await self.session.generate_reply(instructions=greeting_prompt)
 
 
 async def entrypoint(ctx: JobContext):
@@ -292,10 +287,10 @@ async def entrypoint(ctx: JobContext):
     me = ctx.room.local_participant
     print(f"[Agent] CONNECTED | Room: {ctx.room.name}")
     print(f"[Agent] MY IDENTITY: {me.identity}")
-    print(f"[Agent] MY SID: {me.sid}")
     print(f"[Agent] CURRENT REMOTE PARTICIPANTS: {[p.identity for p in ctx.room.remote_participants.values()]}")
 
     agent = OnboardingAgent()
+    agent.room = ctx.room
     
     # Listen for context messages from local server
     @ctx.room.on("data_received")
@@ -327,25 +322,22 @@ async def entrypoint(ctx: JobContext):
     print("Starting onboarding agent (Context-Push mode)...")
     print(f"[Agent] WAITING for context push (25s timeout)...")
     
-    if not await agent.context.wait_for_context(timeout=25.0):
+    context_received = await agent.context.wait_for_context(timeout=25.0)
+    
+    if not context_received:
         print("[Agent] CRITICAL TIMEOUT: No context received.")
         print(f"[Agent] FINAL ROOM MEMBERS: {[p.identity for p in ctx.room.remote_participants.values()]}")
         print("[Agent] Falling back to generic mode.")
-        agent.say("Hi! I'm having trouble connecting to your local codebase. Make sure 'sb serve' is running.")
-    else:
-        # Update instructions and greet
-        print("[Agent] Context received. Starting onboarding...")
-        agent._update_system_instructions()
-        await agent.greet_user()
 
-    # Start the agent
-    print("[Agent] Starting assistant...")
-    agent.start(ctx.room)
-
+    # Start the agent session
+    print("[Agent] Starting session...")
+    session = AgentSession()
+    
     # Listen for transcription for navigation
-    @agent.on("user_speech_committed")
-    def on_user_input(msg: llm.ChatMessage):
-        user_text = msg.content.strip()
+    @session.on("user_input_transcribed")
+    def on_user_input(event: UserInputTranscribedEvent):
+        if not event.is_final: return
+        user_text = event.transcript.strip()
         word_count = len(user_text.split())
         
         if word_count >= 15: return
@@ -357,6 +349,12 @@ async def entrypoint(ctx: JobContext):
             return
         
         asyncio.create_task(classify_and_handle_intent(agent, user_text))
+
+    await session.start(agent=agent, room=ctx.room)
+
+    # Greet once started if we have context
+    if agent.context.session:
+        await agent.greet_user()
 
     await asyncio.sleep(1)
 
