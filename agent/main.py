@@ -3,6 +3,26 @@ LiveKit Agent for Startblock Onboarding
 Handles voice conversations with users during codebase onboarding.
 """
 
+# #region agent log
+import json
+import time
+def log_agent(message, data=None, hypothesis_id=None, location=None):
+    log_entry = {
+        "timestamp": int(time.time() * 1000),
+        "location": location or "sb-cli/agent/main.py",
+        "message": message,
+        "data": data or {},
+        "sessionId": "debug-session",
+        "runId": "run1",
+        "hypothesisId": hypothesis_id
+    }
+    try:
+        with open("/Users/salif/Documents/floreo-labs/startblock/.cursor/debug.log", "a") as f:
+            f.write(json.dumps(log_entry) + "\n")
+    except:
+        pass
+# #endregion
+
 import asyncio
 import os
 import json
@@ -52,9 +72,17 @@ class OnboardingAgent(VoiceAgent):
     """Voice agent that guides users through codebase onboarding."""
 
     def __init__(self, *, repo_root: str):
+        # #region agent log
+        log_agent("OnboardingAgent initialized", {"repo_root": repo_root}, "A")
+        print(f"[DEBUG] [HYPOTHESIS A] OnboardingAgent initialized with repo_root: {repo_root}")
+        # #endregion
         self.room = None
         self.repo_root = repo_root
         self.onboarding_session = load_session(repo_root)
+        # #region agent log
+        log_agent("Session loaded", {"session_found": bool(self.onboarding_session), "user_name": self.onboarding_session.get("userName") if self.onboarding_session else None}, "D")
+        print(f"[DEBUG] [HYPOTHESIS D] Session loaded: {bool(self.onboarding_session)}. User: {self.onboarding_session.get('userName') if self.onboarding_session else None}")
+        # #endregion
         self.current_file_index = 0
         
         # Load all available context
@@ -246,6 +274,9 @@ Keep it celebratory but brief (2-3 sentences)."""
             if selected_files:
                 first_file = selected_files[0]
                 first_file_knowledge = get_context_for_file(self.repo_root, first_file)
+                # #region agent log
+                log_agent("Greeting context", {"first_file": first_file, "knowledge_len": len(first_file_knowledge) if first_file_knowledge else 0, "knowledge_preview": first_file_knowledge[:100] if first_file_knowledge else None}, "B")
+                # #endregion
                 print(f"[DEBUG] First file: {first_file}")
                 print(f"[DEBUG] Knowledge found: {bool(first_file_knowledge and 'No knowledge' not in first_file_knowledge)}")
                 
@@ -266,6 +297,11 @@ Keep it celebratory but brief (2-3 sentences)."""
             first_file=first_file,
             first_file_knowledge=first_file_knowledge,
         )
+        
+        # #region agent log
+        log_agent("Greeting prompt built", {"prompt_preview": greeting_prompt[:500]}, "C")
+        print(f"[DEBUG] [HYPOTHESIS C] Built greeting prompt (preview): {greeting_prompt[:300]}...")
+        # #endregion
         
         print(f"[DEBUG] User: {user_name}, Goal: {goal}")
         print(f"[DEBUG] First file to discuss: {first_file}")

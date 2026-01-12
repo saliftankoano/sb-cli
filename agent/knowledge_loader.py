@@ -2,6 +2,26 @@
 Load and format knowledge files for the agent's context.
 """
 
+# #region agent log
+import json
+import time
+def log_agent(message, data=None, hypothesis_id=None, location=None):
+    log_entry = {
+        "timestamp": int(time.time() * 1000),
+        "location": location or "sb-cli/agent/knowledge_loader.py",
+        "message": message,
+        "data": data or {},
+        "sessionId": "debug-session",
+        "runId": "run1",
+        "hypothesisId": hypothesis_id
+    }
+    try:
+        with open("/Users/salif/Documents/floreo-labs/startblock/.cursor/debug.log", "a") as f:
+            f.write(json.dumps(log_entry) + "\n")
+    except:
+        pass
+# #endregion
+
 import os
 import json
 from pathlib import Path
@@ -176,6 +196,11 @@ def load_knowledge_file(knowledge_dir: Path, file_path: str) -> Optional[Dict]:
     """Load a single knowledge file and parse its content."""
     knowledge_file = knowledge_dir / f"{file_path}.md"
     
+    # #region agent log
+    log_agent("Attempting to load knowledge", {"expected_path": str(knowledge_file), "exists": knowledge_file.exists()}, "B")
+    print(f"[DEBUG] [HYPOTHESIS B] Attempting to load knowledge for {file_path} at {knowledge_file}. Exists: {knowledge_file.exists()}")
+    # #endregion
+
     if not knowledge_file.exists():
         return None
     

@@ -1,50 +1,42 @@
 ---
 filePath: agent/knowledge_loader.py
-fileVersion: 58f84348b1e49d79670af734ad811a0504f9e922
-lastUpdated: '2025-12-17T01:33:56.187Z'
+fileVersion: 0f6c7a202946c89ca89cbdaa6a1d864ead62c9e1
+lastUpdated: '2026-01-12T00:05:33.375Z'
 updatedBy: sb-cli
 tags:
   - agent
   - python
-  - new
 importance: low
 extractedBy: sb-cli@1.0.0
 model: gpt-4o-mini
 humanVerified: false
 feature: knowledge-loader
-featureRole: service
+featureRole: helper
 userFlows:
-  - User can access onboarding documents
-  - User can view a summary of system features
-  - User can retrieve detailed knowledge about specific files
+  - User can load knowledge files for the agent
+  - User can debug knowledge loading issues
+  - User can access formatted knowledge context for files
 relatedFiles:
-  - frontmatter.py
+  - frontmatter
+  - os
+  - json
+  - pathlib
 ---
-# Knowledge Loader Documentation
-
 ## Purpose
-This file is responsible for loading and formatting knowledge files and onboarding documents for an agent's context, enabling better user interaction.
+Load and format knowledge files for the agent's context, while providing logging for debugging purposes.
 
-## Key Functionality
-- `load_features(repo_root: str)`: Loads system features from `features.json`.
-- `load_onboarding_doc(repo_root: str, doc_name: str)`: Loads specific onboarding documents like `INDEX.md` or `SETUP.md`.
-- `get_onboarding_context(repo_root: str)`: Aggregates multiple onboarding documents into a single dictionary.
-- `format_features_summary(features: List[Dict])`: Formats a summary of features for display.
-- `load_session(repo_root: str)`: Loads the most recent onboarding session data.
-- `load_knowledge_file(knowledge_dir: Path, file_path: str)`: Loads and parses a knowledge file, extracting sections based on headers.
+## Problem
+Prior to this implementation, there was no mechanism to log attempts to load knowledge files, making it difficult to diagnose issues related to file accessibility or existence. This lack of visibility could lead to confusion when knowledge files were missing or incorrectly referenced, hindering the agent's functionality.
 
-## Gotchas
-- The fallback mechanism for the 'frontmatter' library is crucial; if it's not available, the code manually parses frontmatter, which may lead to inconsistencies if the format is not adhered to.
-- Error handling is implemented throughout, but it primarily logs errors without halting execution, which could lead to silent failures if not monitored.
-- The session loading mechanism sorts session files by modification time, which assumes that the most recent session is always the most relevant, potentially overlooking other important sessions.
-- The method for extracting sections from markdown content relies on regex, which may fail if the markdown structure is not strictly followed, leading to missing information.
+## Solution
+This file introduces a logging function, `log_agent`, which records attempts to load knowledge files along with relevant metadata such as timestamps and file paths. The logging occurs before the loading process, allowing developers to see exactly what the system is trying to access. Additionally, the file maintains its core functionality of loading and formatting knowledge files, ensuring that the agent can still retrieve necessary information while providing enhanced debugging capabilities.
 
-## Dependencies
-- The `frontmatter` library is used for parsing markdown files with frontmatter; if unavailable, a manual parsing method is implemented as a fallback.
+## Impact
+With the introduction of logging, developers can now easily trace and debug issues related to knowledge file loading. This improvement enhances the overall maintainability of the system, allowing for quicker identification of problems. Users benefit indirectly as the agent becomes more reliable in accessing and utilizing knowledge files, leading to a smoother user experience.
 
 ## Architecture Context
-This file fits into the larger system by providing the necessary context and documentation for the agent, allowing it to interact intelligently based on the loaded knowledge and onboarding materials.
+This file is part of the agent's knowledge management system, which interacts with various knowledge files stored in a specific directory. It relies on the presence of these files to provide context and insights to the agent. The logging mechanism integrates seamlessly into the existing flow of loading knowledge, ensuring that all attempts are recorded without disrupting the primary functionality.
 
-## Implementation Notes
-- The file uses a structured approach to load and format various documents, ensuring that the agent has access to relevant information.
-- Performance considerations include the sorting of session files, which could impact loading times if there are many sessions. The regex used for section extraction should be tested against various markdown formats to ensure robustness.
+## Gotchas (If Applicable)
+- The logging function will fail silently if there are issues with the log file path, which may lead to a lack of logs when debugging.
+- Ensure that the log file is managed properly to prevent excessive growth, which could impact performance and readability.
