@@ -143,15 +143,16 @@ class OnboardingAgent(VoiceAgent):
             "path": file_path
         }).encode("utf-8")
         
+        print(f"[Agent] Requesting file content: {file_path}")
         await self.room.local_participant.publish_data(
             payload=payload,
             reliable=True,
-            topic="server-context"
+            topic="agent-commands"
         )
         
         try:
             # Wait for response with timeout
-            return await asyncio.wait_for(future, timeout=5.0)
+            return await asyncio.wait_for(future, timeout=3.0)
         except asyncio.TimeoutError:
             print(f"[Agent] Timeout requesting file: {file_path}")
             if request_id in self.context._pending_requests:
@@ -173,10 +174,15 @@ class OnboardingAgent(VoiceAgent):
         # Use current file context from store if it matches
         file_knowledge = None
         current_feature = None
+        current_file_content = None
         
         if current_file_path:
             file_knowledge = self.context.knowledge_files.get(current_file_path)
             current_feature = get_feature_for_file(self.context.features, current_file_path)
+            
+            # If the current_file in context matches the one we want, use its data
+            if self.context.current_file and self.context.current_file.get("path") == current_file_path:
+                current_file_content = self.context.current_file.get("content")
 
         new_instructions = build_system_prompt(
             user_name=self.context.session.get("userName"),
@@ -189,6 +195,7 @@ class OnboardingAgent(VoiceAgent):
             total_steps=len(selected_files),
             features_summary=self.context.features_summary,
             current_feature=current_feature,
+            current_file_content=current_file_content,
             architecture_doc=None, 
             setup_doc=None,
             tasks_doc=None,

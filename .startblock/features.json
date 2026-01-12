@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-01-12T21:47:51.679Z",
+  "lastUpdated": "2026-01-12T22:13:27.199Z",
   "features": [
     {
       "id": "startblock-onboarding",
@@ -240,11 +240,14 @@
         "User can navigate through files and features with voice prompts",
         "User can receive personalized onboarding guidance while exploring the codebase.",
         "User can navigate through files with contextual assistance from the agent.",
-        "User can interact with the onboarding agent using voice commands."
+        "User can interact with the onboarding agent using voice commands.",
+        "User can navigate through codebase files using voice commands",
+        "User receives personalized onboarding instructions based on their current context",
+        "User can ask questions and receive guidance about specific files"
       ],
-      "mermaidDiagram": "flowchart TD\n  Start([Onboarding Agent])\n  onboarding_agent_1[User can receive personalized onboarding guidan...]\n  onboarding_agent_2[User can navigate through files with contextual...]\n  onboarding_agent_3[User can interact with the onboarding agent usi...]\n  Start --> onboarding_agent_1\n  onboarding_agent_1 --> onboarding_agent_2\n  onboarding_agent_2 --> onboarding_agent_3\n  onboarding_agent_3 --> End([Complete])\n",
-      "mermaidJourney": "journey\n  title Onboarding Agent\n  section User Actions\n    User can receive personalized onboard...: 3: User\n    User can navigate through files with ...: 3: User\n    User can interact with the onboarding...: 3: User\n",
-      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant agent/main.py as agent/main.py\n    participant ...at_features_summary.py as ...at_features_summary.py\n    participant ...build_system_prompt.py as ...build_system_prompt.py\n    participant ...ild_greeting_prompt.py as ...ild_greeting_prompt.py\n    participant ...d_transition_prompt.py as ...d_transition_prompt.py\n    participant ...nds/NavigateCommand.py as ...nds/NavigateCommand.py\n    participant ...nds/ShowFileCommand.py as ...nds/ShowFileCommand.py\n    participant ...s/serialize_command.py as ...s/serialize_command.py\n    User->>agent/main.py: User can receive personalized onboarding guidan...\n    agent/main.py->>...at_features_summary.py: process\n    ...at_features_summary.py->>...build_system_prompt.py: process\n    ...build_system_prompt.py->>...ild_greeting_prompt.py: process\n    ...ild_greeting_prompt.py->>...d_transition_prompt.py: process\n    ...d_transition_prompt.py->>...nds/NavigateCommand.py: process\n    ...nds/NavigateCommand.py->>...nds/ShowFileCommand.py: process\n    ...nds/ShowFileCommand.py->>...s/serialize_command.py: process\n    agent/main.py->>...at_features_summary.py: process\n    ...at_features_summary.py->>...build_system_prompt.py: process\n    ...build_system_prompt.py->>...ild_greeting_prompt.py: process\n    ...ild_greeting_prompt.py->>...d_transition_prompt.py: process\n    ...d_transition_prompt.py->>...nds/NavigateCommand.py: process\n    ...nds/NavigateCommand.py->>...nds/ShowFileCommand.py: process\n    ...nds/ShowFileCommand.py->>...s/serialize_command.py: process\n    agent/main.py->>...at_features_summary.py: process\n    ...at_features_summary.py->>...build_system_prompt.py: process\n    ...build_system_prompt.py->>...ild_greeting_prompt.py: process\n    ...ild_greeting_prompt.py->>...d_transition_prompt.py: process\n    ...d_transition_prompt.py->>...nds/NavigateCommand.py: process\n    ...nds/NavigateCommand.py->>...nds/ShowFileCommand.py: process\n    ...nds/ShowFileCommand.py->>...s/serialize_command.py: process\n",
+      "mermaidDiagram": "flowchart TD\n  Start([Onboarding Agent])\n  onboarding_agent_1[User can navigate through codebase files using ...]\n  onboarding_agent_2[User receives personalized onboarding instructi...]\n  onboarding_agent_3[User can ask questions and receive guidance abo...]\n  Start --> onboarding_agent_1\n  onboarding_agent_1 --> onboarding_agent_2\n  onboarding_agent_2 --> onboarding_agent_3\n  onboarding_agent_3 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title Onboarding Agent\n  section User Actions\n    User can navigate through codebase fi...: 3: User\n    User receives personalized onboarding...: 3: User\n    User can ask questions and receive gu...: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant agent/main.py as agent/main.py\n    participant ...at_features_summary.py as ...at_features_summary.py\n    participant ...et_feature_for_file.py as ...et_feature_for_file.py\n    participant ...build_system_prompt.py as ...build_system_prompt.py\n    participant ...ild_greeting_prompt.py as ...ild_greeting_prompt.py\n    participant ...d_transition_prompt.py as ...d_transition_prompt.py\n    participant ...nds/NavigateCommand.py as ...nds/NavigateCommand.py\n    participant ...nds/ShowFileCommand.py as ...nds/ShowFileCommand.py\n    User->>agent/main.py: User can navigate through codebase files using ...\n    agent/main.py->>...at_features_summary.py: process\n    ...at_features_summary.py->>...et_feature_for_file.py: process\n    ...et_feature_for_file.py->>...build_system_prompt.py: process\n    ...build_system_prompt.py->>...ild_greeting_prompt.py: process\n    ...ild_greeting_prompt.py->>...d_transition_prompt.py: process\n    ...d_transition_prompt.py->>...nds/NavigateCommand.py: process\n    ...nds/NavigateCommand.py->>...nds/ShowFileCommand.py: process\n    ...nds/ShowFileCommand.py->>...s/serialize_command.py: process\n    agent/main.py->>...at_features_summary.py: process\n    ...at_features_summary.py->>...et_feature_for_file.py: process\n    ...et_feature_for_file.py->>...build_system_prompt.py: process\n    ...build_system_prompt.py->>...ild_greeting_prompt.py: process\n    ...ild_greeting_prompt.py->>...d_transition_prompt.py: process\n    ...d_transition_prompt.py->>...nds/NavigateCommand.py: process\n    ...nds/NavigateCommand.py->>...nds/ShowFileCommand.py: process\n    ...nds/ShowFileCommand.py->>...s/serialize_command.py: process\n    agent/main.py->>...at_features_summary.py: process\n    ...at_features_summary.py->>...et_feature_for_file.py: process\n    ...et_feature_for_file.py->>...build_system_prompt.py: process\n    ...build_system_prompt.py->>...ild_greeting_prompt.py: process\n    ...ild_greeting_prompt.py->>...d_transition_prompt.py: process\n    ...d_transition_prompt.py->>...nds/NavigateCommand.py: process\n    ...nds/NavigateCommand.py->>...nds/ShowFileCommand.py: process\n    ...nds/ShowFileCommand.py->>...s/serialize_command.py: process\n",
       "files": [
         "agent/main.py",
         "knowledge_loader.py",
@@ -606,6 +609,39 @@
         "User can interact with the onboarding agent using voice commands.": [
           "agent/main.py",
           "knowledge_loader/format_features_summary.py",
+          "prompts/build_system_prompt.py",
+          "prompts/build_greeting_prompt.py",
+          "prompts/build_transition_prompt.py",
+          "commands/NavigateCommand.py",
+          "commands/ShowFileCommand.py",
+          "commands/serialize_command.py"
+        ],
+        "User can navigate through codebase files using voice commands": [
+          "agent/main.py",
+          "knowledge_loader/format_features_summary.py",
+          "knowledge_loader/get_feature_for_file.py",
+          "prompts/build_system_prompt.py",
+          "prompts/build_greeting_prompt.py",
+          "prompts/build_transition_prompt.py",
+          "commands/NavigateCommand.py",
+          "commands/ShowFileCommand.py",
+          "commands/serialize_command.py"
+        ],
+        "User receives personalized onboarding instructions based on their current context": [
+          "agent/main.py",
+          "knowledge_loader/format_features_summary.py",
+          "knowledge_loader/get_feature_for_file.py",
+          "prompts/build_system_prompt.py",
+          "prompts/build_greeting_prompt.py",
+          "prompts/build_transition_prompt.py",
+          "commands/NavigateCommand.py",
+          "commands/ShowFileCommand.py",
+          "commands/serialize_command.py"
+        ],
+        "User can ask questions and receive guidance about specific files": [
+          "agent/main.py",
+          "knowledge_loader/format_features_summary.py",
+          "knowledge_loader/get_feature_for_file.py",
           "prompts/build_system_prompt.py",
           "prompts/build_greeting_prompt.py",
           "prompts/build_transition_prompt.py",
@@ -3180,6 +3216,39 @@
           "commands/NavigateCommand.py",
           "commands/ShowFileCommand.py",
           "commands/serialize_command.py"
+        ]
+      },
+      "dependencies": [],
+      "tags": [
+        "agent",
+        "python"
+      ]
+    },
+    {
+      "id": "agent-prompts",
+      "name": "Agent Prompts",
+      "description": "",
+      "category": "Services",
+      "userFlows": [
+        "User can receive personalized onboarding prompts based on their context",
+        "User can view relevant source code snippets during onboarding",
+        "User can smoothly transition between files with contextual guidance"
+      ],
+      "mermaidDiagram": "flowchart TD\n  Start([Agent Prompts])\n  agent_prompts_1[User can receive personalized onboarding prompt...]\n  agent_prompts_2[User can view relevant source code snippets dur...]\n  agent_prompts_3[User can smoothly transition between files with...]\n  Start --> agent_prompts_1\n  agent_prompts_1 --> agent_prompts_2\n  agent_prompts_2 --> agent_prompts_3\n  agent_prompts_3 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title Agent Prompts\n  section User Actions\n    User can receive personalized onboard...: 3: User\n    User can view relevant source code sn...: 3: User\n    User can smoothly transition between ...: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant agent/prompts.py as agent/prompts.py\n    User->>agent/prompts.py: User can receive personalized onboarding prompt...\n",
+      "files": [
+        "agent/prompts.py"
+      ],
+      "filesByAction": {
+        "User can receive personalized onboarding prompts based on their context": [
+          "agent/prompts.py"
+        ],
+        "User can view relevant source code snippets during onboarding": [
+          "agent/prompts.py"
+        ],
+        "User can smoothly transition between files with contextual guidance": [
+          "agent/prompts.py"
         ]
       },
       "dependencies": [],

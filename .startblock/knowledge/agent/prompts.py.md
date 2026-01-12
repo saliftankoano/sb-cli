@@ -1,46 +1,38 @@
 ---
 filePath: agent/prompts.py
-fileVersion: 58f84348b1e49d79670af734ad811a0504f9e922
-lastUpdated: '2025-12-17T01:33:56.188Z'
+fileVersion: 0f6c7a202946c89ca89cbdaa6a1d864ead62c9e1
+lastUpdated: '2026-01-12T22:13:27.198Z'
 updatedBy: sb-cli
 tags:
   - agent
   - python
-  - new
 importance: low
 extractedBy: sb-cli@1.0.0
 model: gpt-4o-mini
 humanVerified: false
-feature: onboarding-agent
+feature: agent-prompts
 featureRole: helper
 userFlows:
-  - User can receive personalized onboarding prompts
-  - User can understand codebase structure through guided prompts
-  - User can transition smoothly between different files during onboarding
+  - User can receive personalized onboarding prompts based on their context
+  - User can view relevant source code snippets during onboarding
+  - User can smoothly transition between files with contextual guidance
 relatedFiles: []
 ---
 ## Purpose
-This file defines system prompts for an onboarding agent, enabling dynamic and context-aware interactions with users as they navigate a codebase.
+This file generates system prompts for an onboarding agent, helping users navigate and understand a codebase effectively.
 
-## Key Functionality
-- `make_speakable_path(file_path: str) -> str`: Converts file paths into a TTS-friendly format, making them easier to articulate.
-- `build_system_prompt(...) -> str`: Constructs a detailed system prompt for the onboarding agent, incorporating user-specific context and journey information.
-- `build_greeting_prompt(...) -> str`: Generates an initial greeting prompt tailored to the user’s goal and experience level.
-- `build_transition_prompt(...) -> str`: Creates a prompt for transitioning between files, maintaining a conversational flow.
-- `_truncate_section(content: str, max_chars: int) -> str`: Truncates long content while preserving whole lines for better readability.
+## Problem
+Before this file, onboarding new developers to a codebase was often inconsistent and lacked personalization. New users struggled to grasp the context of files and their relevance to their learning goals, leading to confusion and slower onboarding processes.
 
-## Gotchas
-- The `make_speakable_path` function assumes that file paths will always contain a filename and may return unexpected results if the input is malformed (e.g., empty strings or paths without a filename).
-- The optional parameters in `build_system_prompt` can lead to incomplete prompts if not provided correctly; developers should ensure they are passing the necessary context.
-- The `_truncate_section` function may truncate important context if the content is too long, potentially leading to misunderstandings if the truncated content is critical for comprehension.
+## Solution
+This file addresses the onboarding challenge by creating dynamic prompts that incorporate user-specific information such as their name, experience level, and current file context. It uses functions to build prompts that guide users through the codebase, providing explanations, context, and even raw file content when available. This tailored approach enhances user engagement and understanding.
 
-## Dependencies
-The file relies on standard Python typing for type hints, which aids in code clarity and helps developers understand expected input and output types.
+## Impact
+With this file, users can receive personalized guidance as they explore the codebase, significantly improving their onboarding experience. Developers can now learn at their own pace, with prompts that adapt to their journey, making it easier to connect concepts and files. This leads to faster ramp-up times and a more effective learning process.
 
 ## Architecture Context
-This file plays a crucial role in the onboarding feature by generating prompts that guide users through understanding the codebase, thus enhancing the overall user experience during onboarding.
+This file is part of the agent system that interacts with users during their onboarding journey. It integrates with other components that manage user data and file knowledge, ensuring that prompts are relevant and contextually aware. The flow of information is designed to be seamless, allowing for a smooth user experience as they transition between different parts of the codebase.
 
-## Implementation Notes
-- The conversational tone of the prompts is intentional to create a welcoming environment for users, especially beginners.
-- Careful attention is given to how file names are articulated to ensure clarity when using TTS, which is a key aspect of the user interaction model.
-- The design allows for extensibility, as additional context can be added to prompts without significant changes to the core logic, making it adaptable for future requirements.
+## Gotchas (If Applicable)
+- Ensure that the current file content is accurately passed to the prompt builder; otherwise, users may miss out on critical context.
+- The truncation logic in the `_truncate_section` function may lead to incomplete information if not handled carefully, especially for larger documents.

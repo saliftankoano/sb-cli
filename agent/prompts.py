@@ -56,6 +56,7 @@ def build_system_prompt(
     total_steps: int = 0,
     features_summary: Optional[str] = None,
     current_feature: Optional[Dict] = None,
+    current_file_content: Optional[str] = None,
     architecture_doc: Optional[str] = None,
     setup_doc: Optional[str] = None,
     tasks_doc: Optional[str] = None,
@@ -119,6 +120,15 @@ This file is part of the **{current_feature.get('name', 'Unknown')}** feature.
             prompt += f"""
 ### What We Know About This File:
 {_truncate_section(file_knowledge, 800)}
+"""
+
+        # Add raw file content if available
+        if current_file_content:
+            prompt += f"""
+### Source Code Preview:
+```
+{_truncate_section(current_file_content, 2000)}
+```
 """
 
     # Add journey context
