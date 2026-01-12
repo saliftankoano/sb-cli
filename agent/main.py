@@ -328,7 +328,10 @@ async def entrypoint(ctx: JobContext):
         print(f"[Agent] FINAL ROOM MEMBERS: {[p.identity for p in ctx.room.remote_participants.values()]}")
         print("[Agent] Falling back to generic mode.")
 
-    agent.session = await agent.start(ctx.room)
+    # Start the agent session
+    print("[Agent] Starting session...")
+    agent.session = AgentSession(agent)
+    await agent.session.start(ctx.room)
     
     # Listen for transcription for navigation
     @agent.session.on("user_input_transcribed")

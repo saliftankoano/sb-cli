@@ -82,43 +82,68 @@ export function useAgentCommands(): UseAgentCommandsReturn {
           });
 
           if (session) {
-            const knowledgeMap: Record<string, string> = {};
-            knowledgeFiles.forEach((k) => {
-              knowledgeMap[k.sourceFile] = k.content.raw;
-            });
-
-            let currentFile = undefined;
-            if (session.selectedFiles.length > 0) {
-              console.log(
-                `[ContextBridge] Fetching content for first file: ${session.selectedFiles[0]}`
-              );
-              const fileData = await fetchFileContent(session.selectedFiles[0]);
-              currentFile = {
-                path: session.selectedFiles[0],
-                content: fileData.content,
-                knowledge: knowledgeMap[session.selectedFiles[0]],
-                totalLines: fileData.totalLines,
-              };
-            }
-
-            const context = {
+            // 1. Send the base context (session + features) - this should be small
+            const baseContext = {
               type: "onboarding-context",
               session,
               features: features.features,
-              knowledgeFiles: knowledgeMap,
-              currentFile,
+              knowledgeFiles: {}, // We'll push these individually
+              currentFile: undefined, // We'll push this next
             };
 
-            const payload = new TextEncoder().encode(JSON.stringify(context));
+            const basePayload = new TextEncoder().encode(
+              JSON.stringify(baseContext)
+            );
             console.warn(
-              `[ContextBridge] SENDING PAYLOAD to ${participant.identity}. Size: ${payload.length} bytes`
+              `[ContextBridge] SENDING BASE CONTEXT to ${participant.identity}. Size: ${basePayload.length} bytes`
             );
 
-            await send(payload, {
+            await send(basePayload, {
               reliable: true,
               destinationIdentities: [participant.identity],
             });
+
+            // 2. Send the first file's content
+            if (session.selectedFiles.length > 0) {
+              const firstFilePath = session.selectedFiles[0];
+              console.log(
+                `[ContextBridge] Fetching content for first file: ${firstFilePath}`
+              );
+              const fileData = await fetchFileContent(firstFilePath);
+
+              // Find knowledge for this file if it exists
+              const knowledge = knowledgeFiles.find(
+                (k) => k.sourceFile === firstFilePath
+              );
+
+              const fileContext = {
+                type: "file-content",
+                path: firstFilePath,
+                content: fileData.content,
+                knowledge: knowledge?.content?.raw,
+                totalLines: fileData.totalLines,
+              };
+
+              const filePayload = new TextEncoder().encode(
+                JSON.stringify(fileContext)
+              );
+              console.log(
+                `[ContextBridge] SENDING FIRST FILE to ${participant.identity}. Size: ${filePayload.length} bytes`
+              );
+
+              await send(filePayload, {
+                reliable: true,
+                destinationIdentities: [participant.identity],
+              });
+            }
+
+            // 3. Optional: Push knowledge file map in small chunks or individually if needed
+            // For now, let's just push the knowledge for the first file.
+            // The agent can request other files as it navigates.
+
             console.warn("[ContextBridge] PUSH SUCCESSFUL");
+          } else {
+            console.warn("[ContextBridge] No session found, skipping context push");
           }
         } catch (err) {
           console.error("[ContextBridge] PUSH FAILED:", err);
