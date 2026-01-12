@@ -77,7 +77,19 @@ export function useAgentCommands(): UseAgentCommandsReturn {
         );
         try {
           // #region debug log
-          fetch('http://127.0.0.1:7243/ingest/7bdaa666-6bb7-4671-81bb-23ccffbde6dd',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'useAgentCommands.ts:79',message:'Fetching local data',sessionId:'debug-session',hypothesisId:'A'})}).catch(()=>{});
+          fetch(
+            "http://127.0.0.1:7243/ingest/7bdaa666-6bb7-4671-81bb-23ccffbde6dd",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                location: "useAgentCommands.ts:79",
+                message: "Fetching local data",
+                sessionId: "debug-session",
+                hypothesisId: "A",
+              }),
+            }
+          ).catch(() => {});
           // #endregion
           const [session, features, knowledgeFiles] = await Promise.all([
             fetchSession(),
@@ -86,7 +98,24 @@ export function useAgentCommands(): UseAgentCommandsReturn {
           ]);
 
           // #region debug log
-          fetch('http://127.0.0.1:7243/ingest/7bdaa666-6bb7-4671-81bb-23ccffbde6dd',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'useAgentCommands.ts:84',message:'Data fetched',data:{hasSession:!!session,featuresCount:features?.features?.length,knowledgeCount:knowledgeFiles?.length},sessionId:'debug-session',hypothesisId:'A'})}).catch(()=>{});
+          fetch(
+            "http://127.0.0.1:7243/ingest/7bdaa666-6bb7-4671-81bb-23ccffbde6dd",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                location: "useAgentCommands.ts:84",
+                message: "Data fetched",
+                data: {
+                  hasSession: !!session,
+                  featuresCount: features?.features?.length,
+                  knowledgeCount: knowledgeFiles?.length,
+                },
+                sessionId: "debug-session",
+                hypothesisId: "A",
+              }),
+            }
+          ).catch(() => {});
           // #endregion
 
           console.log("[ContextBridge] Local data fetched", {
@@ -94,7 +123,7 @@ export function useAgentCommands(): UseAgentCommandsReturn {
           });
 
           if (session) {
-            // 1. Send the base context (session info only) - keep it minimal
+            console.warn("[ContextBridge-V4] Preparing payload...");
             const baseContext = {
               type: "onboarding-context",
               session: {
@@ -103,27 +132,32 @@ export function useAgentCommands(): UseAgentCommandsReturn {
                 experienceLevel: session.experienceLevel,
                 selectedFiles: session.selectedFiles,
               },
-              features: [], // We'll push these next
+              features: [],
               knowledgeFiles: {},
               currentFile: undefined,
             };
 
-            const basePayload = new TextEncoder().encode(
-              JSON.stringify(baseContext)
-            );
-
-            // #region debug log
-            fetch('http://127.0.0.1:7243/ingest/7bdaa666-6bb7-4671-81bb-23ccffbde6dd',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'useAgentCommands.ts:107',message:'Base context size',data:{size:basePayload.length,context:baseContext},sessionId:'debug-session',hypothesisId:'A'})}).catch(()=>{});
-            // #endregion
+            const fullStr = JSON.stringify(baseContext);
+            const basePayload = new TextEncoder().encode(fullStr);
 
             console.warn(
-              `[ContextBridge] SENDING BASE CONTEXT to ${participant.identity}. Size: ${basePayload.length} bytes`
+              `[ContextBridge-V4] PAYLOAD SIZE: ${basePayload.length} bytes`
             );
+
+            if (basePayload.length > 60000) {
+              console.error("[ContextBridge-V4] PAYLOAD TOO LARGE!", {
+                userName: session.userName?.length,
+                goal: session.goal?.length,
+                selectedFilesCount: session.selectedFiles?.length,
+                fullPayloadPreview: fullStr.slice(0, 1000),
+              });
+            }
 
             await send(basePayload, {
               reliable: true,
               destinationIdentities: [participant.identity],
             });
+            console.warn("[ContextBridge-V4] Base context SENT");
 
             // 2. Send features in a separate message
             const strippedFeatures = features.features.map((f: any) => ({

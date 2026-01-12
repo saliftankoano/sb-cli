@@ -294,7 +294,12 @@ async def entrypoint(ctx: JobContext):
     
     # Listen for context messages from local server
     @ctx.room.on("data_received")
-    def on_data(payload: bytes, participant: Any, kind: Any, topic: str):
+    def on_data(packet: Any):
+        # The SDK version on Railway passes a single DataPacket object
+        payload = packet.data
+        topic = packet.topic
+        participant = packet.participant
+        
         p_identity = participant.identity if participant else 'unknown'
         print(f"[Agent] DATA RECEIVED | Topic: {topic} | From: {p_identity} | Size: {len(payload)} bytes")
         

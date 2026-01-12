@@ -1,7 +1,7 @@
 ---
 filePath: ui/src/hooks/useAgentCommands.ts
-fileVersion: c1df2113c344b329032d9e7a3d0a38f14a32fdfe
-lastUpdated: '2026-01-12T11:09:49.466Z'
+fileVersion: 07023b8c98d540ba1d3fb47310348e9b8e5fd98c
+lastUpdated: '2026-01-12T11:21:57.996Z'
 updatedBy: sb-cli
 tags:
   - ui
@@ -15,28 +15,28 @@ humanVerified: false
 feature: agent-commands
 featureRole: helper
 userFlows:
-  - Agent can receive context data upon joining a session
-  - Agent can request specific file contents during collaboration
-  - Agent can view features and guided states based on commands
+  - Agent can receive context data upon joining a room
+  - Agent can execute commands to show files or request file content
+  - Agent can receive real-time updates about the session and features
 relatedFiles:
-  - lib/api.ts
-  - components/GuidedView.ts
+  - '@/components/GuidedView'
+  - '@/lib/api'
 ---
 ## Purpose
-This file defines a custom React hook that manages agent commands and context data in a collaborative environment using LiveKit.
+This file provides a custom hook for managing agent commands and context in a collaborative application, facilitating communication between the application and agent participants.
 
 ## Problem
-Before this file, there was no structured way to manage the context and commands for agent participants in a collaborative session. Agents needed relevant session data and commands to interact effectively, but the existing architecture lacked a mechanism to push this information dynamically.
+In a collaborative environment, agents need to receive relevant context and commands to assist users effectively. Before this file, there was no structured way to manage and send this information to agents, leading to potential confusion and inefficiencies in agent interactions.
 
 ## Solution
-The `useAgentCommands` hook addresses this by leveraging LiveKit's data channels to send context data and handle commands from agents. It listens for participant connections, checks their identities to determine if they are agents, and pushes relevant session information, features, and file contents to them. The use of async functions and React state management ensures that updates are handled efficiently.
+The `useAgentCommands` hook fetches session data, features, and knowledge files, then sends this information to agents as they join the room. It uses a data channel to listen for commands from agents and updates the application state accordingly. The implementation includes debug logging for monitoring data flow and payload sizes to ensure efficient communication.
 
 ## Impact
-With this implementation, agents can now receive real-time updates about their session context, including features and file contents, which enhances their ability to make informed decisions during collaboration. This leads to a more interactive and responsive user experience.
+With this file, agents can receive real-time context and commands, enabling them to assist users more effectively. This improves the overall user experience by ensuring that agents have the necessary information at their fingertips, leading to better interaction outcomes.
 
 ## Architecture Context
-This hook integrates with LiveKit's participant management and data channels. It fetches session data, features, and knowledge files from the API and sends them to agents as they connect to the room. The data flow is initiated upon participant connection and is maintained through periodic checks for new agents.
+This hook integrates with the LiveKit library for real-time communication, relying on the `useRoomContext` and `useDataChannel` hooks. It fetches data from the API and sends it over a data channel to identified agent participants, ensuring a smooth flow of information.
 
 ## Gotchas (If Applicable)
-- The debug logging added for tracking context pushes may affect performance if left in production, as it introduces additional network requests.
-- The agent detection logic is permissive, which could lead to false positives if the participant identities are not well-defined, potentially causing missed context pushes.
+- The payload size is monitored, and if it exceeds 60,000 bytes, an error is logged. This is important to prevent issues with data transmission.
+- The hook handles potential errors in fetching data and sending messages, which is crucial for maintaining a robust communication system with agents.
