@@ -1,7 +1,7 @@
 ---
 filePath: ui/src/hooks/useAgentCommands.ts
-fileVersion: 07023b8c98d540ba1d3fb47310348e9b8e5fd98c
-lastUpdated: '2026-01-12T11:21:57.996Z'
+fileVersion: 03fe4ddce2f75c83267bce483ab0b1b19aa5ced5
+lastUpdated: '2026-01-12T21:47:51.675Z'
 updatedBy: sb-cli
 tags:
   - ui
@@ -15,28 +15,28 @@ humanVerified: false
 feature: agent-commands
 featureRole: helper
 userFlows:
-  - Agent can receive context data upon joining a room
-  - Agent can execute commands to show files or request file content
-  - Agent can receive real-time updates about the session and features
+  - Agent can receive onboarding context when joining a session
+  - Agent can request specific file content from the application
+  - Agent can view relevant features and knowledge files dynamically
 relatedFiles:
-  - '@/components/GuidedView'
-  - '@/lib/api'
+  - lib/api.ts
+  - components/GuidedView.ts
 ---
 ## Purpose
-This file provides a custom hook for managing agent commands and context in a collaborative application, facilitating communication between the application and agent participants.
+This file defines a custom hook that manages agent commands and context within a collaborative environment, facilitating communication between agents and the application.
 
 ## Problem
-In a collaborative environment, agents need to receive relevant context and commands to assist users effectively. Before this file, there was no structured way to manage and send this information to agents, leading to potential confusion and inefficiencies in agent interactions.
+Before this file, there was no structured way to manage interactions between agents and the application. Agents needed to receive context about the session, features, and files dynamically as they joined, which was not being handled efficiently. This led to confusion and potential miscommunication during collaborative sessions.
 
 ## Solution
-The `useAgentCommands` hook fetches session data, features, and knowledge files, then sends this information to agents as they join the room. It uses a data channel to listen for commands from agents and updates the application state accordingly. The implementation includes debug logging for monitoring data flow and payload sizes to ensure efficient communication.
+The `useAgentCommands` hook solves this problem by leveraging React's state management and effects to send context to agents when they join a room. It listens for participant connections, fetches necessary data (session, features, knowledge files), and sends this information as payloads to the agents. The hook also handles commands from agents, allowing them to request specific files or show content dynamically.
 
 ## Impact
-With this file, agents can receive real-time context and commands, enabling them to assist users more effectively. This improves the overall user experience by ensuring that agents have the necessary information at their fingertips, leading to better interaction outcomes.
+With this file, agents can now receive relevant context and commands in real-time, enhancing their ability to interact with the application effectively. This leads to a smoother onboarding experience and better collaboration, as agents can access the information they need without delays.
 
 ## Architecture Context
-This hook integrates with the LiveKit library for real-time communication, relying on the `useRoomContext` and `useDataChannel` hooks. It fetches data from the API and sends it over a data channel to identified agent participants, ensuring a smooth flow of information.
+This hook integrates with the LiveKit components for real-time communication and relies on API calls to fetch session data and files. It operates within a React component tree, making it easy to manage state and side effects related to agent interactions.
 
 ## Gotchas (If Applicable)
-- The payload size is monitored, and if it exceeds 60,000 bytes, an error is logged. This is important to prevent issues with data transmission.
-- The hook handles potential errors in fetching data and sending messages, which is crucial for maintaining a robust communication system with agents.
+- The agent detection logic is permissive, which could lead to false positives if participant identities are not carefully managed. Ensure that agent naming conventions are consistent to avoid misidentification.
+- The hook relies on the reliability of the data channel for message delivery; any issues in the network can affect the communication between agents and the application.

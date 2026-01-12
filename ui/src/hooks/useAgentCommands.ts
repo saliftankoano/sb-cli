@@ -76,54 +76,17 @@ export function useAgentCommands(): UseAgentCommandsReturn {
           "[ContextBridge] TARGET AGENT DETECTED! Starting context push..."
         );
         try {
-          // #region debug log
-          fetch(
-            "http://127.0.0.1:7243/ingest/7bdaa666-6bb7-4671-81bb-23ccffbde6dd",
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                location: "useAgentCommands.ts:79",
-                message: "Fetching local data",
-                sessionId: "debug-session",
-                hypothesisId: "A",
-              }),
-            }
-          ).catch(() => {});
-          // #endregion
           const [session, features, knowledgeFiles] = await Promise.all([
             fetchSession(),
             fetchFeatures(),
             fetchKnowledge(),
           ]);
 
-          // #region debug log
-          fetch(
-            "http://127.0.0.1:7243/ingest/7bdaa666-6bb7-4671-81bb-23ccffbde6dd",
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                location: "useAgentCommands.ts:84",
-                message: "Data fetched",
-                data: {
-                  hasSession: !!session,
-                  featuresCount: features?.features?.length,
-                  knowledgeCount: knowledgeFiles?.length,
-                },
-                sessionId: "debug-session",
-                hypothesisId: "A",
-              }),
-            }
-          ).catch(() => {});
-          // #endregion
-
           console.log("[ContextBridge] Local data fetched", {
             hasSession: !!session,
           });
 
           if (session) {
-            console.warn("[ContextBridge-V4] Preparing payload...");
             const baseContext = {
               type: "onboarding-context",
               session: {
@@ -137,27 +100,14 @@ export function useAgentCommands(): UseAgentCommandsReturn {
               currentFile: undefined,
             };
 
-            const fullStr = JSON.stringify(baseContext);
-            const basePayload = new TextEncoder().encode(fullStr);
-
-            console.warn(
-              `[ContextBridge-V4] PAYLOAD SIZE: ${basePayload.length} bytes`
+            const basePayload = new TextEncoder().encode(
+              JSON.stringify(baseContext)
             );
-
-            if (basePayload.length > 60000) {
-              console.error("[ContextBridge-V4] PAYLOAD TOO LARGE!", {
-                userName: session.userName?.length,
-                goal: session.goal?.length,
-                selectedFilesCount: session.selectedFiles?.length,
-                fullPayloadPreview: fullStr.slice(0, 1000),
-              });
-            }
 
             await send(basePayload, {
               reliable: true,
               destinationIdentities: [participant.identity],
             });
-            console.warn("[ContextBridge-V4] Base context SENT");
 
             // 2. Send features in a separate message
             const strippedFeatures = features.features.map((f: any) => ({
@@ -179,9 +129,6 @@ export function useAgentCommands(): UseAgentCommandsReturn {
             const featuresPayload = new TextEncoder().encode(
               JSON.stringify(featuresContext)
             );
-            console.warn(
-              `[ContextBridge] SENDING FEATURES to ${participant.identity}. Size: ${featuresPayload.length} bytes`
-            );
 
             await send(featuresPayload, {
               reliable: true,
@@ -191,9 +138,6 @@ export function useAgentCommands(): UseAgentCommandsReturn {
             // 3. Send the first file's content
             if (session.selectedFiles.length > 0) {
               const firstFilePath = session.selectedFiles[0];
-              console.log(
-                `[ContextBridge] Fetching content for first file: ${firstFilePath}`
-              );
               const fileData = await fetchFileContent(firstFilePath);
 
               // Find knowledge for this file if it exists
@@ -211,9 +155,6 @@ export function useAgentCommands(): UseAgentCommandsReturn {
 
               const filePayload = new TextEncoder().encode(
                 JSON.stringify(fileContext)
-              );
-              console.log(
-                `[ContextBridge] SENDING FIRST FILE to ${participant.identity}. Size: ${filePayload.length} bytes`
               );
 
               await send(filePayload, {
