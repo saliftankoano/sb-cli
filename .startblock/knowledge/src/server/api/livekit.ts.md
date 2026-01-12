@@ -1,7 +1,7 @@
 ---
 filePath: src/server/api/livekit.ts
-fileVersion: 1b783e65430147947652a7193cf209ec2b331aa9
-lastUpdated: '2026-01-12T00:31:53.106Z'
+fileVersion: 865536330a1cc5cf89f436352091701359f959dd
+lastUpdated: '2026-01-12T04:20:22.723Z'
 updatedBy: sb-cli
 tags:
   - src
@@ -12,29 +12,29 @@ importance: low
 extractedBy: sb-cli@1.0.0
 model: gpt-4o-mini
 humanVerified: false
-feature: livekit-onboarding
-featureRole: entry_point
+feature: livekit-integration
+featureRole: service
 userFlows:
-  - User can join an onboarding session in a LiveKit room
-  - User can receive an access token for room participation
+  - User can join an onboarding session with real-time communication features
+  - User can receive a unique access token for session participation
 relatedFiles:
-  - context-provider.js
+  - livekit-server-sdk.ts
 ---
 ## Purpose
-This file sets up API routes for managing LiveKit rooms and generating access tokens for users in an onboarding context.
+This file sets up API routes for generating LiveKit access tokens and managing room creation for onboarding sessions.
 
 ## Problem
-Prior to this implementation, there was no streamlined way to create and manage LiveKit rooms for onboarding sessions, leading to potential issues with user access and session management. The lack of a dynamic room creation process hindered real-time collaboration and context sharing among users.
+Before this file, there was no mechanism to dynamically create rooms and generate access tokens for users in real-time communication scenarios. This lack of functionality hindered the ability to facilitate onboarding sessions effectively, where users need to join live interactions.
 
 ## Solution
-This file addresses the problem by providing an Express router that handles the creation of LiveKit rooms based on incoming requests. It uses the `RoomServiceClient` to create rooms with metadata and generates access tokens for users, allowing them to join the appropriate room with the necessary permissions. The implementation simplifies the onboarding process by dynamically generating room names and managing user access efficiently.
+The file implements an Express router that listens for POST requests to the `/token` endpoint. It checks for necessary LiveKit configuration, creates a room using the LiveKit SDK, and generates an access token for users. The room name is dynamically generated based on session IDs or timestamps to prevent conflicts and ensure uniqueness.
 
 ## Impact
-With this file, developers can now easily integrate LiveKit for real-time collaboration in onboarding sessions. Users can join unique rooms tailored to their sessions, enhancing the overall user experience and enabling effective context sharing. This leads to improved onboarding processes and better resource management on the server side.
+With this implementation, users can seamlessly join onboarding sessions with real-time communication capabilities. Developers can now integrate LiveKit's features into their applications, enhancing user experience and enabling collaborative functionalities.
 
 ## Architecture Context
-This file integrates with the LiveKit SDK to manage real-time communication. It relies on environment variables for configuration, ensuring flexibility in different deployment scenarios. The router exposes an endpoint for token generation, which is crucial for user authentication and room access.
+This file integrates with the LiveKit server SDK and relies on environment variables for configuration. It fits within the broader application architecture by providing a backend service that interacts with the LiveKit API to manage real-time communication sessions.
 
 ## Gotchas (If Applicable)
-- Ensure that the LiveKit configuration (URL, API key, and secret) is correctly set in the environment to avoid errors during room creation.
-- The previous implementation included persistent room connections, which have been removed; ensure that any dependencies on that behavior are updated accordingly.
+- Ensure that LiveKit credentials are correctly set in the environment or configuration files; otherwise, requests will fail.
+- The room creation process may silently fail if a room with the same name already exists, which could lead to confusion if not handled properly.

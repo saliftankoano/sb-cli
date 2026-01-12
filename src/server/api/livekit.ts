@@ -25,7 +25,9 @@ export function setupLiveKitRoutes(
       }
 
       const { sessionId } = req.body as LiveKitTokenRequest;
-      const roomName = sessionId ? `onboarding-${sessionId}` : `onboarding-${Date.now()}`;
+      const roomName = sessionId
+        ? `onboarding-${sessionId}`
+        : `onboarding-${Date.now()}`;
 
       // Create the room with metadata
       const roomService = new RoomServiceClient(

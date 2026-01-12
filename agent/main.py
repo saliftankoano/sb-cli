@@ -320,7 +320,7 @@ async def entrypoint(ctx: JobContext):
 
 async def entrypoint(ctx: JobContext):
     # Connect with AUDIO_ONLY to reduce overhead, but we need data channels
-    await ctx.connect(auto_subscribe=SubscribeOptions.AUDIO_ONLY)
+    await ctx.connect(auto_subscribe=AutoSubscribe.AUDIO_ONLY)
     
     # Identify ourselves
     me = ctx.room.local_participant

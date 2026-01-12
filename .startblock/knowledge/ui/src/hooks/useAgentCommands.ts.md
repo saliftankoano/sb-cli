@@ -1,7 +1,7 @@
 ---
 filePath: ui/src/hooks/useAgentCommands.ts
-fileVersion: b5cf43c5d96a9bb3a7657454d53c7f15932768b7
-lastUpdated: '2026-01-12T04:10:40.745Z'
+fileVersion: a65fdd93d211569e251d84bda3dc4fd46edf69d4
+lastUpdated: '2026-01-12T04:20:22.725Z'
 updatedBy: sb-cli
 tags:
   - ui
@@ -15,29 +15,28 @@ humanVerified: false
 feature: agent-commands
 featureRole: helper
 userFlows:
-  - Agent receives context upon joining a session
+  - Agent can receive context when joining a session
   - Agent can request specific file content
-  - Agent can execute commands to navigate or show files
+  - Agent can trigger file display with additional information
 relatedFiles:
-  - '@livekit/components-react'
-  - '@/components/GuidedView'
-  - '@/lib/api'
+  - '@/lib/api.ts'
+  - '@/components/GuidedView.ts'
 ---
 ## Purpose
-This file provides a custom hook for managing agent commands and context sharing in a collaborative environment using LiveKit.
+This file provides a custom React hook that manages agent commands and context within a collaborative environment, facilitating real-time communication between agents and the application.
 
 ## Problem
-In collaborative applications, especially those involving agents, there was a lack of efficient context sharing when agents joined a session. Prior to this implementation, agents might not receive necessary information about the session, features, or relevant files, leading to confusion and inefficiencies in their operations.
+Before this file existed, there was no structured way to handle commands from agents in a collaborative setting. Agents needed to receive context and commands dynamically, but the system lacked a reliable mechanism to detect agents and push necessary data to them. This led to potential inefficiencies and a disjointed user experience.
 
 ## Solution
-The `useAgentCommands` hook detects when agents join a room and pushes relevant context data, including session details, features, and knowledge files. It employs the LiveKit framework to listen for participant connections and periodically checks for agents that may have connected without triggering events. This ensures that all agents receive the necessary context to operate effectively.
+The `useAgentCommands` hook solves this problem by leveraging a data channel to send and receive commands from agents. It detects agent participants based on their identities and pushes relevant context (like session data and file content) when they join. The hook also listens for commands from agents, allowing the application to respond to requests for file content or to show specific files dynamically. This approach ensures that agents have the information they need to operate effectively within the collaborative environment.
 
 ## Impact
-With this implementation, agents can dynamically receive context and commands, allowing for improved collaboration and interaction within the application. This enhances the overall user experience by ensuring agents are well-informed and can respond to commands effectively, streamlining workflows and reducing the potential for miscommunication.
+With this implementation, users (agents) can now receive real-time updates and commands, allowing for a more interactive and responsive experience. Developers benefit from a structured way to manage agent interactions, leading to improved collaboration and efficiency in the application. The ability to dynamically show files and respond to requests enhances the overall functionality of the system.
 
 ## Architecture Context
-This hook integrates with the LiveKit components for managing room contexts and data channels. It fetches data from APIs to provide agents with the necessary context and listens for incoming messages to handle commands from agents. The data flow involves fetching session information, features, and knowledge files, which are then sent to agents as they join the room.
+This hook is part of a larger system that integrates with LiveKit for real-time communication. It relies on several API calls to fetch session data, features, and knowledge files, which are essential for providing context to agents. The data flow involves sending payloads to agents and receiving commands via a dedicated data channel, ensuring seamless interaction.
 
 ## Gotchas (If Applicable)
-- The agent detection logic is permissive, which may lead to false positives if participant identities are not well-defined. Care should be taken to ensure that the naming conventions for participants are consistent.
-- The periodic check for agents is set to a 5-second interval, which could lead to performance issues if there are many participants. Adjustments may be necessary based on the expected load.
+- The agent detection logic is permissive, which could lead to incorrect identification of agents if participant identities are not standardized. This may require careful management of participant naming conventions.
+- The periodic check for agents introduces potential performance overhead, especially in rooms with many participants. It's essential to balance the frequency of checks with system performance.

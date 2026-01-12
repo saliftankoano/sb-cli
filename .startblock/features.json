@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-01-12T04:10:40.746Z",
+  "lastUpdated": "2026-01-12T04:20:22.726Z",
   "features": [
     {
       "id": "startblock-onboarding",
@@ -53,8 +53,7 @@
       "id": "livekit-integration",
       "name": "Livekit Integration",
       "description": "",
-      "category": "Services",
-      "entryPoint": "ui/src/App.tsx",
+      "category": "API",
       "userFlows": [
         "User can generate a LiveKit token for real-time communication",
         "User can create or join a LiveKit room for onboarding sessions",
@@ -63,11 +62,13 @@
         "User can join a live audio session",
         "User can navigate through onboarding documents",
         "User can view features and details about the application",
-        "User can access guided assistance from an agent"
+        "User can access guided assistance from an agent",
+        "User can join an onboarding session with real-time communication features",
+        "User can receive a unique access token for session participation"
       ],
-      "mermaidDiagram": "flowchart TD\n  Start([Livekit Integration])\n  livekit_integration_1[User can join a live audio session]\n  livekit_integration_2[User can navigate through onboarding documents]\n  livekit_integration_3[User can view features and details about the ap...]\n  livekit_integration_4[User can access guided assistance from an agent]\n  Start --> livekit_integration_1\n  livekit_integration_1 --> livekit_integration_2\n  livekit_integration_2 --> livekit_integration_3\n  livekit_integration_3 --> livekit_integration_4\n  livekit_integration_4 --> End([Complete])\n",
-      "mermaidJourney": "journey\n  title Livekit Integration\n  section User Actions\n    User can join a live audio session: 3: User\n    User can navigate through onboarding ...: 3: User\n    User can view features and details ab...: 3: User\n    User can access guided assistance fro...: 3: User\n",
-      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant ui/src/App.tsx as ui/src/App.tsx\n    participant ./components/Layout as ./components/Layout\n    participant ./hooks/useSession as ./hooks/useSession\n    participant ./hooks/useJourney as ./hooks/useJourney\n    participant ./lib/api as ./lib/api\n    participant ./components/JourneyView as ./components/JourneyView\n    participant ./components/FileFocus as ./components/FileFocus\n    participant ...ponents/ConnectionView as ...ponents/ConnectionView\n    User->>ui/src/App.tsx: User can join a live audio session\n    ui/src/App.tsx->>./components/Layout: process\n    ./components/Layout->>./hooks/useSession: process\n    ./hooks/useSession->>./hooks/useJourney: process\n    ./hooks/useJourney->>./lib/api: process\n    ./lib/api->>./components/JourneyView: process\n    ./components/JourneyView->>./components/FileFocus: process\n    ./components/FileFocus->>...ponents/ConnectionView: process\n    ...ponents/ConnectionView->>./components/FileSidebar: process\n    ./components/FileSidebar->>...mponents/WelcomeScreen: process\n    ...mponents/WelcomeScreen->>...nts/VoiceControlIsland: process\n    ...nts/VoiceControlIsland->>...mponents/ContentHeader: process\n    ...mponents/ContentHeader->>./components/FeaturesView: process\n    ./components/FeaturesView->>...nts/OnboardingDocsView: process\n    ...nts/OnboardingDocsView->>./components/GuidedView: process\n    ./components/GuidedView->>./hooks/useAgentCommands: process\n    ui/src/App.tsx->>./components/Layout: process\n    ./components/Layout->>./hooks/useSession: process\n    ./hooks/useSession->>./hooks/useJourney: process\n    ./hooks/useJourney->>./lib/api: process\n    ./lib/api->>./components/JourneyView: process\n    ./components/JourneyView->>./components/FileFocus: process\n    ./components/FileFocus->>...ponents/ConnectionView: process\n    ...ponents/ConnectionView->>./components/FileSidebar: process\n    ./components/FileSidebar->>...mponents/WelcomeScreen: process\n    ...mponents/WelcomeScreen->>...nts/VoiceControlIsland: process\n    ...nts/VoiceControlIsland->>...mponents/ContentHeader: process\n    ...mponents/ContentHeader->>./components/FeaturesView: process\n    ./components/FeaturesView->>...nts/OnboardingDocsView: process\n    ...nts/OnboardingDocsView->>./components/GuidedView: process\n    ./components/GuidedView->>./hooks/useAgentCommands: process\n    ui/src/App.tsx->>./components/Layout: process\n    ./components/Layout->>./hooks/useSession: process\n    ./hooks/useSession->>./hooks/useJourney: process\n    ./hooks/useJourney->>./lib/api: process\n    ./lib/api->>./components/JourneyView: process\n    ./components/JourneyView->>./components/FileFocus: process\n    ./components/FileFocus->>...ponents/ConnectionView: process\n    ...ponents/ConnectionView->>./components/FileSidebar: process\n    ./components/FileSidebar->>...mponents/WelcomeScreen: process\n    ...mponents/WelcomeScreen->>...nts/VoiceControlIsland: process\n    ...nts/VoiceControlIsland->>...mponents/ContentHeader: process\n    ...mponents/ContentHeader->>./components/FeaturesView: process\n    ./components/FeaturesView->>...nts/OnboardingDocsView: process\n    ...nts/OnboardingDocsView->>./components/GuidedView: process\n    ./components/GuidedView->>./hooks/useAgentCommands: process\n    ui/src/App.tsx->>./components/Layout: process\n    ./components/Layout->>./hooks/useSession: process\n    ./hooks/useSession->>./hooks/useJourney: process\n    ./hooks/useJourney->>./lib/api: process\n    ./lib/api->>./components/JourneyView: process\n    ./components/JourneyView->>./components/FileFocus: process\n    ./components/FileFocus->>...ponents/ConnectionView: process\n    ...ponents/ConnectionView->>./components/FileSidebar: process\n    ./components/FileSidebar->>...mponents/WelcomeScreen: process\n    ...mponents/WelcomeScreen->>...nts/VoiceControlIsland: process\n    ...nts/VoiceControlIsland->>...mponents/ContentHeader: process\n    ...mponents/ContentHeader->>./components/FeaturesView: process\n    ./components/FeaturesView->>...nts/OnboardingDocsView: process\n    ...nts/OnboardingDocsView->>./components/GuidedView: process\n    ./components/GuidedView->>./hooks/useAgentCommands: process\n",
+      "mermaidDiagram": "flowchart TD\n  Start([Livekit Integration])\n  livekit_integration_1[User can join an onboarding session with real-t...]\n  livekit_integration_2[User can receive a unique access token for sess...]\n  Start --> livekit_integration_1\n  livekit_integration_1 --> livekit_integration_2\n  livekit_integration_2 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title Livekit Integration\n  section User Actions\n    User can join an onboarding session w...: 3: User\n    User can receive a unique access toke...: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant src/server/api/livekit.ts as src/server/api/livekit.ts\n    participant livekit-server-sdk.ts as livekit-server-sdk.ts\n    User->>src/server/api/livekit.ts: User can join an onboarding session with real-t...\n    src/server/api/livekit.ts->>livekit-server-sdk.ts: process\n    src/server/api/livekit.ts->>livekit-server-sdk.ts: process\n",
       "files": [
         "src/server/api/livekit.ts",
         "../../config/loader.js",
@@ -86,7 +87,8 @@
         "./components/FeaturesView",
         "./components/OnboardingDocsView",
         "./components/GuidedView",
-        "./hooks/useAgentCommands"
+        "./hooks/useAgentCommands",
+        "livekit-server-sdk.ts"
       ],
       "filesByAction": {
         "User can generate a LiveKit token for real-time communication": [
@@ -176,6 +178,14 @@
           "./components/OnboardingDocsView",
           "./components/GuidedView",
           "./hooks/useAgentCommands"
+        ],
+        "User can join an onboarding session with real-time communication features": [
+          "src/server/api/livekit.ts",
+          "livekit-server-sdk.ts"
+        ],
+        "User can receive a unique access token for session participation": [
+          "src/server/api/livekit.ts",
+          "livekit-server-sdk.ts"
         ]
       },
       "dependencies": [],
@@ -213,11 +223,14 @@
         "User can navigate through codebase files with voice commands",
         "User can ask questions and receive contextual answers about the codebase",
         "User can navigate between files using voice commands",
-        "User can ask questions and receive contextual responses"
+        "User can ask questions and receive contextual responses",
+        "User can navigate through code files using voice commands",
+        "User can receive contextual information about the codebase",
+        "User can ask questions and get real-time assistance during onboarding"
       ],
-      "mermaidDiagram": "flowchart TD\n  Start([Onboarding Agent])\n  onboarding_agent_1[User can receive voice-guided onboarding throug...]\n  onboarding_agent_2[User can navigate between files using voice com...]\n  onboarding_agent_3[User can ask questions and receive contextual r...]\n  Start --> onboarding_agent_1\n  onboarding_agent_1 --> onboarding_agent_2\n  onboarding_agent_2 --> onboarding_agent_3\n  onboarding_agent_3 --> End([Complete])\n",
-      "mermaidJourney": "journey\n  title Onboarding Agent\n  section User Actions\n    User can receive voice-guided onboard...: 3: User\n    User can navigate between files using...: 3: User\n    User can ask questions and receive co...: 3: User\n",
-      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant agent/main.py as agent/main.py\n    participant ...at_features_summary.py as ...at_features_summary.py\n    participant ...et_feature_for_file.py as ...et_feature_for_file.py\n    participant ...build_system_prompt.py as ...build_system_prompt.py\n    participant ...ild_greeting_prompt.py as ...ild_greeting_prompt.py\n    participant ...d_transition_prompt.py as ...d_transition_prompt.py\n    participant ...nds/NavigateCommand.py as ...nds/NavigateCommand.py\n    participant ...nds/ShowFileCommand.py as ...nds/ShowFileCommand.py\n    User->>agent/main.py: User can receive voice-guided onboarding throug...\n    agent/main.py->>...at_features_summary.py: process\n    ...at_features_summary.py->>...et_feature_for_file.py: process\n    ...et_feature_for_file.py->>...build_system_prompt.py: process\n    ...build_system_prompt.py->>...ild_greeting_prompt.py: process\n    ...ild_greeting_prompt.py->>...d_transition_prompt.py: process\n    ...d_transition_prompt.py->>...nds/NavigateCommand.py: process\n    ...nds/NavigateCommand.py->>...nds/ShowFileCommand.py: process\n    ...nds/ShowFileCommand.py->>...s/serialize_command.py: process\n    agent/main.py->>...at_features_summary.py: process\n    ...at_features_summary.py->>...et_feature_for_file.py: process\n    ...et_feature_for_file.py->>...build_system_prompt.py: process\n    ...build_system_prompt.py->>...ild_greeting_prompt.py: process\n    ...ild_greeting_prompt.py->>...d_transition_prompt.py: process\n    ...d_transition_prompt.py->>...nds/NavigateCommand.py: process\n    ...nds/NavigateCommand.py->>...nds/ShowFileCommand.py: process\n    ...nds/ShowFileCommand.py->>...s/serialize_command.py: process\n    agent/main.py->>...at_features_summary.py: process\n    ...at_features_summary.py->>...et_feature_for_file.py: process\n    ...et_feature_for_file.py->>...build_system_prompt.py: process\n    ...build_system_prompt.py->>...ild_greeting_prompt.py: process\n    ...ild_greeting_prompt.py->>...d_transition_prompt.py: process\n    ...d_transition_prompt.py->>...nds/NavigateCommand.py: process\n    ...nds/NavigateCommand.py->>...nds/ShowFileCommand.py: process\n    ...nds/ShowFileCommand.py->>...s/serialize_command.py: process\n",
+      "mermaidDiagram": "flowchart TD\n  Start([Onboarding Agent])\n  onboarding_agent_1[User can navigate through code files using voic...]\n  onboarding_agent_2[User can receive contextual information about t...]\n  onboarding_agent_3[User can ask questions and get real-time assist...]\n  Start --> onboarding_agent_1\n  onboarding_agent_1 --> onboarding_agent_2\n  onboarding_agent_2 --> onboarding_agent_3\n  onboarding_agent_3 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title Onboarding Agent\n  section User Actions\n    User can navigate through code files ...: 3: User\n    User can receive contextual informati...: 3: User\n    User can ask questions and get real-t...: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant agent/main.py as agent/main.py\n    participant ...at_features_summary.py as ...at_features_summary.py\n    participant ...et_feature_for_file.py as ...et_feature_for_file.py\n    participant ...build_system_prompt.py as ...build_system_prompt.py\n    participant ...ild_greeting_prompt.py as ...ild_greeting_prompt.py\n    participant ...d_transition_prompt.py as ...d_transition_prompt.py\n    participant ...nds/NavigateCommand.py as ...nds/NavigateCommand.py\n    participant ...nds/ShowFileCommand.py as ...nds/ShowFileCommand.py\n    User->>agent/main.py: User can navigate through code files using voic...\n    agent/main.py->>...at_features_summary.py: process\n    ...at_features_summary.py->>...et_feature_for_file.py: process\n    ...et_feature_for_file.py->>...build_system_prompt.py: process\n    ...build_system_prompt.py->>...ild_greeting_prompt.py: process\n    ...ild_greeting_prompt.py->>...d_transition_prompt.py: process\n    ...d_transition_prompt.py->>...nds/NavigateCommand.py: process\n    ...nds/NavigateCommand.py->>...nds/ShowFileCommand.py: process\n    ...nds/ShowFileCommand.py->>...s/serialize_command.py: process\n    agent/main.py->>...at_features_summary.py: process\n    ...at_features_summary.py->>...et_feature_for_file.py: process\n    ...et_feature_for_file.py->>...build_system_prompt.py: process\n    ...build_system_prompt.py->>...ild_greeting_prompt.py: process\n    ...ild_greeting_prompt.py->>...d_transition_prompt.py: process\n    ...d_transition_prompt.py->>...nds/NavigateCommand.py: process\n    ...nds/NavigateCommand.py->>...nds/ShowFileCommand.py: process\n    ...nds/ShowFileCommand.py->>...s/serialize_command.py: process\n    agent/main.py->>...at_features_summary.py: process\n    ...at_features_summary.py->>...et_feature_for_file.py: process\n    ...et_feature_for_file.py->>...build_system_prompt.py: process\n    ...build_system_prompt.py->>...ild_greeting_prompt.py: process\n    ...ild_greeting_prompt.py->>...d_transition_prompt.py: process\n    ...d_transition_prompt.py->>...nds/NavigateCommand.py: process\n    ...nds/NavigateCommand.py->>...nds/ShowFileCommand.py: process\n    ...nds/ShowFileCommand.py->>...s/serialize_command.py: process\n",
       "files": [
         "agent/main.py",
         "knowledge_loader.py",
@@ -425,6 +438,39 @@
           "commands/NavigateCommand.py",
           "commands/ShowFileCommand.py",
           "commands/serialize_command.py"
+        ],
+        "User can navigate through code files using voice commands": [
+          "agent/main.py",
+          "knowledge_loader/format_features_summary.py",
+          "knowledge_loader/get_feature_for_file.py",
+          "prompts/build_system_prompt.py",
+          "prompts/build_greeting_prompt.py",
+          "prompts/build_transition_prompt.py",
+          "commands/NavigateCommand.py",
+          "commands/ShowFileCommand.py",
+          "commands/serialize_command.py"
+        ],
+        "User can receive contextual information about the codebase": [
+          "agent/main.py",
+          "knowledge_loader/format_features_summary.py",
+          "knowledge_loader/get_feature_for_file.py",
+          "prompts/build_system_prompt.py",
+          "prompts/build_greeting_prompt.py",
+          "prompts/build_transition_prompt.py",
+          "commands/NavigateCommand.py",
+          "commands/ShowFileCommand.py",
+          "commands/serialize_command.py"
+        ],
+        "User can ask questions and get real-time assistance during onboarding": [
+          "agent/main.py",
+          "knowledge_loader/format_features_summary.py",
+          "knowledge_loader/get_feature_for_file.py",
+          "prompts/build_system_prompt.py",
+          "prompts/build_greeting_prompt.py",
+          "prompts/build_transition_prompt.py",
+          "commands/NavigateCommand.py",
+          "commands/ShowFileCommand.py",
+          "commands/serialize_command.py"
         ]
       },
       "dependencies": [],
@@ -533,11 +579,13 @@
         "Agent can request specific file content during interactions.",
         "Agent receives context upon joining a session",
         "Agent can request specific file content",
-        "Agent can execute commands to navigate or show files"
+        "Agent can execute commands to navigate or show files",
+        "Agent can receive context when joining a session",
+        "Agent can trigger file display with additional information"
       ],
-      "mermaidDiagram": "flowchart TD\n  Start([Agent Commands])\n  agent_commands_1[Agent receives context upon joining a session]\n  agent_commands_2[Agent can request specific file content]\n  agent_commands_3[Agent can execute commands to navigate or show ...]\n  Start --> agent_commands_1\n  agent_commands_1 --> agent_commands_2\n  agent_commands_2 --> agent_commands_3\n  agent_commands_3 --> End([Complete])\n",
-      "mermaidJourney": "journey\n  title Agent Commands\n  section User Actions\n    Agent receives context upon joining a...: 3: User\n    Agent can request specific file content: 3: User\n    Agent can execute commands to navigat...: 3: User\n",
-      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant ...ks/useAgentCommands.ts as ...ks/useAgentCommands.ts\n    participant _livekit/components-react as @livekit/components-react\n    participant _/components/GuidedView as @/components/GuidedView\n    participant _/lib/api as @/lib/api\n    User->>...ks/useAgentCommands.ts: Agent receives context upon joining a session\n    ...ks/useAgentCommands.ts->>_livekit/components-react: process\n    _livekit/components-react->>_/components/GuidedView: process\n    _/components/GuidedView->>_/lib/api: process\n    ...ks/useAgentCommands.ts->>_livekit/components-react: process\n    _livekit/components-react->>_/components/GuidedView: process\n    _/components/GuidedView->>_/lib/api: process\n    ...ks/useAgentCommands.ts->>_livekit/components-react: process\n    _livekit/components-react->>_/components/GuidedView: process\n    _/components/GuidedView->>_/lib/api: process\n",
+      "mermaidDiagram": "flowchart TD\n  Start([Agent Commands])\n  agent_commands_1[Agent can receive context when joining a session]\n  agent_commands_2[Agent can request specific file content]\n  agent_commands_3[Agent can trigger file display with additional ...]\n  Start --> agent_commands_1\n  agent_commands_1 --> agent_commands_2\n  agent_commands_2 --> agent_commands_3\n  agent_commands_3 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title Agent Commands\n  section User Actions\n    Agent can receive context when joinin...: 3: User\n    Agent can request specific file content: 3: User\n    Agent can trigger file display with a...: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant ...ks/useAgentCommands.ts as ...ks/useAgentCommands.ts\n    participant _/lib/api.ts as @/lib/api.ts\n    participant ...mponents/GuidedView.ts as ...mponents/GuidedView.ts\n    User->>...ks/useAgentCommands.ts: Agent can receive context when joining a session\n    ...ks/useAgentCommands.ts->>_/lib/api.ts: process\n    _/lib/api.ts->>...mponents/GuidedView.ts: process\n    ...ks/useAgentCommands.ts->>_/lib/api.ts: process\n    _/lib/api.ts->>...mponents/GuidedView.ts: process\n    ...ks/useAgentCommands.ts->>_/lib/api.ts: process\n    _/lib/api.ts->>...mponents/GuidedView.ts: process\n",
       "files": [
         "agent/commands.py",
         "ui/src/hooks/useAgentCommands.ts",
@@ -545,7 +593,9 @@
         "@/components/GuidedView",
         "@/lib/api",
         "lib/api.ts",
-        "components/GuidedView.ts"
+        "components/GuidedView.ts",
+        "@/lib/api.ts",
+        "@/components/GuidedView.ts"
       ],
       "filesByAction": {
         "User can navigate between files or steps": [
@@ -634,15 +684,24 @@
         ],
         "Agent can request specific file content": [
           "ui/src/hooks/useAgentCommands.ts",
-          "@livekit/components-react",
-          "@/components/GuidedView",
-          "@/lib/api"
+          "@/lib/api.ts",
+          "@/components/GuidedView.ts"
         ],
         "Agent can execute commands to navigate or show files": [
           "ui/src/hooks/useAgentCommands.ts",
           "@livekit/components-react",
           "@/components/GuidedView",
           "@/lib/api"
+        ],
+        "Agent can receive context when joining a session": [
+          "ui/src/hooks/useAgentCommands.ts",
+          "@/lib/api.ts",
+          "@/components/GuidedView.ts"
+        ],
+        "Agent can trigger file display with additional information": [
+          "ui/src/hooks/useAgentCommands.ts",
+          "@/lib/api.ts",
+          "@/components/GuidedView.ts"
         ]
       },
       "dependencies": [],
