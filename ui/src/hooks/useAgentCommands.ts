@@ -46,16 +46,43 @@ export function useAgentCommands(): UseAgentCommandsReturn {
 
   // Push initial context when agent joins
   useEffect(() => {
+    const log = (message: string, data?: any) => {
+      console.log(`[ContextBridge] ${message}`, data || "");
+      fetch('http://127.0.0.1:7243/ingest/7bdaa666-6bb7-4671-81bb-23ccffbde6dd', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          location: 'useAgentCommands.ts',
+          message,
+          data,
+          timestamp: Date.now(),
+          sessionId: 'debug-session',
+          hypothesisId: 'H1'
+        })
+      }).catch(() => {});
+    };
+
     const sendContext = async (participant: any) => {
-      console.log(`[ContextBridge] Checking participant: ${participant.identity}`);
-      if (participant.identity.toLowerCase().includes("agent") || participant.identity.toLowerCase().includes("python")) {
-        console.log("[ContextBridge] Target agent detected. Preparing context...");
+      log(`Checking participant: ${participant.identity}`);
+      const isAgent = participant.identity.toLowerCase().includes("agent") || 
+                      participant.identity.toLowerCase().includes("python") ||
+                      participant.identity.toLowerCase().includes("participant"); // Added participant as fallback
+      
+      if (isAgent) {
+        log("Target agent detected. Preparing context...");
         try {
+          log("Fetching local data (session, features, knowledge)...");
           const [session, features, knowledgeFiles] = await Promise.all([
             fetchSession(),
             fetchFeatures(),
             fetchKnowledge()
           ]);
+
+          log("Data fetched successfully", { 
+            hasSession: !!session, 
+            featuresCount: features?.features?.length,
+            knowledgeCount: knowledgeFiles?.length 
+          });
 
           if (session) {
             const knowledgeMap: Record<string, string> = {};
@@ -65,6 +92,7 @@ export function useAgentCommands(): UseAgentCommandsReturn {
 
             let currentFile = undefined;
             if (session.selectedFiles.length > 0) {
+              log(`Fetching content for first file: ${session.selectedFiles[0]}`);
               const fileData = await fetchFileContent(session.selectedFiles[0]);
               currentFile = {
                 path: session.selectedFiles[0],
@@ -72,6 +100,7 @@ export function useAgentCommands(): UseAgentCommandsReturn {
                 knowledge: knowledgeMap[session.selectedFiles[0]],
                 totalLines: fileData.totalLines
               };
+              log("File content fetched");
             }
 
             const context = {
@@ -83,29 +112,34 @@ export function useAgentCommands(): UseAgentCommandsReturn {
             };
 
             const payload = new TextEncoder().encode(JSON.stringify(context));
-            console.log(`[ContextBridge] Sending context to ${participant.identity} (Topic: server-context)...`);
+            log(`Sending context to ${participant.identity} (Topic: server-context). Size: ${payload.length} bytes`);
             
             await send(payload, {
               reliable: true,
               destinationIdentities: [participant.identity]
             });
-            console.log("[ContextBridge] Initial context sent successfully");
+            log("Initial context sent successfully");
+          } else {
+            log("No session found, skipping context send");
           }
         } catch (err) {
-          console.error("[ContextBridge] Failed to send context:", err);
+          log("Failed to send context", { error: err instanceof Error ? err.message : String(err) });
         }
+      } else {
+        log(`Participant ${participant.identity} ignored (not an agent)`);
       }
     };
 
     // 1. Check participants already in the room
-    Array.from(room.remoteParticipants.values()).forEach(p => {
-      console.log(`[ContextBridge] Found existing participant: ${p.identity}`);
+    const existing = Array.from(room.remoteParticipants.values());
+    log(`Syncing existing participants (${existing.length})`);
+    existing.forEach(p => {
       sendContext(p);
     });
 
     // 2. Listen for new joins
     const onParticipantConnected = (participant: any) => {
-      console.log(`[ContextBridge] New participant joined: ${participant.identity}`);
+      log(`New participant connected: ${participant.identity}`);
       sendContext(participant);
     };
 

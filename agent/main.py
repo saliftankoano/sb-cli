@@ -321,17 +321,20 @@ async def entrypoint(ctx: JobContext):
     # Listen for context messages from local server
     @ctx.room.on("data_received")
     def on_data(payload: bytes, participant: Any, kind: Any, topic: str):
-        print(f"[Agent] Received data on topic '{topic}' from {participant.identity if participant else 'unknown'}")
+        p_identity = participant.identity if participant else 'unknown'
+        print(f"[Agent] Data received | Topic: {topic} | From: {p_identity} | Size: {len(payload)} bytes")
         
         try:
             decoded = payload.decode("utf-8")
-            print(f"[Agent] Payload preview (first 50 chars): {decoded[:50]}...")
             data = json.loads(decoded)
+            print(f"[Agent] Data type: {data.get('type')}")
             
             if topic == "server-context":
                 if data.get("type") == "onboarding-context":
+                    print(f"[Agent] Processing onboarding-context from {p_identity}")
                     agent.context.update_context(data)
                 elif data.get("type") == "file-content":
+                    print(f"[Agent] Processing file-content for {data.get('path')}")
                     agent.context.update_file(data)
             else:
                 # Debug: check if context was sent on wrong topic
@@ -339,7 +342,15 @@ async def entrypoint(ctx: JobContext):
                     print(f"[Agent] WARNING: Received context on WRONG topic: {topic}")
                     agent.context.update_context(data)
         except Exception as e:
-            print(f"[Agent] Error parsing data message: {e}")
+            print(f"[Agent] ERROR parsing data: {e}")
+
+    print("Starting onboarding agent (Context-Push mode)...")
+    print(f"[Agent] Waiting up to 20s for context push from {ctx.room.name}...")
+    
+    if not await agent.context.wait_for_context(timeout=20.0):
+        print("[Agent] CRITICAL: Timeout waiting for context. Room members at timeout:")
+        print(f"       {[p.identity for p in ctx.room.remote_participants.values()]}")
+        print("[Agent] Falling back to generic mode.")
 
     await session.start(agent=agent, room=ctx.room)
     await asyncio.sleep(1)
