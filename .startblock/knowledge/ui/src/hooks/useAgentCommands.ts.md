@@ -1,14 +1,13 @@
 ---
 filePath: ui/src/hooks/useAgentCommands.ts
-fileVersion: unknown
-lastUpdated: '2025-12-17T01:38:41.911Z'
+fileVersion: 0bae6537356e19ed555671925e6cf9551cd0bde6
+lastUpdated: '2026-01-12T00:31:53.114Z'
 updatedBy: sb-cli
 tags:
   - ui
   - src
   - hooks
   - typescript
-  - new
 importance: low
 extractedBy: sb-cli@1.0.0
 model: gpt-4o-mini
@@ -16,30 +15,30 @@ humanVerified: false
 feature: agent-commands
 featureRole: helper
 userFlows:
-  - User can navigate to different sections based on agent commands
-  - User can view files with context provided by the agent
-  - User can see connections related to the current context
+  - Agent can receive real-time context when joining a session
+  - Agent can request specific file content dynamically
+  - Agent can navigate through commands issued by the system
 relatedFiles:
   - '@livekit/components-react'
   - '@/components/GuidedView'
+  - '@/lib/api'
 ---
 ## Purpose
-This file provides a custom React hook that manages commands from an agent, enabling dynamic updates to the UI based on received commands.
+This file defines a custom React hook that manages agent commands and context in a collaborative environment, facilitating communication between agents and the system.
 
-## Key Functionality
-- `useAgentCommands`: A hook that initializes state for guided views and handles incoming agent commands via a data channel.
+## Problem
+Before this hook was implemented, agents lacked a structured way to receive commands and context information in real-time, leading to inefficiencies and potential miscommunication during collaborative tasks. The need for a dynamic system that could provide agents with relevant information based on their actions prompted the creation of this hook.
 
-## Gotchas
-- The `onMessage` function must handle both payload structures (with and without `payload` property), which could lead to parsing errors if not managed correctly.
-- Ensure that the `clearGuidedState` function is called appropriately to avoid stale state issues.
-- If messages are received at a high frequency, performance may be impacted due to state updates and potential re-renders.
+## Solution
+The hook leverages the LiveKit data channel to listen for commands from agents and send them relevant context upon connection. It fetches necessary session data, features, and knowledge files asynchronously, allowing agents to receive tailored information as they join the session. The use of command types enables structured interactions, allowing agents to request specific file content or receive instructions on navigating the system.
 
-## Dependencies
-- `useDataChannel`: This hook is used to subscribe to messages on a specific topic, which is crucial for receiving agent commands in real-time.
+## Impact
+With this hook, agents can now receive real-time context and commands, improving their efficiency and effectiveness in collaborative tasks. They can dynamically request file content, which enhances their ability to work with the system based on immediate needs. This leads to a smoother user experience and better overall performance of the collaborative environment.
 
 ## Architecture Context
-This hook is part of a larger system that interacts with an agent, likely in a collaborative or guided user experience context, where commands dictate UI changes based on user interactions or agent suggestions.
+This hook is part of a larger system that utilizes LiveKit for real-time communication. It interacts with various APIs to fetch session-related data and integrates with the overall application state through React's context and hooks. The data flow involves receiving commands from agents, processing them, and sending responses back through the data channel.
 
-## Implementation Notes
-- The `onMessage` function includes error handling to prevent crashes from malformed messages, which is critical for maintaining application stability.
-- The use of `useCallback` for `onMessage` and `clearGuidedState` ensures that these functions are not recreated on every render, optimizing performance.
+## Gotchas (If Applicable)
+- Ensure that the command parsing logic is robust to handle unexpected message formats, as this could lead to runtime errors.
+- Be aware of potential delays in fetching data from APIs, which may impact the responsiveness of the agent commands.
+- The hook assumes that the agent's identity will always include the word "agent"; any deviation could lead to unexpected behavior.

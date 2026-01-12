@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-01-12T00:25:41.661Z",
+  "lastUpdated": "2026-01-12T00:31:53.115Z",
   "features": [
     {
       "id": "startblock-onboarding",
@@ -460,16 +460,20 @@
         "User can view a file with contextual information and code snippets",
         "User can navigate to different sections based on agent commands",
         "User can view files with context provided by the agent",
-        "User can see connections related to the current context"
+        "User can see connections related to the current context",
+        "Agent can receive real-time context when joining a session",
+        "Agent can request specific file content dynamically",
+        "Agent can navigate through commands issued by the system"
       ],
-      "mermaidDiagram": "flowchart TD\n  Start([Agent Commands])\n  agent_commands_1[User can navigate to different sections based o...]\n  agent_commands_2[User can view files with context provided by th...]\n  agent_commands_3[User can see connections related to the current...]\n  Start --> agent_commands_1\n  agent_commands_1 --> agent_commands_2\n  agent_commands_2 --> agent_commands_3\n  agent_commands_3 --> End([Complete])\n",
-      "mermaidJourney": "journey\n  title Agent Commands\n  section User Actions\n    User can navigate to different sectio...: 3: User\n    User can view files with context prov...: 3: User\n    User can see connections related to t...: 3: User\n",
-      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant ...ks/useAgentCommands.ts as ...ks/useAgentCommands.ts\n    participant _livekit/components-react as @livekit/components-react\n    participant _/components/GuidedView as @/components/GuidedView\n    User->>...ks/useAgentCommands.ts: User can navigate to different sections based o...\n    ...ks/useAgentCommands.ts->>_livekit/components-react: process\n    _livekit/components-react->>_/components/GuidedView: process\n    ...ks/useAgentCommands.ts->>_livekit/components-react: process\n    _livekit/components-react->>_/components/GuidedView: process\n    ...ks/useAgentCommands.ts->>_livekit/components-react: process\n    _livekit/components-react->>_/components/GuidedView: process\n",
+      "mermaidDiagram": "flowchart TD\n  Start([Agent Commands])\n  agent_commands_1[Agent can receive real-time context when joinin...]\n  agent_commands_2[Agent can request specific file content dynamic...]\n  agent_commands_3[Agent can navigate through commands issued by t...]\n  Start --> agent_commands_1\n  agent_commands_1 --> agent_commands_2\n  agent_commands_2 --> agent_commands_3\n  agent_commands_3 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title Agent Commands\n  section User Actions\n    Agent can receive real-time context w...: 3: User\n    Agent can request specific file conte...: 3: User\n    Agent can navigate through commands i...: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant ...ks/useAgentCommands.ts as ...ks/useAgentCommands.ts\n    participant _livekit/components-react as @livekit/components-react\n    participant _/components/GuidedView as @/components/GuidedView\n    participant _/lib/api as @/lib/api\n    User->>...ks/useAgentCommands.ts: Agent can receive real-time context when joinin...\n    ...ks/useAgentCommands.ts->>_livekit/components-react: process\n    _livekit/components-react->>_/components/GuidedView: process\n    _/components/GuidedView->>_/lib/api: process\n    ...ks/useAgentCommands.ts->>_livekit/components-react: process\n    _livekit/components-react->>_/components/GuidedView: process\n    _/components/GuidedView->>_/lib/api: process\n    ...ks/useAgentCommands.ts->>_livekit/components-react: process\n    _livekit/components-react->>_/components/GuidedView: process\n    _/components/GuidedView->>_/lib/api: process\n",
       "files": [
         "agent/commands.py",
         "ui/src/hooks/useAgentCommands.ts",
         "@livekit/components-react",
-        "@/components/GuidedView"
+        "@/components/GuidedView",
+        "@/lib/api"
       ],
       "filesByAction": {
         "User can navigate between files or steps": [
@@ -504,6 +508,24 @@
           "ui/src/hooks/useAgentCommands.ts",
           "@livekit/components-react",
           "@/components/GuidedView"
+        ],
+        "Agent can receive real-time context when joining a session": [
+          "ui/src/hooks/useAgentCommands.ts",
+          "@livekit/components-react",
+          "@/components/GuidedView",
+          "@/lib/api"
+        ],
+        "Agent can request specific file content dynamically": [
+          "ui/src/hooks/useAgentCommands.ts",
+          "@livekit/components-react",
+          "@/components/GuidedView",
+          "@/lib/api"
+        ],
+        "Agent can navigate through commands issued by the system": [
+          "ui/src/hooks/useAgentCommands.ts",
+          "@livekit/components-react",
+          "@/components/GuidedView",
+          "@/lib/api"
         ]
       },
       "dependencies": [],
@@ -2585,14 +2607,17 @@
       "userFlows": [
         "Agent can connect to a LiveKit room for onboarding",
         "Agent receives initial context upon joining a room",
-        "Agent can request specific file content during the session"
+        "Agent can request specific file content during the session",
+        "User can join an onboarding session in a LiveKit room",
+        "User can receive an access token for room participation"
       ],
-      "mermaidDiagram": "flowchart TD\n  Start([Livekit Onboarding])\n  livekit_onboarding_1[Agent can connect to a LiveKit room for onboarding]\n  livekit_onboarding_2[Agent receives initial context upon joining a room]\n  livekit_onboarding_3[Agent can request specific file content during ...]\n  Start --> livekit_onboarding_1\n  livekit_onboarding_1 --> livekit_onboarding_2\n  livekit_onboarding_2 --> livekit_onboarding_3\n  livekit_onboarding_3 --> End([Complete])\n",
-      "mermaidJourney": "journey\n  title Livekit Onboarding\n  section User Actions\n    Agent can connect to a LiveKit room f...: 3: User\n    Agent receives initial context upon j...: 3: User\n    Agent can request specific file conte...: 3: User\n",
-      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant src/server/api/livekit.ts as src/server/api/livekit.ts\n    participant ./context-provider.js as ./context-provider.js\n    User->>src/server/api/livekit.ts: Agent can connect to a LiveKit room for onboarding\n    src/server/api/livekit.ts->>./context-provider.js: process\n    src/server/api/livekit.ts->>./context-provider.js: process\n    src/server/api/livekit.ts->>./context-provider.js: process\n",
+      "mermaidDiagram": "flowchart TD\n  Start([Livekit Onboarding])\n  livekit_onboarding_1[User can join an onboarding session in a LiveKi...]\n  livekit_onboarding_2[User can receive an access token for room parti...]\n  Start --> livekit_onboarding_1\n  livekit_onboarding_1 --> livekit_onboarding_2\n  livekit_onboarding_2 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title Livekit Onboarding\n  section User Actions\n    User can join an onboarding session i...: 3: User\n    User can receive an access token for ...: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant src/server/api/livekit.ts as src/server/api/livekit.ts\n    participant context-provider.js as context-provider.js\n    User->>src/server/api/livekit.ts: User can join an onboarding session in a LiveKi...\n    src/server/api/livekit.ts->>context-provider.js: process\n    src/server/api/livekit.ts->>context-provider.js: process\n",
       "files": [
         "src/server/api/livekit.ts",
-        "./context-provider.js"
+        "./context-provider.js",
+        "context-provider.js"
       ],
       "filesByAction": {
         "Agent can connect to a LiveKit room for onboarding": [
@@ -2606,6 +2631,14 @@
         "Agent can request specific file content during the session": [
           "src/server/api/livekit.ts",
           "./context-provider.js"
+        ],
+        "User can join an onboarding session in a LiveKit room": [
+          "src/server/api/livekit.ts",
+          "context-provider.js"
+        ],
+        "User can receive an access token for room participation": [
+          "src/server/api/livekit.ts",
+          "context-provider.js"
         ]
       },
       "dependencies": [],
@@ -2614,7 +2647,8 @@
         "server",
         "api",
         "typescript"
-      ]
+      ],
+      "entryPoint": "src/server/api/livekit.ts"
     }
   ]
 }

@@ -1,6 +1,7 @@
-import { useCallback, useState } from "react";
-import { useDataChannel } from "@livekit/components-react";
+import { useCallback, useState, useEffect } from "react";
+import { useDataChannel, useRoomContext } from "@livekit/components-react";
 import type { GuidedViewState } from "@/components/GuidedView";
+import { fetchSession, fetchFeatures, fetchKnowledge, fetchFileContent } from "@/lib/api";
 
 // Command types from agent
 interface NavigateCommand {
@@ -19,22 +20,16 @@ interface ShowFileCommand {
   featureName?: string;
 }
 
-interface ShowConnectionsCommand {
-  type: "showConnections";
-  file: string;
-}
-
-interface ExpandSectionCommand {
-  type: "expandSection";
-  file: string;
-  section: "purpose" | "gotchas" | "history";
+interface RequestFileCommand {
+  type: "request-file";
+  path: string;
+  requestId: string;
 }
 
 type AgentCommand =
   | NavigateCommand
   | ShowFileCommand
-  | ShowConnectionsCommand
-  | ExpandSectionCommand;
+  | RequestFileCommand;
 
 interface UseAgentCommandsReturn {
   guidedState: GuidedViewState | null;
@@ -45,11 +40,70 @@ interface UseAgentCommandsReturn {
 export function useAgentCommands(): UseAgentCommandsReturn {
   const [guidedState, setGuidedState] = useState<GuidedViewState | null>(null);
   const [lastCommand, setLastCommand] = useState<AgentCommand | null>(null);
+  const room = useRoomContext();
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const onMessage = useCallback((msg: any) => {
+  const { send } = useDataChannel("server-context");
+
+  // Push initial context when agent joins
+  useEffect(() => {
+    const onParticipantConnected = async (participant: any) => {
+      if (participant.identity.toLowerCase().includes("agent")) {
+        console.log("[ContextBridge] Agent joined. Preparing context...");
+        try {
+          const [session, features, knowledgeFiles] = await Promise.all([
+            fetchSession(),
+            fetchFeatures(),
+            fetchKnowledge()
+          ]);
+
+          if (session) {
+            // Map knowledge to path -> content for the agent
+            const knowledgeMap: Record<string, string> = {};
+            knowledgeFiles.forEach(k => {
+              knowledgeMap[k.sourceFile] = k.content.raw;
+            });
+
+            // Get first file content
+            let currentFile = undefined;
+            if (session.selectedFiles.length > 0) {
+              const fileData = await fetchFileContent(session.selectedFiles[0]);
+              currentFile = {
+                path: session.selectedFiles[0],
+                content: fileData.content,
+                knowledge: knowledgeMap[session.selectedFiles[0]],
+                totalLines: fileData.totalLines
+              };
+            }
+
+            const context = {
+              type: "onboarding-context",
+              session,
+              features: features.features,
+              knowledgeFiles: knowledgeMap,
+              currentFile
+            };
+
+            await send(new TextEncoder().encode(JSON.stringify(context)), {
+              reliable: true,
+              destinationIdentities: [participant.identity]
+            });
+            console.log("[ContextBridge] Initial context sent to agent");
+          }
+        } catch (err) {
+          console.error("[ContextBridge] Failed to send context:", err);
+        }
+      }
+    };
+
+    room.on("participantConnected", onParticipantConnected);
+    return () => {
+      room.off("participantConnected", onParticipantConnected);
+    };
+  }, [room, send]);
+
+  // Handle data received (requests from agent)
+  const onMessage = useCallback(async (msg: any) => {
     try {
-      // msg can be { payload: Uint8Array } or just Uint8Array depending on version
       const payload = msg.payload || msg;
       const text = new TextDecoder().decode(payload);
       const command = JSON.parse(text) as AgentCommand;
@@ -67,13 +121,32 @@ export function useAgentCommands(): UseAgentCommandsReturn {
           highlightLines: command.highlightLines,
           featureName: command.featureName,
         });
+      } else if (command.type === "request-file") {
+        console.log("[ContextBridge] Agent requested file:", command.path);
+        try {
+          const fileData = await fetchFileContent(command.path);
+          const response = {
+            type: "file-content",
+            requestId: command.requestId,
+            path: command.path,
+            content: fileData.content,
+            totalLines: fileData.totalLines
+          };
+          
+          await send(new TextEncoder().encode(JSON.stringify(response)), {
+            reliable: true
+          });
+          console.log("[ContextBridge] Sent file content to agent");
+        } catch (err) {
+          console.error("[ContextBridge] Failed to fetch requested file:", err);
+        }
       }
     } catch (error) {
       console.error("[AgentCommand] Failed to parse:", error);
     }
-  }, []);
+  }, [send]);
 
-  // Listen for data channel messages on "agent-commands" topic
+  // Listen for agent commands
   useDataChannel("agent-commands", onMessage);
 
   const clearGuidedState = useCallback(() => {

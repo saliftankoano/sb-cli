@@ -1,7 +1,7 @@
 ---
 filePath: src/server/api/livekit.ts
-fileVersion: 9674f2f871b9b2558c7acd2b813bcfa34f2cea42
-lastUpdated: '2026-01-12T00:25:41.660Z'
+fileVersion: 1b783e65430147947652a7193cf209ec2b331aa9
+lastUpdated: '2026-01-12T00:31:53.106Z'
 updatedBy: sb-cli
 tags:
   - src
@@ -13,30 +13,28 @@ extractedBy: sb-cli@1.0.0
 model: gpt-4o-mini
 humanVerified: false
 feature: livekit-onboarding
-featureRole: service
+featureRole: entry_point
 userFlows:
-  - Agent can connect to a LiveKit room for onboarding
-  - Agent receives initial context upon joining a room
-  - Agent can request specific file content during the session
+  - User can join an onboarding session in a LiveKit room
+  - User can receive an access token for room participation
 relatedFiles:
-  - ./context-provider.js
+  - context-provider.js
 ---
 ## Purpose
-This file sets up API routes for managing LiveKit connections, enabling real-time context sharing during onboarding sessions.
+This file sets up API routes for managing LiveKit rooms and generating access tokens for users in an onboarding context.
 
 ## Problem
-Before this file, there was no mechanism for the server to provide real-time context to participants in onboarding sessions using LiveKit. This lack of context sharing could lead to disjointed experiences for agents, making it difficult for them to access necessary information during their interactions.
+Prior to this implementation, there was no streamlined way to create and manage LiveKit rooms for onboarding sessions, leading to potential issues with user access and session management. The lack of a dynamic room creation process hindered real-time collaboration and context sharing among users.
 
 ## Solution
-This file connects the server to LiveKit rooms, allowing it to act as a context provider. It creates rooms dynamically based on session IDs and manages participant connections. When an agent connects, the server sends them relevant onboarding context and responds to specific requests for file content, thereby enhancing the onboarding experience.
+This file addresses the problem by providing an Express router that handles the creation of LiveKit rooms based on incoming requests. It uses the `RoomServiceClient` to create rooms with metadata and generates access tokens for users, allowing them to join the appropriate room with the necessary permissions. The implementation simplifies the onboarding process by dynamically generating room names and managing user access efficiently.
 
 ## Impact
-Users can now have a seamless onboarding experience where they receive real-time context and file information directly from the server. This capability improves the efficiency of agents by providing them with the information they need as they interact with the system.
+With this file, developers can now easily integrate LiveKit for real-time collaboration in onboarding sessions. Users can join unique rooms tailored to their sessions, enhancing the overall user experience and enabling effective context sharing. This leads to improved onboarding processes and better resource management on the server side.
 
 ## Architecture Context
-This file integrates with the LiveKit SDK to manage rooms and participants. It relies on environment variables for configuration and interacts with the context-provider module to fetch onboarding context and file knowledge. The data flow involves receiving requests from agents, processing them, and sending back relevant information through LiveKit's data channels.
+This file integrates with the LiveKit SDK to manage real-time communication. It relies on environment variables for configuration, ensuring flexibility in different deployment scenarios. The router exposes an endpoint for token generation, which is crucial for user authentication and room access.
 
 ## Gotchas (If Applicable)
-- Ensure that the LiveKit credentials are correctly set in the environment or configuration; otherwise, the server will fail to connect to rooms.
-- The activeRooms map is crucial for managing connections; failing to track this can lead to unnecessary resource consumption or connection issues.
-- Error handling is essential, particularly in the dataReceived event, to prevent crashes from malformed messages or unexpected payloads.
+- Ensure that the LiveKit configuration (URL, API key, and secret) is correctly set in the environment to avoid errors during room creation.
+- The previous implementation included persistent room connections, which have been removed; ensure that any dependencies on that behavior are updated accordingly.
