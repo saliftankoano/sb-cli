@@ -88,10 +88,17 @@ export function useAgentCommands(): UseAgentCommandsReturn {
 
           if (session) {
             // 1. Send the base context (session + features) - this should be small
+            // We strip features to only essential fields to avoid the 64KB limit
             const baseContext = {
               type: "onboarding-context",
               session,
-              features: features.features,
+              features: features.features.map((f: any) => ({
+                name: f.name,
+                description: f.description,
+                category: f.category,
+                userFlows: f.userFlows,
+                files: f.files,
+              })),
               knowledgeFiles: {}, // We'll push these individually
               currentFile: undefined, // We'll push this next
             };

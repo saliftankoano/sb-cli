@@ -1,7 +1,7 @@
 ---
 filePath: ui/src/hooks/useAgentCommands.ts
-fileVersion: 1c8a8193940c20be934d48b3e534207d158fc6e7
-lastUpdated: '2026-01-12T10:47:41.985Z'
+fileVersion: cae485cea0c20c1ddec5afe951997e82214609ce
+lastUpdated: '2026-01-12T10:54:17.426Z'
 updatedBy: sb-cli
 tags:
   - ui
@@ -15,29 +15,27 @@ humanVerified: false
 feature: agent-commands
 featureRole: helper
 userFlows:
-  - User can receive context updates when an agent joins
-  - User can interact with agents through commands
-  - User can view relevant file content as requested by agents
+  - Agent can receive context data upon joining a session
+  - Agent can execute commands to show files or request file contents
 relatedFiles:
-  - '@livekit/components-react'
   - '@/components/GuidedView'
   - '@/lib/api'
 ---
 ## Purpose
-This file defines a custom React hook that manages agent commands and context communication in a collaborative environment using LiveKit.
+This file defines a custom React hook that manages agent commands and context within a collaborative environment, facilitating communication between agents and the main application.
 
 ## Problem
-Before this file, there was no efficient mechanism to manage context communication with agents in a collaborative setting. Agents could join at any time, and there was a risk of sending redundant context data, which could lead to performance issues and confusion.
+Before this file existed, there was no structured way to manage the context and commands sent to agent participants in a collaborative session. Agents needed timely and relevant information to perform their tasks, but the existing system lacked a mechanism to efficiently send this data, leading to potential confusion and inefficiency.
 
 ## Solution
-The `useAgentCommands` hook implements a strategy to track which participants have already received context using a Set. It sends context data only once per agent and includes functionality for periodic checks to ensure that no agents are missed. This is achieved through the use of LiveKit's data channels to communicate with agents and manage their commands effectively.
+The `useAgentCommands` hook addresses this issue by establishing a data channel that sends context information and file contents to agents when they join a session. It fetches necessary data (session, features, knowledge files) and formats it to avoid exceeding payload limits. The hook also listens for incoming commands from agents, allowing for dynamic interactions based on their requests.
 
 ## Impact
-With this implementation, users can seamlessly interact with agents in a collaborative environment without worrying about redundant data transmission. Developers benefit from a more structured approach to managing agent interactions, leading to improved performance and user experience in applications that utilize this hook.
+With this implementation, agents can receive essential context and file information seamlessly, improving their ability to assist users effectively. This enhances the overall user experience in collaborative sessions, as agents are better equipped to respond to user needs and commands.
 
 ## Architecture Context
-This hook integrates with LiveKit's room and data channel contexts, allowing it to listen for participant connections and manage context sending. It fetches necessary data from the backend and sends it to agents as they join or request it, ensuring a smooth flow of information.
+This hook integrates with the LiveKit components for real-time communication and relies on various API calls to fetch session data, features, and knowledge files. It maintains a connection to the room context and manages participant connections dynamically, ensuring that agents are updated as new participants join.
 
 ## Gotchas (If Applicable)
-- The asynchronous nature of context sending means that if a send fails, the participant is marked for a retry, which could introduce delays in communication.
-- Ensure that the identity checks for agents are comprehensive enough to avoid false negatives, as the current implementation relies on string matching.
+- The implementation is designed to avoid exceeding the 64KB limit for data payloads by stripping non-essential fields from the features data. This is crucial for maintaining performance and ensuring successful data transmission.
+- The hook includes a periodic check for agents that may have joined after the initial context push, which is essential for ensuring all agents receive the necessary context, but could lead to redundant data pushes if not managed carefully.
