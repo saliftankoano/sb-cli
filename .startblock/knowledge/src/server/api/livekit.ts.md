@@ -1,7 +1,7 @@
 ---
 filePath: src/server/api/livekit.ts
-fileVersion: 47a0fae09d8add3f6e041cab60a1cfc07b8b24c0
-lastUpdated: '2026-01-03T02:24:27.861Z'
+fileVersion: 9674f2f871b9b2558c7acd2b813bcfa34f2cea42
+lastUpdated: '2026-01-12T00:25:41.660Z'
 updatedBy: sb-cli
 tags:
   - src
@@ -12,34 +12,31 @@ importance: low
 extractedBy: sb-cli@1.0.0
 model: gpt-4o-mini
 humanVerified: false
-feature: livekit
-featureRole: entry_point
+feature: livekit-onboarding
+featureRole: service
 userFlows:
-  - User can generate a LiveKit token for real-time communication
-  - User can create or join a communication room
+  - Agent can connect to a LiveKit room for onboarding
+  - Agent receives initial context upon joining a room
+  - Agent can request specific file content during the session
 relatedFiles:
-  - src/server/api/livekit.ts
-  - src/server/api/anotherFile.ts
+  - ./context-provider.js
 ---
 ## Purpose
-This file sets up API routes for generating LiveKit tokens necessary for real-time communication sessions.
+This file sets up API routes for managing LiveKit connections, enabling real-time context sharing during onboarding sessions.
 
-## Key Functionality
-- `setupLiveKitRoutes(repoRoot: string, config?: { url?: string; apiKey?: string; apiSecret?: string }): Router`: Configures the router with a POST endpoint to generate LiveKit tokens.
+## Problem
+Before this file, there was no mechanism for the server to provide real-time context to participants in onboarding sessions using LiveKit. This lack of context sharing could lead to disjointed experiences for agents, making it difficult for them to access necessary information during their interactions.
 
-## Gotchas
-- Credentials can be provided via environment variables or a config object; ensure both are validated to prevent errors.
-- If a room already exists, the error from creating the room is caught and ignored, which can lead to confusion if the room creation fails silently.
-- Room names are generated using session IDs or timestamps, which may lead to collisions if not managed properly.
-- The AccessToken identity is based on timestamps, which may not be unique across different sessions.
+## Solution
+This file connects the server to LiveKit rooms, allowing it to act as a context provider. It creates rooms dynamically based on session IDs and manages participant connections. When an agent connects, the server sends them relevant onboarding context and responds to specific requests for file content, thereby enhancing the onboarding experience.
 
-## Dependencies
-- `express`: Used for routing and handling HTTP requests.
-- `livekit-server-sdk`: Provides the necessary classes to interact with LiveKit services for room creation and token generation.
+## Impact
+Users can now have a seamless onboarding experience where they receive real-time context and file information directly from the server. This capability improves the efficiency of agents by providing them with the information they need as they interact with the system.
 
 ## Architecture Context
-This file is part of the server-side API that facilitates real-time communication features in the application, integrating with LiveKit for managing sessions and tokens.
+This file integrates with the LiveKit SDK to manage rooms and participants. It relies on environment variables for configuration and interacts with the context-provider module to fetch onboarding context and file knowledge. The data flow involves receiving requests from agents, processing them, and sending back relevant information through LiveKit's data channels.
 
-## Implementation Notes
-- The addition of the config parameter allows for more flexible deployment configurations.
-- Ensure that error handling is robust, especially for token generation and room creation, to avoid runtime issues during high load or unexpected states.
+## Gotchas (If Applicable)
+- Ensure that the LiveKit credentials are correctly set in the environment or configuration; otherwise, the server will fail to connect to rooms.
+- The activeRooms map is crucial for managing connections; failing to track this can lead to unnecessary resource consumption or connection issues.
+- Error handling is essential, particularly in the dataReceived event, to prevent crashes from malformed messages or unexpected payloads.

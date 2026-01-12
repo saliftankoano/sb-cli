@@ -1,7 +1,7 @@
 ---
 filePath: agent/knowledge_loader.py
-fileVersion: 0f6c7a202946c89ca89cbdaa6a1d864ead62c9e1
-lastUpdated: '2026-01-12T00:05:33.375Z'
+fileVersion: 4285be8799bdc15d12625e1ae00e75a6ff1c46c4
+lastUpdated: '2026-01-12T00:25:41.655Z'
 updatedBy: sb-cli
 tags:
   - agent
@@ -13,30 +13,25 @@ humanVerified: false
 feature: knowledge-loader
 featureRole: helper
 userFlows:
-  - User can load knowledge files for the agent
-  - User can debug knowledge loading issues
-  - User can access formatted knowledge context for files
-relatedFiles:
-  - frontmatter
-  - os
-  - json
-  - pathlib
+  - User can view a summary of system features
+  - User can understand the capabilities of specific features
+  - User can access related files for each feature
+relatedFiles: []
 ---
 ## Purpose
-Load and format knowledge files for the agent's context, while providing logging for debugging purposes.
+Utilities for formatting knowledge context.
 
 ## Problem
-Prior to this implementation, there was no mechanism to log attempts to load knowledge files, making it difficult to diagnose issues related to file accessibility or existence. This lack of visibility could lead to confusion when knowledge files were missing or incorrectly referenced, hindering the agent's functionality.
+Before this file, there was no systematic way to summarize and present feature documentation for the agent. This lack of organization made it difficult for users and developers to quickly understand the capabilities of different features and their associated files. The situation prompted the need for a utility that could format and present this information clearly.
 
 ## Solution
-This file introduces a logging function, `log_agent`, which records attempts to load knowledge files along with relevant metadata such as timestamps and file paths. The logging occurs before the loading process, allowing developers to see exactly what the system is trying to access. Additionally, the file maintains its core functionality of loading and formatting knowledge files, ensuring that the agent can still retrieve necessary information while providing enhanced debugging capabilities.
+This file provides functions to format feature summaries and contexts. It categorizes features, formats them into readable summaries, and extracts relevant information such as user flows and dependencies. The key approach involves grouping features by category and generating structured output that highlights important details in a user-friendly manner.
 
 ## Impact
-With the introduction of logging, developers can now easily trace and debug issues related to knowledge file loading. This improvement enhances the overall maintainability of the system, allowing for quicker identification of problems. Users benefit indirectly as the agent becomes more reliable in accessing and utilizing knowledge files, leading to a smoother user experience.
+With this file, users and developers can easily access and understand the features available in the system. It enhances the onboarding experience and improves documentation clarity, allowing for quicker feature discovery and comprehension. This ultimately leads to better utilization of the system's capabilities.
 
 ## Architecture Context
-This file is part of the agent's knowledge management system, which interacts with various knowledge files stored in a specific directory. It relies on the presence of these files to provide context and insights to the agent. The logging mechanism integrates seamlessly into the existing flow of loading knowledge, ensuring that all attempts are recorded without disrupting the primary functionality.
+This file fits into the agent's documentation system, where it serves as a utility for formatting and summarizing feature data. It interacts with feature data structures and is likely called by other components that manage feature documentation and presentation.
 
 ## Gotchas (If Applicable)
-- The logging function will fail silently if there are issues with the log file path, which may lead to a lack of logs when debugging.
-- Ensure that the log file is managed properly to prevent excessive growth, which could impact performance and readability.
+Ensure that feature data is complete and well-structured; missing or improperly formatted data can lead to incomplete summaries. There are no significant performance traps noted, but careful handling of edge cases is necessary to maintain output quality.

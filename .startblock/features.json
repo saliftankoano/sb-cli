@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-01-12T00:05:33.382Z",
+  "lastUpdated": "2026-01-12T00:25:41.661Z",
   "features": [
     {
       "id": "startblock-onboarding",
@@ -205,11 +205,14 @@
         "User receives personalized greetings and guidance",
         "User can receive voice-guided onboarding through the codebase",
         "User can interactively explore files with contextual assistance",
-        "User can get real-time feedback on their progress during onboarding"
+        "User can get real-time feedback on their progress during onboarding",
+        "User can interactively explore the codebase via voice commands",
+        "User can receive real-time updates and context about files",
+        "User can navigate through onboarding materials seamlessly"
       ],
-      "mermaidDiagram": "flowchart TD\n  Start([Onboarding Agent])\n  onboarding_agent_1[User can receive voice-guided onboarding throug...]\n  onboarding_agent_2[User can interactively explore files with conte...]\n  onboarding_agent_3[User can get real-time feedback on their progre...]\n  Start --> onboarding_agent_1\n  onboarding_agent_1 --> onboarding_agent_2\n  onboarding_agent_2 --> onboarding_agent_3\n  onboarding_agent_3 --> End([Complete])\n",
-      "mermaidJourney": "journey\n  title Onboarding Agent\n  section User Actions\n    User can receive voice-guided onboard...: 3: User\n    User can interactively explore files ...: 3: User\n    User can get real-time feedback on th...: 3: User\n",
-      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant agent/main.py as agent/main.py\n    participant ...loader/load_session.py as ...loader/load_session.py\n    participant ...oader/load_features.py as ...oader/load_features.py\n    participant ..._onboarding_context.py as ..._onboarding_context.py\n    participant ...et_context_for_file.py as ...et_context_for_file.py\n    participant ...at_features_summary.py as ...at_features_summary.py\n    participant ...et_feature_for_file.py as ...et_feature_for_file.py\n    participant ...build_system_prompt.py as ...build_system_prompt.py\n    User->>agent/main.py: User can receive voice-guided onboarding throug...\n    agent/main.py->>...loader/load_session.py: process\n    ...loader/load_session.py->>...oader/load_features.py: process\n    ...oader/load_features.py->>..._onboarding_context.py: process\n    ..._onboarding_context.py->>...et_context_for_file.py: process\n    ...et_context_for_file.py->>...at_features_summary.py: process\n    ...at_features_summary.py->>...et_feature_for_file.py: process\n    ...et_feature_for_file.py->>...build_system_prompt.py: process\n    ...build_system_prompt.py->>...ild_greeting_prompt.py: process\n    ...ild_greeting_prompt.py->>...d_transition_prompt.py: process\n    ...d_transition_prompt.py->>...nds/NavigateCommand.py: process\n    ...nds/NavigateCommand.py->>...nds/ShowFileCommand.py: process\n    ...nds/ShowFileCommand.py->>...s/serialize_command.py: process\n    agent/main.py->>...loader/load_session.py: process\n    ...loader/load_session.py->>...oader/load_features.py: process\n    ...oader/load_features.py->>..._onboarding_context.py: process\n    ..._onboarding_context.py->>...et_context_for_file.py: process\n    ...et_context_for_file.py->>...at_features_summary.py: process\n    ...at_features_summary.py->>...et_feature_for_file.py: process\n    ...et_feature_for_file.py->>...build_system_prompt.py: process\n    ...build_system_prompt.py->>...ild_greeting_prompt.py: process\n    ...ild_greeting_prompt.py->>...d_transition_prompt.py: process\n    ...d_transition_prompt.py->>...nds/NavigateCommand.py: process\n    ...nds/NavigateCommand.py->>...nds/ShowFileCommand.py: process\n    ...nds/ShowFileCommand.py->>...s/serialize_command.py: process\n    agent/main.py->>...loader/load_session.py: process\n    ...loader/load_session.py->>...oader/load_features.py: process\n    ...oader/load_features.py->>..._onboarding_context.py: process\n    ..._onboarding_context.py->>...et_context_for_file.py: process\n    ...et_context_for_file.py->>...at_features_summary.py: process\n    ...at_features_summary.py->>...et_feature_for_file.py: process\n    ...et_feature_for_file.py->>...build_system_prompt.py: process\n    ...build_system_prompt.py->>...ild_greeting_prompt.py: process\n    ...ild_greeting_prompt.py->>...d_transition_prompt.py: process\n    ...d_transition_prompt.py->>...nds/NavigateCommand.py: process\n    ...nds/NavigateCommand.py->>...nds/ShowFileCommand.py: process\n    ...nds/ShowFileCommand.py->>...s/serialize_command.py: process\n",
+      "mermaidDiagram": "flowchart TD\n  Start([Onboarding Agent])\n  onboarding_agent_1[User can interactively explore the codebase via...]\n  onboarding_agent_2[User can receive real-time updates and context ...]\n  onboarding_agent_3[User can navigate through onboarding materials ...]\n  Start --> onboarding_agent_1\n  onboarding_agent_1 --> onboarding_agent_2\n  onboarding_agent_2 --> onboarding_agent_3\n  onboarding_agent_3 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title Onboarding Agent\n  section User Actions\n    User can interactively explore the co...: 3: User\n    User can receive real-time updates an...: 3: User\n    User can navigate through onboarding ...: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant agent/main.py as agent/main.py\n    participant ...at_features_summary.py as ...at_features_summary.py\n    participant ...et_feature_for_file.py as ...et_feature_for_file.py\n    participant ...build_system_prompt.py as ...build_system_prompt.py\n    participant ...ild_greeting_prompt.py as ...ild_greeting_prompt.py\n    participant ...d_transition_prompt.py as ...d_transition_prompt.py\n    participant ...nds/NavigateCommand.py as ...nds/NavigateCommand.py\n    participant ...nds/ShowFileCommand.py as ...nds/ShowFileCommand.py\n    User->>agent/main.py: User can interactively explore the codebase via...\n    agent/main.py->>...at_features_summary.py: process\n    ...at_features_summary.py->>...et_feature_for_file.py: process\n    ...et_feature_for_file.py->>...build_system_prompt.py: process\n    ...build_system_prompt.py->>...ild_greeting_prompt.py: process\n    ...ild_greeting_prompt.py->>...d_transition_prompt.py: process\n    ...d_transition_prompt.py->>...nds/NavigateCommand.py: process\n    ...nds/NavigateCommand.py->>...nds/ShowFileCommand.py: process\n    ...nds/ShowFileCommand.py->>...s/serialize_command.py: process\n    ...s/serialize_command.py->>livekit/plugins/openai.py: process\n    livekit/plugins/openai.py->>livekit/plugins/silero.py: process\n    agent/main.py->>...at_features_summary.py: process\n    ...at_features_summary.py->>...et_feature_for_file.py: process\n    ...et_feature_for_file.py->>...build_system_prompt.py: process\n    ...build_system_prompt.py->>...ild_greeting_prompt.py: process\n    ...ild_greeting_prompt.py->>...d_transition_prompt.py: process\n    ...d_transition_prompt.py->>...nds/NavigateCommand.py: process\n    ...nds/NavigateCommand.py->>...nds/ShowFileCommand.py: process\n    ...nds/ShowFileCommand.py->>...s/serialize_command.py: process\n    ...s/serialize_command.py->>livekit/plugins/openai.py: process\n    livekit/plugins/openai.py->>livekit/plugins/silero.py: process\n    agent/main.py->>...at_features_summary.py: process\n    ...at_features_summary.py->>...et_feature_for_file.py: process\n    ...et_feature_for_file.py->>...build_system_prompt.py: process\n    ...build_system_prompt.py->>...ild_greeting_prompt.py: process\n    ...ild_greeting_prompt.py->>...d_transition_prompt.py: process\n    ...d_transition_prompt.py->>...nds/NavigateCommand.py: process\n    ...nds/NavigateCommand.py->>...nds/ShowFileCommand.py: process\n    ...nds/ShowFileCommand.py->>...s/serialize_command.py: process\n    ...s/serialize_command.py->>livekit/plugins/openai.py: process\n    livekit/plugins/openai.py->>livekit/plugins/silero.py: process\n",
       "files": [
         "agent/main.py",
         "knowledge_loader.py",
@@ -227,7 +230,9 @@
         "prompts/build_transition_prompt.py",
         "commands/NavigateCommand.py",
         "commands/ShowFileCommand.py",
-        "commands/serialize_command.py"
+        "commands/serialize_command.py",
+        "livekit/plugins/openai.py",
+        "livekit/plugins/silero.py"
       ],
       "filesByAction": {
         "User can navigate through the codebase using voice commands": [
@@ -319,6 +324,45 @@
           "commands/NavigateCommand.py",
           "commands/ShowFileCommand.py",
           "commands/serialize_command.py"
+        ],
+        "User can interactively explore the codebase via voice commands": [
+          "agent/main.py",
+          "knowledge_loader/format_features_summary.py",
+          "knowledge_loader/get_feature_for_file.py",
+          "prompts/build_system_prompt.py",
+          "prompts/build_greeting_prompt.py",
+          "prompts/build_transition_prompt.py",
+          "commands/NavigateCommand.py",
+          "commands/ShowFileCommand.py",
+          "commands/serialize_command.py",
+          "livekit/plugins/openai.py",
+          "livekit/plugins/silero.py"
+        ],
+        "User can receive real-time updates and context about files": [
+          "agent/main.py",
+          "knowledge_loader/format_features_summary.py",
+          "knowledge_loader/get_feature_for_file.py",
+          "prompts/build_system_prompt.py",
+          "prompts/build_greeting_prompt.py",
+          "prompts/build_transition_prompt.py",
+          "commands/NavigateCommand.py",
+          "commands/ShowFileCommand.py",
+          "commands/serialize_command.py",
+          "livekit/plugins/openai.py",
+          "livekit/plugins/silero.py"
+        ],
+        "User can navigate through onboarding materials seamlessly": [
+          "agent/main.py",
+          "knowledge_loader/format_features_summary.py",
+          "knowledge_loader/get_feature_for_file.py",
+          "prompts/build_system_prompt.py",
+          "prompts/build_greeting_prompt.py",
+          "prompts/build_transition_prompt.py",
+          "commands/NavigateCommand.py",
+          "commands/ShowFileCommand.py",
+          "commands/serialize_command.py",
+          "livekit/plugins/openai.py",
+          "livekit/plugins/silero.py"
         ]
       },
       "dependencies": [],
@@ -484,11 +528,13 @@
         "User can retrieve detailed knowledge about specific files",
         "User can load knowledge files for the agent",
         "User can debug knowledge loading issues",
-        "User can access formatted knowledge context for files"
+        "User can access formatted knowledge context for files",
+        "User can understand the capabilities of specific features",
+        "User can access related files for each feature"
       ],
-      "mermaidDiagram": "flowchart TD\n  Start([Knowledge Loader])\n  knowledge_loader_1[User can load knowledge files for the agent]\n  knowledge_loader_2[User can debug knowledge loading issues]\n  knowledge_loader_3[User can access formatted knowledge context for...]\n  Start --> knowledge_loader_1\n  knowledge_loader_1 --> knowledge_loader_2\n  knowledge_loader_2 --> knowledge_loader_3\n  knowledge_loader_3 --> End([Complete])\n",
-      "mermaidJourney": "journey\n  title Knowledge Loader\n  section User Actions\n    User can load knowledge files for the...: 3: User\n    User can debug knowledge loading issues: 3: User\n    User can access formatted knowledge c...: 3: User\n",
-      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant agent/knowledge_loader.py as agent/knowledge_loader.py\n    participant frontmatter as frontmatter\n    participant os as os\n    participant json as json\n    participant pathlib as pathlib\n    User->>agent/knowledge_loader.py: User can load knowledge files for the agent\n    agent/knowledge_loader.py->>frontmatter: process\n    frontmatter->>os: process\n    os->>json: process\n    json->>pathlib: process\n    agent/knowledge_loader.py->>frontmatter: process\n    frontmatter->>os: process\n    os->>json: process\n    json->>pathlib: process\n    agent/knowledge_loader.py->>frontmatter: process\n    frontmatter->>os: process\n    os->>json: process\n    json->>pathlib: process\n",
+      "mermaidDiagram": "flowchart TD\n  Start([Knowledge Loader])\n  knowledge_loader_1[User can view a summary of system features]\n  knowledge_loader_2[User can understand the capabilities of specifi...]\n  knowledge_loader_3[User can access related files for each feature]\n  Start --> knowledge_loader_1\n  knowledge_loader_1 --> knowledge_loader_2\n  knowledge_loader_2 --> knowledge_loader_3\n  knowledge_loader_3 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title Knowledge Loader\n  section User Actions\n    User can view a summary of system fea...: 3: User\n    User can understand the capabilities ...: 3: User\n    User can access related files for eac...: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant agent/knowledge_loader.py as agent/knowledge_loader.py\n    User->>agent/knowledge_loader.py: User can view a summary of system features\n",
       "files": [
         "agent/knowledge_loader.py",
         "frontmatter.py",
@@ -503,8 +549,7 @@
           "frontmatter.py"
         ],
         "User can view a summary of system features": [
-          "agent/knowledge_loader.py",
-          "frontmatter.py"
+          "agent/knowledge_loader.py"
         ],
         "User can retrieve detailed knowledge about specific files": [
           "agent/knowledge_loader.py",
@@ -530,6 +575,12 @@
           "os",
           "json",
           "pathlib"
+        ],
+        "User can understand the capabilities of specific features": [
+          "agent/knowledge_loader.py"
+        ],
+        "User can access related files for each feature": [
+          "agent/knowledge_loader.py"
         ]
       },
       "dependencies": [],
@@ -2476,6 +2527,93 @@
         "components",
         "typescript",
         "new"
+      ]
+    },
+    {
+      "id": "onboarding-context",
+      "name": "Onboarding Context",
+      "description": "",
+      "category": "API",
+      "userFlows": [
+        "User can access onboarding context for voice agents",
+        "User can retrieve specific file content along with its knowledge",
+        "User can manage and view features related to onboarding"
+      ],
+      "mermaidDiagram": "flowchart TD\n  Start([Onboarding Context])\n  onboarding_context_1[User can access onboarding context for voice ag...]\n  onboarding_context_2[User can retrieve specific file content along w...]\n  onboarding_context_3[User can manage and view features related to on...]\n  Start --> onboarding_context_1\n  onboarding_context_1 --> onboarding_context_2\n  onboarding_context_2 --> onboarding_context_3\n  onboarding_context_3 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title Onboarding Context\n  section User Actions\n    User can access onboarding context fo...: 3: User\n    User can retrieve specific file conte...: 3: User\n    User can manage and view features rel...: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant ...pi/context-provider.ts as ...pi/context-provider.ts\n    participant .../onboarding-session.js as .../onboarding-session.js\n    participant ../../config/loader.js as ../../config/loader.js\n    participant ../../utils/file-utils.js as ../../utils/file-utils.js\n    User->>...pi/context-provider.ts: User can access onboarding context for voice ag...\n    ...pi/context-provider.ts->>.../onboarding-session.js: process\n    .../onboarding-session.js->>../../config/loader.js: process\n    ../../config/loader.js->>../../utils/file-utils.js: process\n    ...pi/context-provider.ts->>.../onboarding-session.js: process\n    .../onboarding-session.js->>../../config/loader.js: process\n    ../../config/loader.js->>../../utils/file-utils.js: process\n    ...pi/context-provider.ts->>.../onboarding-session.js: process\n    .../onboarding-session.js->>../../config/loader.js: process\n    ../../config/loader.js->>../../utils/file-utils.js: process\n",
+      "files": [
+        "src/server/api/context-provider.ts",
+        "../../utils/onboarding-session.js",
+        "../../config/loader.js",
+        "../../utils/file-utils.js"
+      ],
+      "filesByAction": {
+        "User can access onboarding context for voice agents": [
+          "src/server/api/context-provider.ts",
+          "../../utils/onboarding-session.js",
+          "../../config/loader.js",
+          "../../utils/file-utils.js"
+        ],
+        "User can retrieve specific file content along with its knowledge": [
+          "src/server/api/context-provider.ts",
+          "../../utils/onboarding-session.js",
+          "../../config/loader.js",
+          "../../utils/file-utils.js"
+        ],
+        "User can manage and view features related to onboarding": [
+          "src/server/api/context-provider.ts",
+          "../../utils/onboarding-session.js",
+          "../../config/loader.js",
+          "../../utils/file-utils.js"
+        ]
+      },
+      "dependencies": [],
+      "tags": [
+        "src",
+        "server",
+        "api",
+        "typescript",
+        "new"
+      ]
+    },
+    {
+      "id": "livekit-onboarding",
+      "name": "Livekit Onboarding",
+      "description": "",
+      "category": "API",
+      "userFlows": [
+        "Agent can connect to a LiveKit room for onboarding",
+        "Agent receives initial context upon joining a room",
+        "Agent can request specific file content during the session"
+      ],
+      "mermaidDiagram": "flowchart TD\n  Start([Livekit Onboarding])\n  livekit_onboarding_1[Agent can connect to a LiveKit room for onboarding]\n  livekit_onboarding_2[Agent receives initial context upon joining a room]\n  livekit_onboarding_3[Agent can request specific file content during ...]\n  Start --> livekit_onboarding_1\n  livekit_onboarding_1 --> livekit_onboarding_2\n  livekit_onboarding_2 --> livekit_onboarding_3\n  livekit_onboarding_3 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title Livekit Onboarding\n  section User Actions\n    Agent can connect to a LiveKit room f...: 3: User\n    Agent receives initial context upon j...: 3: User\n    Agent can request specific file conte...: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant src/server/api/livekit.ts as src/server/api/livekit.ts\n    participant ./context-provider.js as ./context-provider.js\n    User->>src/server/api/livekit.ts: Agent can connect to a LiveKit room for onboarding\n    src/server/api/livekit.ts->>./context-provider.js: process\n    src/server/api/livekit.ts->>./context-provider.js: process\n    src/server/api/livekit.ts->>./context-provider.js: process\n",
+      "files": [
+        "src/server/api/livekit.ts",
+        "./context-provider.js"
+      ],
+      "filesByAction": {
+        "Agent can connect to a LiveKit room for onboarding": [
+          "src/server/api/livekit.ts",
+          "./context-provider.js"
+        ],
+        "Agent receives initial context upon joining a room": [
+          "src/server/api/livekit.ts",
+          "./context-provider.js"
+        ],
+        "Agent can request specific file content during the session": [
+          "src/server/api/livekit.ts",
+          "./context-provider.js"
+        ]
+      },
+      "dependencies": [],
+      "tags": [
+        "src",
+        "server",
+        "api",
+        "typescript"
       ]
     }
   ]
