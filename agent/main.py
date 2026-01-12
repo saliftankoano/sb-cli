@@ -15,10 +15,9 @@ from livekit.agents import (
     WorkerOptions,
     cli,
     llm,
-    UserInputTranscribedEvent,
 )
-from livekit.agents.voice import Agent as VoiceAgent, AgentSession
-from livekit.plugins import openai
+from livekit.agents.voice import VoiceAssistant
+import livekit.plugins.openai as openai
 import livekit.plugins.silero as silero
 from knowledge_loader import (
     format_features_summary,
@@ -71,8 +70,8 @@ class ContextStore:
             return False
 
 
-class OnboardingAgent(VoiceAgent):
-    """Voice agent that guides users through codebase onboarding."""
+class OnboardingAgent(VoiceAssistant):
+    """Voice assistant that guides users through codebase onboarding."""
 
     def __init__(self):
         self.room = None
@@ -85,15 +84,16 @@ class OnboardingAgent(VoiceAgent):
         tts_model = openai.TTS(voice="nova", model="tts-1")
         vad_model = silero.VAD.load()
 
-        # Initialize the voice agent with empty instructions initially
-        # They will be updated once context is received
+        # Initialize the voice assistant
         super().__init__(
-            instructions="You are an onboarding assistant. Please wait a moment while I load the codebase context.",
+            vad=vad_model,
             stt=stt_model,
             llm=llm_model,
             tts=tts_model,
-            vad=vad_model,
-            chat_ctx=llm.ChatContext(),
+            chat_ctx=llm.ChatContext().append(
+                role="system",
+                text="You are an onboarding assistant. Please wait a moment while I load the codebase context.",
+            ),
         )
 
     async def _request_file_from_server(self, file_path: str) -> Optional[Dict[str, Any]]:
@@ -168,11 +168,14 @@ class OnboardingAgent(VoiceAgent):
             tasks_doc=None,
         )
         
-        # Directly update the underlying LLM instructions
-        # Note: VoiceAgent doesn't have a direct instructions setter that's obvious,
-        # but we can update the chat context or instructions property if it exists.
-        # super().__init__ sets self._instructions
-        self._instructions = new_instructions
+        # Update the system message in chat context
+        for msg in self.chat_ctx.messages:
+            if msg.role == "system":
+                msg.content = new_instructions
+                return
+        
+        # If no system message found, insert one at the beginning
+        self.chat_ctx.messages.insert(0, llm.ChatMessage(role="system", content=new_instructions))
 
     async def _advance_to_next_file(self):
         """Advance to the next file in the journey."""
@@ -218,12 +221,12 @@ class OnboardingAgent(VoiceAgent):
                 to_feature=to_feature,
             )
             
-            await self.session.generate_reply(instructions=transition_prompt)
+            self.say(transition_prompt)
         else:
             # Reached end
             user_name = self.context.session.get("userName", "you")
             completion_prompt = f"Celebrate {user_name} completing the journey! Recp what they learned and encourage them."
-            await self.session.generate_reply(instructions=completion_prompt)
+            self.say(completion_prompt)
     
     async def _send_ui_command(self, command):
         """Send a UI command via data channel."""
@@ -278,7 +281,7 @@ class OnboardingAgent(VoiceAgent):
             first_file_knowledge=first_file_knowledge,
         )
         
-        await self.session.generate_reply(instructions=greeting_prompt)
+        self.say(greeting_prompt)
 
 
 async def entrypoint(ctx: JobContext):
@@ -320,6 +323,7 @@ async def entrypoint(ctx: JobContext):
         except Exception as e:
             print(f"[Agent] PARSE ERROR: {e}")
 
+    # Wait for context
     print("Starting onboarding agent (Context-Push mode)...")
     print(f"[Agent] WAITING for context push (25s timeout)...")
     
@@ -327,16 +331,21 @@ async def entrypoint(ctx: JobContext):
         print("[Agent] CRITICAL TIMEOUT: No context received.")
         print(f"[Agent] FINAL ROOM MEMBERS: {[p.identity for p in ctx.room.remote_participants.values()]}")
         print("[Agent] Falling back to generic mode.")
+        agent.say("Hi! I'm having trouble connecting to your local codebase. Make sure 'sb serve' is running.")
+    else:
+        # Update instructions and greet
+        print("[Agent] Context received. Starting onboarding...")
+        agent._update_system_instructions()
+        await agent.greet_user()
 
-    # Start the agent session
-    print("[Agent] Starting session...")
-    await agent.start(ctx.room)
-    
+    # Start the agent
+    print("[Agent] Starting assistant...")
+    agent.start(ctx.room)
+
     # Listen for transcription for navigation
-    @agent.session.on("user_input_transcribed")
-    def on_user_input(event: UserInputTranscribedEvent):
-        if not event.is_final: return
-        user_text = event.transcript.strip()
+    @agent.on("user_speech_committed")
+    def on_user_input(msg: llm.ChatMessage):
+        user_text = msg.content.strip()
         word_count = len(user_text.split())
         
         if word_count >= 15: return
@@ -348,11 +357,6 @@ async def entrypoint(ctx: JobContext):
             return
         
         asyncio.create_task(classify_and_handle_intent(agent, user_text))
-
-    # Update UI and Greet
-    if agent.context.session:
-        agent._update_system_instructions()
-        await agent.greet_user()
 
     await asyncio.sleep(1)
 

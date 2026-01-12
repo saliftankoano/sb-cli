@@ -87,20 +87,18 @@ export function useAgentCommands(): UseAgentCommandsReturn {
           });
 
           if (session) {
-            // 1. Send the base context (session + features) - this should be small
-            // We strip features to only essential fields to avoid the 64KB limit
+            // 1. Send the base context (session info only) - keep it minimal
             const baseContext = {
               type: "onboarding-context",
-              session,
-              features: features.features.map((f: any) => ({
-                name: f.name,
-                description: f.description,
-                category: f.category,
-                userFlows: f.userFlows,
-                files: f.files,
-              })),
-              knowledgeFiles: {}, // We'll push these individually
-              currentFile: undefined, // We'll push this next
+              session: {
+                userName: session.userName,
+                goal: session.goal,
+                experienceLevel: session.experienceLevel,
+                selectedFiles: session.selectedFiles,
+              },
+              features: [], // We'll push these next
+              knowledgeFiles: {},
+              currentFile: undefined,
             };
 
             const basePayload = new TextEncoder().encode(
@@ -115,7 +113,36 @@ export function useAgentCommands(): UseAgentCommandsReturn {
               destinationIdentities: [participant.identity],
             });
 
-            // 2. Send the first file's content
+            // 2. Send features in a separate message
+            const strippedFeatures = features.features.map((f: any) => ({
+              name: f.name,
+              description: f.description?.slice(0, 500), // Truncate long descriptions
+              category: f.category,
+              userFlows: f.userFlows?.slice(0, 5), // Only first 5 flows
+              files: f.files?.slice(0, 10), // Only first 10 files
+            }));
+
+            const featuresContext = {
+              type: "onboarding-context",
+              session: undefined,
+              features: strippedFeatures,
+              knowledgeFiles: {},
+              currentFile: undefined,
+            };
+
+            const featuresPayload = new TextEncoder().encode(
+              JSON.stringify(featuresContext)
+            );
+            console.warn(
+              `[ContextBridge] SENDING FEATURES to ${participant.identity}. Size: ${featuresPayload.length} bytes`
+            );
+
+            await send(featuresPayload, {
+              reliable: true,
+              destinationIdentities: [participant.identity],
+            });
+
+            // 3. Send the first file's content
             if (session.selectedFiles.length > 0) {
               const firstFilePath = session.selectedFiles[0];
               console.log(
