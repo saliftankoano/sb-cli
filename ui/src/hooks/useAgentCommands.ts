@@ -54,7 +54,11 @@ export function useAgentCommands(): UseAgentCommandsReturn {
       participantCount: room.remoteParticipants.size,
     });
 
+    const sentParticipants = new Set<string>();
+
     const sendContext = async (participant: any) => {
+      if (sentParticipants.has(participant.identity)) return;
+
       console.warn(
         `[ContextBridge] Checking participant: ${participant.identity} | IsAgent?`
       );
@@ -67,6 +71,7 @@ export function useAgentCommands(): UseAgentCommandsReturn {
         participant.identity.startsWith("PA_"); // LiveKit participant ID prefix
 
       if (isAgent) {
+        sentParticipants.add(participant.identity);
         console.warn(
           "[ContextBridge] TARGET AGENT DETECTED! Starting context push..."
         );
@@ -137,15 +142,15 @@ export function useAgentCommands(): UseAgentCommandsReturn {
               });
             }
 
-            // 3. Optional: Push knowledge file map in small chunks or individually if needed
-            // For now, let's just push the knowledge for the first file.
-            // The agent can request other files as it navigates.
-
             console.warn("[ContextBridge] PUSH SUCCESSFUL");
           } else {
-            console.warn("[ContextBridge] No session found, skipping context push");
+            sentParticipants.delete(participant.identity); // Try again later if no session
+            console.warn(
+              "[ContextBridge] No session found, skipping context push"
+            );
           }
         } catch (err) {
+          sentParticipants.delete(participant.identity); // Try again later if failed
           console.error("[ContextBridge] PUSH FAILED:", err);
         }
       } else {
@@ -177,19 +182,20 @@ export function useAgentCommands(): UseAgentCommandsReturn {
     // 3. Periodic check for agent if connection events were missed
     const interval = setInterval(() => {
       const participants = Array.from(room.remoteParticipants.values());
-      const agent = participants.find(
-        (p) =>
-          p.identity.toLowerCase().includes("agent") ||
-          p.identity.toLowerCase().includes("python")
-      );
-      if (agent) {
-        console.log(
-          "[ContextBridge] Periodic check found agent",
-          agent.identity
-        );
-        // sendContext is async, but we can call it here
-        // We'll only send if we haven't successfully sent yet (could add a ref for that)
-      }
+      participants.forEach((p) => {
+        if (!sentParticipants.has(p.identity)) {
+          const isAgent =
+            p.identity.toLowerCase().includes("agent") ||
+            p.identity.toLowerCase().includes("python");
+          if (isAgent) {
+            console.log(
+              "[ContextBridge] Periodic check found agent",
+              p.identity
+            );
+            sendContext(p);
+          }
+        }
+      });
     }, 5000);
 
     return () => {

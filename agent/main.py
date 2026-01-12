@@ -330,8 +330,8 @@ async def entrypoint(ctx: JobContext):
 
     # Start the agent session
     print("[Agent] Starting session...")
-    agent.session = AgentSession(agent)
-    await agent.session.start(ctx.room)
+    agent.session = AgentSession()
+    await agent.session.start(agent=agent, room=ctx.room)
     
     # Listen for transcription for navigation
     @agent.session.on("user_input_transcribed")

@@ -1,7 +1,7 @@
 ---
 filePath: ui/src/hooks/useAgentCommands.ts
-fileVersion: 113a58529a16b39fe9be517a01456a804fc0a701
-lastUpdated: '2026-01-12T10:41:25.272Z'
+fileVersion: 1c8a8193940c20be934d48b3e534207d158fc6e7
+lastUpdated: '2026-01-12T10:47:41.985Z'
 updatedBy: sb-cli
 tags:
   - ui
@@ -15,29 +15,29 @@ humanVerified: false
 feature: agent-commands
 featureRole: helper
 userFlows:
-  - Agent can receive onboarding context upon joining a session
-  - Agent can fetch specific file content on request
-  - Agent can respond to commands from users
+  - User can receive context updates when an agent joins
+  - User can interact with agents through commands
+  - User can view relevant file content as requested by agents
 relatedFiles:
-  - lib/api.ts
-  - components/GuidedView.ts
+  - '@livekit/components-react'
+  - '@/components/GuidedView'
+  - '@/lib/api'
 ---
 ## Purpose
-This file provides a custom React hook that manages the communication of context and file content between a client and an agent in a collaborative environment.
+This file defines a custom React hook that manages agent commands and context communication in a collaborative environment using LiveKit.
 
 ## Problem
-Before this file was implemented, there was no structured way to send relevant context and file content to agents joining a collaborative session. This lack of communication could lead to confusion and inefficiencies, as agents would not have the necessary information to assist users effectively.
+Before this file, there was no efficient mechanism to manage context communication with agents in a collaborative setting. Agents could join at any time, and there was a risk of sending redundant context data, which could lead to performance issues and confusion.
 
 ## Solution
-The `useAgentCommands` hook solves this problem by establishing a data channel for sending context and file content to agents. It sends a base context containing session details and features, followed by the content of the first selected file. This structured approach ensures that agents are onboarded with the necessary information to perform their tasks efficiently. The hook also listens for commands from agents, allowing for dynamic interactions based on user actions.
+The `useAgentCommands` hook implements a strategy to track which participants have already received context using a Set. It sends context data only once per agent and includes functionality for periodic checks to ensure that no agents are missed. This is achieved through the use of LiveKit's data channels to communicate with agents and manage their commands effectively.
 
 ## Impact
-With this implementation, agents can receive real-time context and file content, which enhances their ability to assist users in a collaborative setting. It streamlines the onboarding process for agents, allowing them to quickly access relevant files and information, thus improving overall user experience and collaboration.
+With this implementation, users can seamlessly interact with agents in a collaborative environment without worrying about redundant data transmission. Developers benefit from a more structured approach to managing agent interactions, leading to improved performance and user experience in applications that utilize this hook.
 
 ## Architecture Context
-This hook integrates with the LiveKit components for managing room contexts and participants. It fetches session data, features, and knowledge files from the API, ensuring that agents have the most up-to-date information upon joining. The data flow involves sending context and file content through a data channel, which is established when the hook is mounted.
+This hook integrates with LiveKit's room and data channel contexts, allowing it to listen for participant connections and manage context sending. It fetches necessary data from the backend and sends it to agents as they join or request it, ensuring a smooth flow of information.
 
 ## Gotchas (If Applicable)
-- The hook relies on correctly identifying agent participants; if the identification logic fails, non-agent participants may be processed incorrectly.
-- Sending knowledge files in chunks may introduce performance overhead if many files are involved, so monitoring the size of the payloads is important.
-- The periodic check for agents may not always catch late joiners if the connection events are missed, so additional handling may be necessary for edge cases.
+- The asynchronous nature of context sending means that if a send fails, the participant is marked for a retry, which could introduce delays in communication.
+- Ensure that the identity checks for agents are comprehensive enough to avoid false negatives, as the current implementation relies on string matching.
