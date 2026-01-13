@@ -43,6 +43,10 @@ class ContextStore:
 
     def update_context(self, data: Dict[str, Any]):
         """Update store with initial context payload."""
+        # #region debug log
+        with open('/Users/salif/Documents/floreo-labs/startblock/.cursor/debug.log', 'a') as f:
+            f.write(json.dumps({"location":"main.py:update_context", "message":"Received context packet", "data":{"type":data.get("type"), "has_session":bool(data.get("session")), "has_features":bool(data.get("features")), "has_file":bool(data.get("currentFile"))}, "timestamp":int(asyncio.get_event_loop().time()*1000), "sessionId":"debug-session", "hypothesisId":"H2"}) + "\n")
+        # #endregion
         if data.get("session"):
             self.session = data.get("session")
             print(f"[ContextStore] Received session. User: {self.session.get('userName')}")
@@ -118,9 +122,10 @@ class OnboardingAgent(VoiceAgent):
         tts_model = openai.TTS(voice="nova", model="tts-1")
         vad_model = silero.VAD.load()
 
-        # Initialize the voice agent with empty instructions initially
+        # Initialize the voice agent with truly empty instructions to prevent
+        # any initial generic talk before context is ready.
         super().__init__(
-            instructions="You are an onboarding assistant. Please wait a moment while I load the codebase context.",
+            instructions="",
             stt=stt_model,
             llm=llm_model,
             tts=tts_model,
@@ -298,6 +303,10 @@ class OnboardingAgent(VoiceAgent):
 
     async def greet_user(self):
         """Generate the initial greeting once context is ready."""
+        # #region debug log
+        with open('/Users/salif/Documents/floreo-labs/startblock/.cursor/debug.log', 'a') as f:
+            f.write(json.dumps({"location":"main.py:greet_user", "message":"Generating greeting", "data":{"has_session":bool(self.context.session), "has_features":bool(self.context.features), "has_file":bool(self.context.current_file)}, "timestamp":int(asyncio.get_event_loop().time()*1000), "sessionId":"debug-session", "hypothesisId":"H1"}) + "\n")
+        # #endregion
         print("[Agent] Generating greeting...")
         self._update_system_instructions()
         

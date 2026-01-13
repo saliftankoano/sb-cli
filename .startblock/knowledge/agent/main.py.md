@@ -1,7 +1,7 @@
 ---
 filePath: agent/main.py
-fileVersion: fe2a185687a6a6ffbea8c862bce9765b2b31a313
-lastUpdated: '2026-01-13T01:45:48.870Z'
+fileVersion: 474ace06496583ff3a6f662dfa4a088dd6756e94
+lastUpdated: '2026-01-13T01:57:43.385Z'
 updatedBy: sb-cli
 tags:
   - agent
@@ -11,11 +11,15 @@ extractedBy: sb-cli@1.0.0
 model: gpt-4o-mini
 humanVerified: false
 feature: onboarding-agent
-featureRole: component
+featureRole: service
 userFlows:
-  - User can receive personalized guidance during codebase onboarding
-  - User can navigate through files with voice commands
-  - User can ask questions and receive context-aware responses
+  - >-
+    User can receive personalized onboarding guidance based on their current
+    context.
+  - User can explore codebase files with relevant explanations and transitions.
+  - >-
+    User can interact with the agent using voice commands to navigate through
+    the onboarding process.
 relatedFiles:
   - knowledge_loader/format_features_summary.py
   - knowledge_loader/get_feature_for_file.py
@@ -27,20 +31,20 @@ relatedFiles:
   - commands/serialize_command.py
 ---
 ## Purpose
-This file implements a voice agent for guiding users through codebase onboarding, facilitating interactive learning through voice conversations.
+This file implements the LiveKit Agent for onboarding users through voice interactions during codebase exploration.
 
 ## Problem
-Prior to this implementation, onboarding users to a codebase was static and lacked personalization, leading to ineffective learning experiences. Users often struggled to navigate the codebase without tailored guidance, resulting in frustration and decreased productivity.
+Before this file, there was no structured way to manage user context during onboarding sessions, leading to generic and unengaging interactions. Users needed a more personalized experience to effectively learn about the codebase, which was not possible without tracking session details, features, and current files.
 
 ## Solution
-The `OnboardingAgent` class dynamically updates its instructions based on the user's session context and the current file being explored. It uses a context store to maintain session data, including user goals and experience levels, allowing the agent to provide relevant information and guidance. This approach ensures that the onboarding experience is tailored to each user's needs, adapting as they progress through the codebase.
+The file introduces the `OnboardingAgent` class, which manages user interactions and context through an in-memory `ContextStore`. It updates the context with session data, features, and current files, allowing the agent to generate personalized responses. Debug logging has been added to facilitate monitoring and troubleshooting of context updates and user greetings.
 
 ## Impact
-With this file, users can now engage in a more interactive and personalized onboarding experience. The agent can respond to user inputs in real-time, guiding them through the codebase effectively. This leads to improved user satisfaction and a more efficient learning process, ultimately enhancing productivity.
+Users can now receive tailored onboarding experiences that adapt based on their current context, enhancing their understanding of the codebase. Developers benefit from a structured approach to managing user sessions and interactions, leading to improved engagement and learning outcomes. The debug logging also aids in maintaining the system's reliability.
 
 ## Architecture Context
-The `OnboardingAgent` operates within a broader system that includes voice recognition and synthesis components, as well as a data channel for communication with a local server. It integrates with various plugins for speech-to-text (STT) and text-to-speech (TTS) functionalities, ensuring a seamless user experience. The context store plays a critical role in managing user sessions and knowledge files, facilitating data flow between the agent and the server.
+This file is part of a larger system that uses LiveKit for real-time communication. It integrates with various models for speech recognition, language processing, and text-to-speech, ensuring a seamless interaction flow. The context management is crucial for the onboarding process, as it allows the agent to respond appropriately based on the user's journey through the codebase.
 
 ## Gotchas (If Applicable)
-- The agent's ability to update the chat context is dependent on the SDK version in use; failure to handle this correctly may lead to inconsistent behavior.
-- Users should be aware that if the context is not fully established (session, features, and current file), the onboarding experience may revert to a generic mode, which could diminish the effectiveness of the guidance provided.
+- The agent waits for full context (session, features, and current file) before generating personalized responses. If the context is incomplete, it may fall back to generic responses, which could confuse users.
+- Debug logs are written to a specific file path, which may need to be adjusted for different environments to avoid permission issues or path errors.
