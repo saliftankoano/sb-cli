@@ -1,7 +1,7 @@
 ---
 filePath: agent/main.py
-fileVersion: 474ace06496583ff3a6f662dfa4a088dd6756e94
-lastUpdated: '2026-01-13T01:57:43.385Z'
+fileVersion: 96a3368452b681d8d41372c74730e364873120e1
+lastUpdated: '2026-01-13T09:32:03.057Z'
 updatedBy: sb-cli
 tags:
   - agent
@@ -11,15 +11,11 @@ extractedBy: sb-cli@1.0.0
 model: gpt-4o-mini
 humanVerified: false
 feature: onboarding-agent
-featureRole: service
+featureRole: component
 userFlows:
-  - >-
-    User can receive personalized onboarding guidance based on their current
-    context.
-  - User can explore codebase files with relevant explanations and transitions.
-  - >-
-    User can interact with the agent using voice commands to navigate through
-    the onboarding process.
+  - User can receive personalized onboarding guidance through voice interactions
+  - User can navigate through code files with contextual assistance
+  - User can ask questions and receive relevant information about the codebase
 relatedFiles:
   - knowledge_loader/format_features_summary.py
   - knowledge_loader/get_feature_for_file.py
@@ -31,20 +27,21 @@ relatedFiles:
   - commands/serialize_command.py
 ---
 ## Purpose
-This file implements the LiveKit Agent for onboarding users through voice interactions during codebase exploration.
+This file implements a voice agent for onboarding users through a codebase, facilitating interactive voice conversations during the onboarding process.
 
 ## Problem
-Before this file, there was no structured way to manage user context during onboarding sessions, leading to generic and unengaging interactions. Users needed a more personalized experience to effectively learn about the codebase, which was not possible without tracking session details, features, and current files.
+Before this file, users lacked a structured and interactive way to onboard to the codebase, leading to confusion and a steep learning curve. The need for a guided experience prompted the creation of this voice agent, which can respond to user queries and provide contextual information about the codebase.
 
 ## Solution
-The file introduces the `OnboardingAgent` class, which manages user interactions and context through an in-memory `ContextStore`. It updates the context with session data, features, and current files, allowing the agent to generate personalized responses. Debug logging has been added to facilitate monitoring and troubleshooting of context updates and user greetings.
+The file defines an `OnboardingAgent` class that extends a voice agent, utilizing a `ContextStore` to manage session data, features, and current files. It listens for context messages from a local server and updates its state accordingly. The agent can generate personalized greetings and transition messages based on user input, enhancing the onboarding experience.
 
 ## Impact
-Users can now receive tailored onboarding experiences that adapt based on their current context, enhancing their understanding of the codebase. Developers benefit from a structured approach to managing user sessions and interactions, leading to improved engagement and learning outcomes. The debug logging also aids in maintaining the system's reliability.
+Users can now engage with the codebase in a more intuitive manner, receiving real-time assistance and guidance as they navigate through files. This leads to improved user satisfaction and a more effective onboarding process, ultimately reducing the time required for new users to become productive.
 
 ## Architecture Context
-This file is part of a larger system that uses LiveKit for real-time communication. It integrates with various models for speech recognition, language processing, and text-to-speech, ensuring a seamless interaction flow. The context management is crucial for the onboarding process, as it allows the agent to respond appropriately based on the user's journey through the codebase.
+The agent connects to a local server and listens for context updates, which it uses to inform its interactions. It integrates with various models for speech recognition and text-to-speech, ensuring smooth communication. The context store is central to managing user-specific data, which is critical for personalized interactions.
 
 ## Gotchas (If Applicable)
-- The agent waits for full context (session, features, and current file) before generating personalized responses. If the context is incomplete, it may fall back to generic responses, which could confuse users.
-- Debug logs are written to a specific file path, which may need to be adjusted for different environments to avoid permission issues or path errors.
+- The removal of debug logging may hinder troubleshooting; consider implementing alternative logging solutions for production.
+- Ensure that the context waiting mechanism is robust, as timeouts can lead to generic responses if full context is not received in time. 
+- Users should be aware that if they provide too few words in their input, the agent may not respond effectively, which could lead to frustration.
