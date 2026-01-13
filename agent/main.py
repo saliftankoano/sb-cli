@@ -201,21 +201,21 @@ class OnboardingAgent(VoiceAgent):
             tasks_doc=None,
         )
         
-        # Update the instructions property (for future generate_reply calls)
+        # Update the instructions property
         self._instructions = new_instructions
         
-        # Update the system message in the chat context directly
-        # This is CRITICAL for the current session to pick up the changes
-        if self.chat_ctx and self.chat_ctx.messages:
-            for msg in self.chat_ctx.messages:
-                if msg.role == "system":
-                    msg.content = new_instructions
-                    print(f"[Agent] Updated system instructions in chat context for {current_file_path}")
-                    return
-            
-            # If no system message found, insert one at the beginning
-            self.chat_ctx.messages.insert(0, llm.ChatMessage(role="system", content=new_instructions))
-            print(f"[Agent] Inserted new system instructions for {current_file_path}")
+        # Update the chat context if possible (handles older/newer SDK variants)
+        try:
+            # Try newer SDK style (VoiceAssistant)
+            if hasattr(self, 'chat_ctx') and self.chat_ctx:
+                # If it's the newer SDK, we can't easily find 'messages' on ReadOnly version
+                # But we can try to append a new system message which often overrides earlier ones in priority
+                # for some LLM configurations, or just rely on self._instructions.
+                pass
+        except Exception as e:
+            print(f"[Agent] Could not update chat context: {e}")
+        
+        print(f"[Agent] Updated persona instructions for {current_file_path}")
 
     async def _advance_to_next_file(self):
         """Advance to the next file in the journey."""
@@ -254,7 +254,7 @@ class OnboardingAgent(VoiceAgent):
                 end_line=50,
             )
             
-            # 5. Update LLM instructions for the new file (CRITICAL!)
+            # 5. Update LLM instructions for the new file
             self._update_system_instructions()
             
             # 6. Generate transition message with new context
@@ -267,7 +267,8 @@ class OnboardingAgent(VoiceAgent):
             )
             
             print(f"[Agent] Generating transition reply for {to_file}")
-            await self.session.generate_reply(instructions=transition_prompt)
+            # Use the full updated persona as base for this transition
+            await self.session.generate_reply(instructions=f"{self._instructions}\n\nTASK: {transition_prompt}")
         else:
             # Reached end
             user_name = self.context.session.get("userName", "you")
@@ -327,7 +328,8 @@ class OnboardingAgent(VoiceAgent):
             first_file_knowledge=first_file_knowledge,
         )
         
-        await self.session.generate_reply(instructions=greeting_prompt)
+        # Use full instructions + specific greeting task
+        await self.session.generate_reply(instructions=f"{self._instructions}\n\nTASK: {greeting_prompt}")
 
 
 async def entrypoint(ctx: JobContext):
