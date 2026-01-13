@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-01-13T09:32:03.064Z",
+  "lastUpdated": "2026-01-13T09:45:46.548Z",
   "features": [
     {
       "id": "startblock-onboarding",
@@ -3272,11 +3272,14 @@
         "User can view specific files and their explanations during onboarding",
         "User can receive real-time guidance during codebase exploration",
         "User can navigate through different files in the codebase using voice commands",
-        "User can ask questions and receive answers about the codebase"
+        "User can ask questions and receive answers about the codebase",
+        "User can navigate to the next file in the onboarding process",
+        "User can go back to the previous file during onboarding",
+        "User receives personalized guidance based on their context and progress"
       ],
-      "mermaidDiagram": "flowchart TD\n  Start([Codebase Onboarding])\n  codebase_onboarding_1[User can receive real-time guidance during code...]\n  codebase_onboarding_2[User can navigate through different files in th...]\n  codebase_onboarding_3[User can ask questions and receive answers abou...]\n  Start --> codebase_onboarding_1\n  codebase_onboarding_1 --> codebase_onboarding_2\n  codebase_onboarding_2 --> codebase_onboarding_3\n  codebase_onboarding_3 --> End([Complete])\n",
-      "mermaidJourney": "journey\n  title Codebase Onboarding\n  section User Actions\n    User can receive real-time guidance d...: 3: User\n    User can navigate through different f...: 3: User\n    User can ask questions and receive an...: 3: User\n",
-      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant agent/main.py as agent/main.py\n    participant ...at_features_summary.py as ...at_features_summary.py\n    participant ...et_feature_for_file.py as ...et_feature_for_file.py\n    participant ...build_system_prompt.py as ...build_system_prompt.py\n    participant ...ild_greeting_prompt.py as ...ild_greeting_prompt.py\n    participant ...d_transition_prompt.py as ...d_transition_prompt.py\n    participant ...nds/NavigateCommand.py as ...nds/NavigateCommand.py\n    participant ...nds/ShowFileCommand.py as ...nds/ShowFileCommand.py\n    User->>agent/main.py: User can receive real-time guidance during code...\n    agent/main.py->>...at_features_summary.py: process\n    ...at_features_summary.py->>...et_feature_for_file.py: process\n    ...et_feature_for_file.py->>...build_system_prompt.py: process\n    ...build_system_prompt.py->>...ild_greeting_prompt.py: process\n    ...ild_greeting_prompt.py->>...d_transition_prompt.py: process\n    ...d_transition_prompt.py->>...nds/NavigateCommand.py: process\n    ...nds/NavigateCommand.py->>...nds/ShowFileCommand.py: process\n    ...nds/ShowFileCommand.py->>...s/serialize_command.py: process\n    agent/main.py->>...at_features_summary.py: process\n    ...at_features_summary.py->>...et_feature_for_file.py: process\n    ...et_feature_for_file.py->>...build_system_prompt.py: process\n    ...build_system_prompt.py->>...ild_greeting_prompt.py: process\n    ...ild_greeting_prompt.py->>...d_transition_prompt.py: process\n    ...d_transition_prompt.py->>...nds/NavigateCommand.py: process\n    ...nds/NavigateCommand.py->>...nds/ShowFileCommand.py: process\n    ...nds/ShowFileCommand.py->>...s/serialize_command.py: process\n    agent/main.py->>...at_features_summary.py: process\n    ...at_features_summary.py->>...et_feature_for_file.py: process\n    ...et_feature_for_file.py->>...build_system_prompt.py: process\n    ...build_system_prompt.py->>...ild_greeting_prompt.py: process\n    ...ild_greeting_prompt.py->>...d_transition_prompt.py: process\n    ...d_transition_prompt.py->>...nds/NavigateCommand.py: process\n    ...nds/NavigateCommand.py->>...nds/ShowFileCommand.py: process\n    ...nds/ShowFileCommand.py->>...s/serialize_command.py: process\n",
+      "mermaidDiagram": "flowchart TD\n  Start([Codebase Onboarding])\n  codebase_onboarding_1[User can navigate to the next file in the onboa...]\n  codebase_onboarding_2[User can go back to the previous file during on...]\n  codebase_onboarding_3[User receives personalized guidance based on th...]\n  Start --> codebase_onboarding_1\n  codebase_onboarding_1 --> codebase_onboarding_2\n  codebase_onboarding_2 --> codebase_onboarding_3\n  codebase_onboarding_3 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title Codebase Onboarding\n  section User Actions\n    User can navigate to the next file in...: 3: User\n    User can go back to the previous file...: 3: User\n    User receives personalized guidance b...: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant agent/main.py as agent/main.py\n    participant ...ormat_features_summary as ...ormat_features_summary\n    participant ...r/get_feature_for_file as ...r/get_feature_for_file\n    participant ...ts/build_system_prompt as ...ts/build_system_prompt\n    participant .../build_greeting_prompt as .../build_greeting_prompt\n    participant ...uild_transition_prompt as ...uild_transition_prompt\n    participant commands/NavigateCommand as commands/NavigateCommand\n    participant commands/ShowFileCommand as commands/ShowFileCommand\n    User->>agent/main.py: User can navigate to the next file in the onboa...\n    agent/main.py->>...ormat_features_summary: process\n    ...ormat_features_summary->>...r/get_feature_for_file: process\n    ...r/get_feature_for_file->>...ts/build_system_prompt: process\n    ...ts/build_system_prompt->>.../build_greeting_prompt: process\n    .../build_greeting_prompt->>...uild_transition_prompt: process\n    ...uild_transition_prompt->>commands/NavigateCommand: process\n    commands/NavigateCommand->>commands/ShowFileCommand: process\n    commands/ShowFileCommand->>...ands/serialize_command: process\n    agent/main.py->>...ormat_features_summary: process\n    ...ormat_features_summary->>...r/get_feature_for_file: process\n    ...r/get_feature_for_file->>...ts/build_system_prompt: process\n    ...ts/build_system_prompt->>.../build_greeting_prompt: process\n    .../build_greeting_prompt->>...uild_transition_prompt: process\n    ...uild_transition_prompt->>commands/NavigateCommand: process\n    commands/NavigateCommand->>commands/ShowFileCommand: process\n    commands/ShowFileCommand->>...ands/serialize_command: process\n    agent/main.py->>...ormat_features_summary: process\n    ...ormat_features_summary->>...r/get_feature_for_file: process\n    ...r/get_feature_for_file->>...ts/build_system_prompt: process\n    ...ts/build_system_prompt->>.../build_greeting_prompt: process\n    .../build_greeting_prompt->>...uild_transition_prompt: process\n    ...uild_transition_prompt->>commands/NavigateCommand: process\n    commands/NavigateCommand->>commands/ShowFileCommand: process\n    commands/ShowFileCommand->>...ands/serialize_command: process\n",
       "files": [
         "agent/main.py",
         "knowledge_loader.py",
@@ -3289,7 +3292,15 @@
         "prompts/build_transition_prompt.py",
         "commands/NavigateCommand.py",
         "commands/ShowFileCommand.py",
-        "commands/serialize_command.py"
+        "commands/serialize_command.py",
+        "knowledge_loader/format_features_summary",
+        "knowledge_loader/get_feature_for_file",
+        "prompts/build_system_prompt",
+        "prompts/build_greeting_prompt",
+        "prompts/build_transition_prompt",
+        "commands/NavigateCommand",
+        "commands/ShowFileCommand",
+        "commands/serialize_command"
       ],
       "filesByAction": {
         "User can interact with the onboarding agent via voice commands": [
@@ -3360,6 +3371,39 @@
           "commands/NavigateCommand.py",
           "commands/ShowFileCommand.py",
           "commands/serialize_command.py"
+        ],
+        "User can navigate to the next file in the onboarding process": [
+          "agent/main.py",
+          "knowledge_loader/format_features_summary",
+          "knowledge_loader/get_feature_for_file",
+          "prompts/build_system_prompt",
+          "prompts/build_greeting_prompt",
+          "prompts/build_transition_prompt",
+          "commands/NavigateCommand",
+          "commands/ShowFileCommand",
+          "commands/serialize_command"
+        ],
+        "User can go back to the previous file during onboarding": [
+          "agent/main.py",
+          "knowledge_loader/format_features_summary",
+          "knowledge_loader/get_feature_for_file",
+          "prompts/build_system_prompt",
+          "prompts/build_greeting_prompt",
+          "prompts/build_transition_prompt",
+          "commands/NavigateCommand",
+          "commands/ShowFileCommand",
+          "commands/serialize_command"
+        ],
+        "User receives personalized guidance based on their context and progress": [
+          "agent/main.py",
+          "knowledge_loader/format_features_summary",
+          "knowledge_loader/get_feature_for_file",
+          "prompts/build_system_prompt",
+          "prompts/build_greeting_prompt",
+          "prompts/build_transition_prompt",
+          "commands/NavigateCommand",
+          "commands/ShowFileCommand",
+          "commands/serialize_command"
         ]
       },
       "dependencies": [],

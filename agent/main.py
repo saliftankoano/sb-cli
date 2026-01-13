@@ -111,6 +111,7 @@ class OnboardingAgent(VoiceAgent):
         self.room = None
         self.context = ContextStore()
         self.current_file_index = 0
+        self._last_nav_time = 0  # Cooldown for navigation
         
         # Initialize STT, LLM, and TTS
         stt_model = openai.STT(model="whisper-1")
@@ -222,6 +223,13 @@ class OnboardingAgent(VoiceAgent):
         if not self.context.session:
             return
         
+        # Cooldown check: prevent double-navigation
+        now = asyncio.get_event_loop().time()
+        if now - self._last_nav_time < 3.0:
+            print(f"[Agent] Navigation cooldown active, ignoring request.")
+            return
+        self._last_nav_time = now
+
         selected_files = self.context.session.get("selectedFiles", [])
         total_files = len(selected_files)
         
@@ -274,6 +282,43 @@ class OnboardingAgent(VoiceAgent):
             user_name = self.context.session.get("userName", "you")
             completion_prompt = f"Celebrate {user_name} completing the journey! Recp what they learned and encourage them."
             await self.session.generate_reply(instructions=completion_prompt)
+
+    async def _go_to_previous_file(self):
+        """Go back to the previous file in the journey."""
+        if not self.context.session:
+            return
+            
+        # Cooldown check
+        now = asyncio.get_event_loop().time()
+        if now - self._last_nav_time < 3.0: return
+        self._last_nav_time = now
+
+        selected_files = self.context.session.get("selectedFiles", [])
+        
+        if self.current_file_index > 0:
+            from_file = selected_files[self.current_file_index]
+            self.current_file_index -= 1
+            to_file = selected_files[self.current_file_index]
+            
+            print(f"[Agent] Going back from {from_file} to {to_file}")
+            
+            if self.session: self.session.interrupt()
+
+            file_data = await self._request_file_from_server(to_file)
+            if file_data: self.context.current_file = file_data
+            
+            to_feature = get_feature_for_file(self.context.features, to_file)
+            
+            await self._show_file_in_ui(
+                file=to_file, title=to_file.split("/")[-1],
+                explanation=f"Let's head back to {to_file}.",
+                start_line=1, end_line=50,
+            )
+            
+            self._update_system_instructions()
+            
+            transition_prompt = f"Smoothly transition back to {to_file}. Briefly explain that we're re-examining it."
+            await self.session.generate_reply(instructions=f"{self._instructions}\n\nTASK: {transition_prompt}")
     
     async def _send_ui_command(self, command):
         """Send a UI command via data channel."""
@@ -400,12 +445,20 @@ async def entrypoint(ctx: JobContext):
         
         if word_count >= 15: return
         
-        if word_count <= 3:
-            quick_nav = ["next", "got it", "okay", "continue", "proceed"]
-            if any(nav in user_text.lower() for nav in quick_nav):
-                asyncio.create_task(agent._advance_to_next_file())
-            return
+        # 1. Immediate keyword check for snappy feel
+        text_lower = user_text.lower()
         
+        # "next" commands
+        if any(nav in text_lower for nav in ["next file", "move forward", "go forward", "proceed"]):
+            asyncio.create_task(agent._advance_to_next_file())
+            return
+            
+        # "previous" commands
+        if any(nav in text_lower for nav in ["previous file", "go back", "move back", "backtrack"]):
+            asyncio.create_task(agent._go_to_previous_file())
+            return
+
+        # 2. Ambiguous short phrases -> classify
         asyncio.create_task(classify_and_handle_intent(agent, user_text))
 
     await session.start(agent=agent, room=ctx.room)
@@ -425,7 +478,7 @@ async def entrypoint(ctx: JobContext):
 
 
 async def classify_and_handle_intent(agent, user_text: str):
-    """Classify user intent for navigation."""
+    """Classify user intent for navigation with improved prompt."""
     try:
         from openai import AsyncOpenAI
         client = AsyncOpenAI()
@@ -436,17 +489,21 @@ async def classify_and_handle_intent(agent, user_text: str):
             model="gpt-4o-mini",
             messages=[{
                 "role": "system",
-                "content": "Classify intent as NAVIGATE, QUESTION, or OTHER. User is in codebase onboarding."
+                "content": "Classify user intent as NEXT, BACK, or OTHER. ONLY respond with one of these three words."
             }, {
                 "role": "user", 
-                "content": f"File: {current_file}\nUser: \"{user_text}\"\nIntent:"
+                "content": f"Context: Codebase onboarding. Current file: {current_file}. User said: \"{user_text}\""
             }],
-            max_tokens=10, temperature=0
+            max_tokens=5, temperature=0
         )
         
         intent = response.choices[0].message.content.strip().upper()
-        if intent == "NAVIGATE":
+        print(f"[Agent] Classified intent: {intent} for \"{user_text}\"")
+        
+        if "NEXT" in intent:
             await agent._advance_to_next_file()
+        elif "BACK" in intent:
+            await agent._go_to_previous_file()
     except Exception as e:
         print(f"[Agent] Intent error: {e}")
 
