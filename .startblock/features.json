@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-01-13T10:08:17.361Z",
+  "lastUpdated": "2026-01-13T10:20:26.976Z",
   "features": [
     {
       "id": "startblock-onboarding",
@@ -1842,10 +1842,12 @@
         "User can analyze the context of a file in a repository",
         "Developers can generate structured documentation for code analysis",
         "Users can understand the rationale behind code decisions",
-        "Team members can onboard more effectively with clear documentation"
+        "Team members can onboard more effectively with clear documentation",
+        "Developers can generate structured documentation for their code.",
+        "Team members can understand the rationale behind design decisions more clearly."
       ],
-      "mermaidDiagram": "flowchart TD\n  Start([Prompts Templates])\n  prompts_templates_1[Developers can generate structured documentatio...]\n  prompts_templates_2[Users can understand the rationale behind code ...]\n  prompts_templates_3[Team members can onboard more effectively with ...]\n  Start --> prompts_templates_1\n  prompts_templates_1 --> prompts_templates_2\n  prompts_templates_2 --> prompts_templates_3\n  prompts_templates_3 --> End([Complete])\n",
-      "mermaidJourney": "journey\n  title Prompts Templates\n  section User Actions\n    Developers can generate structured do...: 3: User\n    Users can understand the rationale be...: 3: User\n    Team members can onboard more effecti...: 3: User\n",
+      "mermaidDiagram": "flowchart TD\n  Start([Prompts Templates])\n  prompts_templates_1[Developers can generate structured documentatio...]\n  prompts_templates_2[Team members can understand the rationale behin...]\n  Start --> prompts_templates_1\n  prompts_templates_1 --> prompts_templates_2\n  prompts_templates_2 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title Prompts Templates\n  section User Actions\n    Developers can generate structured do...: 3: User\n    Team members can understand the ratio...: 3: User\n",
       "mermaidSequence": "sequenceDiagram\n    participant User\n    participant src/prompts/templates.ts as src/prompts/templates.ts\n    User->>src/prompts/templates.ts: Developers can generate structured documentatio...\n",
       "files": [
         "src/prompts/templates.ts"
@@ -1870,6 +1872,12 @@
           "src/prompts/templates.ts"
         ],
         "Team members can onboard more effectively with clear documentation": [
+          "src/prompts/templates.ts"
+        ],
+        "Developers can generate structured documentation for their code.": [
+          "src/prompts/templates.ts"
+        ],
+        "Team members can understand the rationale behind design decisions more clearly.": [
           "src/prompts/templates.ts"
         ]
       },
@@ -2325,11 +2333,14 @@
       "category": "Services",
       "userFlows": [
         "User can analyze multiple files for insights",
-        "User can generate onboarding tasks based on their goals"
+        "User can generate onboarding tasks based on their goals",
+        "User can analyze code files for insights and documentation",
+        "User can generate onboarding tasks based on code analysis",
+        "User can retrieve structured insights for better understanding of codebase"
       ],
-      "mermaidDiagram": "flowchart TD\n  Start([Openai Client])\n  openai_client_1[User can analyze multiple files for insights]\n  openai_client_2[User can generate onboarding tasks based on the...]\n  Start --> openai_client_1\n  openai_client_1 --> openai_client_2\n  openai_client_2 --> End([Complete])\n",
-      "mermaidJourney": "journey\n  title Openai Client\n  section User Actions\n    User can analyze multiple files for i...: 3: User\n    User can generate onboarding tasks ba...: 3: User\n",
-      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant src/core/openai-client.ts as src/core/openai-client.ts\n    participant ../config/defaults.js as ../config/defaults.js\n    participant ../prompts/templates.js as ../prompts/templates.js\n    participant ../utils/sleep.js as ../utils/sleep.js\n    User->>src/core/openai-client.ts: User can analyze multiple files for insights\n    src/core/openai-client.ts->>../config/defaults.js: process\n    ../config/defaults.js->>../prompts/templates.js: process\n    ../prompts/templates.js->>../utils/sleep.js: process\n    src/core/openai-client.ts->>../config/defaults.js: process\n    ../config/defaults.js->>../prompts/templates.js: process\n    ../prompts/templates.js->>../utils/sleep.js: process\n",
+      "mermaidDiagram": "flowchart TD\n  Start([Openai Client])\n  openai_client_1[User can analyze code files for insights and do...]\n  openai_client_2[User can generate onboarding tasks based on cod...]\n  openai_client_3[User can retrieve structured insights for bette...]\n  Start --> openai_client_1\n  openai_client_1 --> openai_client_2\n  openai_client_2 --> openai_client_3\n  openai_client_3 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title Openai Client\n  section User Actions\n    User can analyze code files for insig...: 3: User\n    User can generate onboarding tasks ba...: 3: User\n    User can retrieve structured insights...: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant src/core/openai-client.ts as src/core/openai-client.ts\n    participant ../config/defaults.js as ../config/defaults.js\n    participant ../prompts/templates.js as ../prompts/templates.js\n    participant ../utils/sleep.js as ../utils/sleep.js\n    User->>src/core/openai-client.ts: User can analyze code files for insights and do...\n    src/core/openai-client.ts->>../config/defaults.js: process\n    ../config/defaults.js->>../prompts/templates.js: process\n    ../prompts/templates.js->>../utils/sleep.js: process\n    src/core/openai-client.ts->>../config/defaults.js: process\n    ../config/defaults.js->>../prompts/templates.js: process\n    ../prompts/templates.js->>../utils/sleep.js: process\n    src/core/openai-client.ts->>../config/defaults.js: process\n    ../config/defaults.js->>../prompts/templates.js: process\n    ../prompts/templates.js->>../utils/sleep.js: process\n",
       "files": [
         "src/core/openai-client.ts",
         "../config/defaults.js",
@@ -2344,6 +2355,24 @@
           "../utils/sleep.js"
         ],
         "User can generate onboarding tasks based on their goals": [
+          "src/core/openai-client.ts",
+          "../config/defaults.js",
+          "../prompts/templates.js",
+          "../utils/sleep.js"
+        ],
+        "User can analyze code files for insights and documentation": [
+          "src/core/openai-client.ts",
+          "../config/defaults.js",
+          "../prompts/templates.js",
+          "../utils/sleep.js"
+        ],
+        "User can generate onboarding tasks based on code analysis": [
+          "src/core/openai-client.ts",
+          "../config/defaults.js",
+          "../prompts/templates.js",
+          "../utils/sleep.js"
+        ],
+        "User can retrieve structured insights for better understanding of codebase": [
           "src/core/openai-client.ts",
           "../config/defaults.js",
           "../prompts/templates.js",
@@ -3323,11 +3352,12 @@
         "User can ask questions and receive answers about the codebase",
         "User can navigate to the next file in the onboarding process",
         "User can go back to the previous file during onboarding",
-        "User receives personalized guidance based on their context and progress"
+        "User receives personalized guidance based on their context and progress",
+        "User can ask general questions or confirm readiness during onboarding"
       ],
-      "mermaidDiagram": "flowchart TD\n  Start([Codebase Onboarding])\n  codebase_onboarding_1[User can navigate to the next file in the onboa...]\n  codebase_onboarding_2[User can go back to the previous file during on...]\n  codebase_onboarding_3[User receives personalized guidance based on th...]\n  Start --> codebase_onboarding_1\n  codebase_onboarding_1 --> codebase_onboarding_2\n  codebase_onboarding_2 --> codebase_onboarding_3\n  codebase_onboarding_3 --> End([Complete])\n",
-      "mermaidJourney": "journey\n  title Codebase Onboarding\n  section User Actions\n    User can navigate to the next file in...: 3: User\n    User can go back to the previous file...: 3: User\n    User receives personalized guidance b...: 3: User\n",
-      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant agent/main.py as agent/main.py\n    participant ...ormat_features_summary as ...ormat_features_summary\n    participant ...r/get_feature_for_file as ...r/get_feature_for_file\n    participant ...ts/build_system_prompt as ...ts/build_system_prompt\n    participant .../build_greeting_prompt as .../build_greeting_prompt\n    participant ...uild_transition_prompt as ...uild_transition_prompt\n    participant commands/NavigateCommand as commands/NavigateCommand\n    participant commands/ShowFileCommand as commands/ShowFileCommand\n    User->>agent/main.py: User can navigate to the next file in the onboa...\n    agent/main.py->>...ormat_features_summary: process\n    ...ormat_features_summary->>...r/get_feature_for_file: process\n    ...r/get_feature_for_file->>...ts/build_system_prompt: process\n    ...ts/build_system_prompt->>.../build_greeting_prompt: process\n    .../build_greeting_prompt->>...uild_transition_prompt: process\n    ...uild_transition_prompt->>commands/NavigateCommand: process\n    commands/NavigateCommand->>commands/ShowFileCommand: process\n    commands/ShowFileCommand->>...ands/serialize_command: process\n    agent/main.py->>...ormat_features_summary: process\n    ...ormat_features_summary->>...r/get_feature_for_file: process\n    ...r/get_feature_for_file->>...ts/build_system_prompt: process\n    ...ts/build_system_prompt->>.../build_greeting_prompt: process\n    .../build_greeting_prompt->>...uild_transition_prompt: process\n    ...uild_transition_prompt->>commands/NavigateCommand: process\n    commands/NavigateCommand->>commands/ShowFileCommand: process\n    commands/ShowFileCommand->>...ands/serialize_command: process\n    agent/main.py->>...ormat_features_summary: process\n    ...ormat_features_summary->>...r/get_feature_for_file: process\n    ...r/get_feature_for_file->>...ts/build_system_prompt: process\n    ...ts/build_system_prompt->>.../build_greeting_prompt: process\n    .../build_greeting_prompt->>...uild_transition_prompt: process\n    ...uild_transition_prompt->>commands/NavigateCommand: process\n    commands/NavigateCommand->>commands/ShowFileCommand: process\n    commands/ShowFileCommand->>...ands/serialize_command: process\n",
+      "mermaidDiagram": "flowchart TD\n  Start([Codebase Onboarding])\n  codebase_onboarding_1[User can navigate to the next file in the onboa...]\n  codebase_onboarding_2[User can go back to the previous file during on...]\n  codebase_onboarding_3[User can ask general questions or confirm readi...]\n  Start --> codebase_onboarding_1\n  codebase_onboarding_1 --> codebase_onboarding_2\n  codebase_onboarding_2 --> codebase_onboarding_3\n  codebase_onboarding_3 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title Codebase Onboarding\n  section User Actions\n    User can navigate to the next file in...: 3: User\n    User can go back to the previous file...: 3: User\n    User can ask general questions or con...: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant agent/main.py as agent/main.py\n    participant knowledge_loader.py as knowledge_loader.py\n    participant prompts.py as prompts.py\n    participant commands.py as commands.py\n    User->>agent/main.py: User can navigate to the next file in the onboa...\n    agent/main.py->>knowledge_loader.py: process\n    knowledge_loader.py->>prompts.py: process\n    prompts.py->>commands.py: process\n    agent/main.py->>knowledge_loader.py: process\n    knowledge_loader.py->>prompts.py: process\n    prompts.py->>commands.py: process\n    agent/main.py->>knowledge_loader.py: process\n    knowledge_loader.py->>prompts.py: process\n    prompts.py->>commands.py: process\n",
       "files": [
         "agent/main.py",
         "knowledge_loader.py",
@@ -3422,25 +3452,15 @@
         ],
         "User can navigate to the next file in the onboarding process": [
           "agent/main.py",
-          "knowledge_loader/format_features_summary",
-          "knowledge_loader/get_feature_for_file",
-          "prompts/build_system_prompt",
-          "prompts/build_greeting_prompt",
-          "prompts/build_transition_prompt",
-          "commands/NavigateCommand",
-          "commands/ShowFileCommand",
-          "commands/serialize_command"
+          "knowledge_loader.py",
+          "prompts.py",
+          "commands.py"
         ],
         "User can go back to the previous file during onboarding": [
           "agent/main.py",
-          "knowledge_loader/format_features_summary",
-          "knowledge_loader/get_feature_for_file",
-          "prompts/build_system_prompt",
-          "prompts/build_greeting_prompt",
-          "prompts/build_transition_prompt",
-          "commands/NavigateCommand",
-          "commands/ShowFileCommand",
-          "commands/serialize_command"
+          "knowledge_loader.py",
+          "prompts.py",
+          "commands.py"
         ],
         "User receives personalized guidance based on their context and progress": [
           "agent/main.py",
@@ -3452,6 +3472,12 @@
           "commands/NavigateCommand",
           "commands/ShowFileCommand",
           "commands/serialize_command"
+        ],
+        "User can ask general questions or confirm readiness during onboarding": [
+          "agent/main.py",
+          "knowledge_loader.py",
+          "prompts.py",
+          "commands.py"
         ]
       },
       "dependencies": [],
@@ -3506,6 +3532,48 @@
       "tags": [
         "agent",
         "python"
+      ]
+    },
+    {
+      "id": "knowledge-management",
+      "name": "Knowledge Management",
+      "description": "",
+      "category": "Services",
+      "userFlows": [
+        "Developers can generate structured knowledge documentation for source files",
+        "Users can view and understand the rationale behind design decisions in the codebase",
+        "Team members can easily update existing documentation with new insights"
+      ],
+      "mermaidDiagram": "flowchart TD\n  Start([Knowledge Management])\n  knowledge_management_1[Developers can generate structured knowledge do...]\n  knowledge_management_2[Users can view and understand the rationale beh...]\n  knowledge_management_3[Team members can easily update existing documen...]\n  Start --> knowledge_management_1\n  knowledge_management_1 --> knowledge_management_2\n  knowledge_management_2 --> knowledge_management_3\n  knowledge_management_3 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title Knowledge Management\n  section User Actions\n    Developers can generate structured kn...: 3: User\n    Users can view and understand the rat...: 3: User\n    Team members can easily update existi...: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant ...re/knowledge-writer.ts as ...re/knowledge-writer.ts\n    participant ../utils/file-utils.js as ../utils/file-utils.js\n    participant ./openai-client.js as ./openai-client.js\n    User->>...re/knowledge-writer.ts: Developers can generate structured knowledge do...\n    ...re/knowledge-writer.ts->>../utils/file-utils.js: process\n    ../utils/file-utils.js->>./openai-client.js: process\n    ...re/knowledge-writer.ts->>../utils/file-utils.js: process\n    ../utils/file-utils.js->>./openai-client.js: process\n    ...re/knowledge-writer.ts->>../utils/file-utils.js: process\n    ../utils/file-utils.js->>./openai-client.js: process\n",
+      "files": [
+        "src/core/knowledge-writer.ts",
+        "../utils/file-utils.js",
+        "./openai-client.js"
+      ],
+      "filesByAction": {
+        "Developers can generate structured knowledge documentation for source files": [
+          "src/core/knowledge-writer.ts",
+          "../utils/file-utils.js",
+          "./openai-client.js"
+        ],
+        "Users can view and understand the rationale behind design decisions in the codebase": [
+          "src/core/knowledge-writer.ts",
+          "../utils/file-utils.js",
+          "./openai-client.js"
+        ],
+        "Team members can easily update existing documentation with new insights": [
+          "src/core/knowledge-writer.ts",
+          "../utils/file-utils.js",
+          "./openai-client.js"
+        ]
+      },
+      "dependencies": [],
+      "tags": [
+        "src",
+        "core",
+        "typescript"
       ]
     }
   ]

@@ -10,6 +10,7 @@ import { sleep } from "../utils/sleep.js";
 export interface AnalysisResult {
   insights: string[]; // Key insights as numbered list for terminal display
   markdown: string;
+  rationale?: string; // WHY this approach was chosen - design decisions summary
   metadata: {
     tags: string[];
     importance: "low" | "medium" | "high" | "critical";
@@ -62,14 +63,20 @@ export class OpenAIClient {
                 insights: {
                   type: "array",
                   description:
-                    "Array of 3-5 key insights about this file (purpose, gotchas, critical details)",
+                    "Array of 3-5 key insights about this file (problem, rationale, solution, impact, gotchas)",
                   items: {
                     type: "string",
                   },
                 },
                 markdown: {
                   type: "string",
-                  description: "Full markdown documentation with all sections",
+                  description:
+                    "Full markdown documentation with all sections including Design Rationale",
+                },
+                rationale: {
+                  type: "string",
+                  description:
+                    "WHY this approach was chosen - concise summary of design decisions and alternatives rejected (2-3 sentences)",
                 },
                 feature: {
                   type: "string",
@@ -110,6 +117,7 @@ export class OpenAIClient {
               required: [
                 "insights",
                 "markdown",
+                "rationale",
                 "feature",
                 "featureRole",
                 "userFlows",
@@ -131,6 +139,7 @@ export class OpenAIClient {
       return {
         insights: parsed.insights || ["No insights available"],
         markdown: parsed.markdown || "",
+        rationale: parsed.rationale || "",
         metadata: { tags, importance },
         feature: parsed.feature,
         featureRole: parsed.featureRole,

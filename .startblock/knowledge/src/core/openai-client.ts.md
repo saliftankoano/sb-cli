@@ -1,7 +1,7 @@
 ---
 filePath: src/core/openai-client.ts
-fileVersion: 3b416f26343e9cc1cfd6140ef640501273e1831e
-lastUpdated: '2025-12-28T17:47:07.403Z'
+fileVersion: 46244646df75c99f7a1f53b04527252ac10fb4e7
+lastUpdated: '2026-01-13T10:20:26.974Z'
 updatedBy: sb-cli
 tags:
   - src
@@ -14,32 +14,30 @@ humanVerified: false
 feature: openai-client
 featureRole: service
 userFlows:
-  - User can analyze multiple files for insights
-  - User can generate onboarding tasks based on their goals
+  - User can analyze code files for insights and documentation
+  - User can generate onboarding tasks based on code analysis
+  - User can retrieve structured insights for better understanding of codebase
 relatedFiles:
   - ../config/defaults.js
   - ../prompts/templates.js
   - ../utils/sleep.js
 ---
 ## Purpose
-This file serves as a wrapper for the OpenAI API, facilitating code analysis and onboarding task generation based on user context and repository structure.
+This file serves as a wrapper around the OpenAI API, facilitating the analysis of code files to generate insights, documentation, and rationale for design decisions.
 
-## Key Functionality
-- `analyze(context: PromptContext)`: Analyzes a single file and returns structured insights.
-- `analyzeBatch(files: Array<{ filePath: string; context: PromptContext }>)`: Analyzes multiple files sequentially, respecting rate limits.
-- `generateOnboardingTasks(...)`: Creates tailored onboarding tasks based on user goals and experience levels.
+## Problem
+Before this file existed, there was no streamlined way to leverage OpenAI's capabilities for analyzing code files and generating useful documentation. Developers faced challenges in understanding complex codebases, leading to inefficiencies in onboarding and knowledge transfer.
 
-## Gotchas
-- The `analyzeBatch` method continues processing even if some analyses fail, which can lead to incomplete results without explicit error handling for the caller.
-- Rate limiting is handled in the `analyze` method, which retries after a delay; however, excessive retries could lead to longer processing times, potentially impacting user experience.
+## Solution
+The `OpenAIClient` class encapsulates the logic for interacting with the OpenAI API. It provides methods for analyzing individual files and batches of files, extracting insights, generating markdown documentation, and creating onboarding tasks. The design includes error handling for rate limits, ensuring that requests are retried appropriately. Additionally, the output is enriched with metadata, including tags and importance levels, to provide context for the analysis.
 
-## Dependencies
-- The OpenAI client is used to interact with the OpenAI API, leveraging its capabilities for generating insights and tasks based on code analysis.
-- Utility functions like `sleep` are used to manage delays during rate limiting, ensuring compliance with API usage policies.
+## Impact
+With this file, developers can now obtain structured insights and documentation for any code file, significantly improving their understanding of the codebase. This facilitates better onboarding processes, enhances collaboration, and allows teams to maintain high-quality documentation effortlessly. The inclusion of rationale in the output also aids in understanding the reasoning behind design choices.
 
 ## Architecture Context
-This file is a service component within the larger system, responsible for integrating AI capabilities into the onboarding process, enabling users to effectively understand and navigate the codebase.
+This file is part of the core services that interact with external APIs (OpenAI). It integrates with various components of the system, including configuration files and prompt templates, to provide a cohesive analysis experience. The data flow involves sending prompts to the OpenAI API and processing the responses to generate structured outputs.
 
-## Implementation Notes
-- The decision to process file analyses sequentially was made to avoid hitting API rate limits, which is crucial for maintaining service reliability. Future improvements could explore parallel processing, but this would require careful consideration of rate limits and context management.
-- The `analyzeBatch` method is designed with extensibility in mind, allowing for potential future enhancements like batching requests into a single prompt for efficiency.
+## Gotchas (If Applicable)
+- Be aware of potential rate limits imposed by the OpenAI API; the implementation includes a retry mechanism but can still lead to delays if limits are exceeded.
+- The quality of insights generated depends on the prompts provided; poorly structured prompts may yield less useful results. 
+- Ensure that the context provided to the analysis methods is accurate, as it directly influences the relevance of the insights generated.

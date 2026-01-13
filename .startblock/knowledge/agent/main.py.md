@@ -1,7 +1,7 @@
 ---
 filePath: agent/main.py
-fileVersion: cbe90c90a2527416352bf9abd40940ae41ef4b74
-lastUpdated: '2026-01-13T09:58:02.729Z'
+fileVersion: 3841cc3ec6316cac1aa3eae40dcb20eff32b855f
+lastUpdated: '2026-01-13T10:20:26.969Z'
 updatedBy: sb-cli
 tags:
   - agent
@@ -10,33 +10,33 @@ importance: low
 extractedBy: sb-cli@1.0.0
 model: gpt-4o-mini
 humanVerified: false
-feature: onboarding-agent
-featureRole: component
+feature: codebase-onboarding
+featureRole: service
 userFlows:
   - User can navigate to the next file in the onboarding process
-  - User can return to the previous file for review
-  - User receives personalized guidance based on their current context
-  - User can interact with the agent using voice commands
+  - User can go back to the previous file during onboarding
+  - User can ask general questions or confirm readiness during onboarding
 relatedFiles:
   - knowledge_loader.py
   - prompts.py
   - commands.py
 ---
 ## Purpose
-This file implements a voice agent for onboarding users through a codebase, facilitating interactive voice conversations that guide users in understanding the system.
+This file implements a voice agent for guiding users through codebase onboarding by handling voice conversations and classifying user intents.
 
 ## Problem
-Before this file, users faced challenges in navigating the codebase effectively during onboarding, often leading to confusion and disengagement. The lack of an interactive guide made it difficult for users to absorb information and understand the context of different files.
+Before this file, onboarding users through a codebase was often confusing and inefficient, especially when users expressed their desires to navigate between files. There was no structured way to interpret user commands, leading to potential misunderstandings and frustration.
 
 ## Solution
-The `OnboardingAgent` class leverages voice interaction to provide real-time guidance and context-aware responses. It listens for user commands, such as "next file" or "go back," and navigates through the codebase accordingly. The agent updates its internal context based on user interactions and server responses, ensuring that the information provided is relevant and timely.
+The file introduces an `OnboardingAgent` class that listens for user input and classifies intents using OpenAI's language model. It interprets commands like "next" and "back" to facilitate smooth navigation through onboarding materials. The classification logic was enhanced to provide clearer instructions to the model, ensuring it accurately identifies user intents based on context.
 
 ## Impact
-Users can now engage with the codebase in a more dynamic way, receiving immediate feedback and assistance as they navigate through files. This enhances their learning experience by allowing them to explore the codebase at their own pace while receiving personalized guidance. Developers benefit from a more structured onboarding process, leading to quicker ramp-up times for new team members.
+Users can now navigate through onboarding files more intuitively, with the agent responding accurately to their commands. This leads to a more engaging and efficient onboarding experience, allowing users to focus on learning rather than struggling with navigation. Developers benefit from a more robust system that can handle various user inputs effectively.
 
 ## Architecture Context
-The `OnboardingAgent` interacts with a local server to fetch file content and context, utilizing asynchronous programming to handle user input and server responses efficiently. It integrates with various models for speech-to-text (STT), text-to-speech (TTS), and language processing, ensuring a smooth user experience.
+This file is part of a larger onboarding system that integrates voice recognition and AI-driven responses. It communicates with a local server to fetch file contents and update the user interface based on user interactions. The agent relies on external APIs for intent classification, which are called during user interactions.
 
 ## Gotchas (If Applicable)
-- The agent interrupts ongoing responses to provide immediate feedback, which may lead to abrupt changes in conversation flow if not managed carefully.
-- Navigation cooldowns are implemented to prevent users from rapidly switching contexts, which could lead to confusion. Users should be aware of this limitation during their interactions.
+- The reliance on external API calls for intent classification may introduce latency, affecting the responsiveness of the agent. 
+- Ensure that the user input is concise; longer inputs may lead to delays in processing and response generation. 
+- The cooldown mechanism for navigation commands prevents rapid-fire commands but may frustrate users if they are unaware of it.

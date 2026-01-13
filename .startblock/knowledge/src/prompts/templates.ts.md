@@ -1,7 +1,7 @@
 ---
 filePath: src/prompts/templates.ts
-fileVersion: 46244646df75c99f7a1f53b04527252ac10fb4e7
-lastUpdated: '2026-01-03T02:24:27.860Z'
+fileVersion: 9674f2f871b9b2558c7acd2b813bcfa34f2cea42
+lastUpdated: '2026-01-13T10:20:26.975Z'
 updatedBy: sb-cli
 tags:
   - src
@@ -14,26 +14,26 @@ humanVerified: false
 feature: prompts-templates
 featureRole: helper
 userFlows:
-  - Developers can generate structured documentation for code analysis
-  - Users can understand the rationale behind code decisions
-  - Team members can onboard more effectively with clear documentation
+  - Developers can generate structured documentation for their code.
+  - >-
+    Team members can understand the rationale behind design decisions more
+    clearly.
 relatedFiles: []
 ---
 ## Purpose
-This file provides a template for generating knowledge documentation for code analysis, focusing on the story behind the code, including the problem it solves, how it solves it, and its impact.
+This file provides a template for generating structured documentation for code analysis, focusing on the rationale behind design decisions and the impact of the code.
 
 ## Problem
-Before this file existed, there was no standardized way to document code that effectively conveyed the rationale behind its existence. This often led to misunderstandings and a lack of clarity in how different parts of the codebase interacted.
+Before this file existed, there was a lack of standardized documentation practices that captured not only what the code does but also why certain approaches were chosen. This often led to confusion among developers and a higher likelihood of repeating mistakes.
 
 ## Solution
-The file introduces a structured prompt that guides users in documenting code by emphasizing the capture of problem, solution, and impact. It also includes contextual information such as commit history and existing documentation to enrich the documentation process.
+The file introduces a systematic prompt that guides developers in documenting their code. It emphasizes capturing the problem, attempts, solution, rationale, and impact, ensuring that future developers understand the context and reasoning behind design choices. This structured approach helps maintain clarity and consistency across documentation.
 
 ## Impact
-Users and developers can now produce more meaningful documentation that not only describes what the code does but also explains why it exists and how it fits into the larger system. This improves knowledge transfer and aids in onboarding new team members.
+With this documentation template, developers can now produce comprehensive and insightful documentation that aids in onboarding new team members, facilitates code reviews, and enhances collaboration. It ultimately leads to a more informed development process and better software quality.
 
 ## Architecture Context
-This file fits into the larger system by serving as a foundational component for documentation generation. It interacts with various parts of the codebase by referencing dependencies and dependents, which helps in understanding the flow of data and control within the application.
+This file fits into the larger system by serving as a foundational tool for generating documentation across various modules. It integrates with the codebase to ensure that all components are well-documented, enhancing overall maintainability and knowledge sharing.
 
 ## Gotchas (If Applicable)
-- Ensure that the context provided in the prompt is accurate; otherwise, it may mislead users about the code's purpose.
-- Be cautious when modifying the structure of the prompt, as changes can affect the clarity and usefulness of the generated documentation.
+Developers should be aware that while capturing failed attempts is encouraged, it is essential to focus on significant failures that provide valuable lessons, rather than trivial issues that do not contribute to the learning process.

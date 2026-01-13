@@ -14,6 +14,8 @@ export interface KnowledgeMetadata {
   extractedBy: string;
   model: string;
   humanVerified: boolean;
+  // Design rationale - WHY this approach was chosen
+  rationale?: string;
   // Feature-aware fields
   feature?: string;
   featureRole?: "entry_point" | "helper" | "component" | "service" | "config";
@@ -75,6 +77,8 @@ export async function writeKnowledgeFile(
     extractedBy: "sb-cli@1.0.0",
     model,
     humanVerified: existingData.data?.humanVerified || false,
+    // Design rationale - WHY this approach was chosen
+    rationale: analysis.rationale,
     // Feature-aware fields
     feature: analysis.feature,
     featureRole: analysis.featureRole,

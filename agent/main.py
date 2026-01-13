@@ -497,7 +497,13 @@ async def classify_and_handle_intent(agent, user_text: str):
             model="gpt-4o-mini",
             messages=[{
                 "role": "system",
-                "content": "Classify user intent as NEXT, BACK, or OTHER. ONLY respond with one of these three words."
+                "content": """Classify user intent as NEXT, BACK, or OTHER. 
+                
+NEXT: User explicitly wants to move to the NEXT file in the journey (e.g., "next", "move on", "I'm done with this").
+BACK: User explicitly wants to go back to the PREVIOUS file (e.g., "go back", "previous").
+OTHER: General questions, comments, or confirmation of readiness (e.g., "I'm ready", "Okay", "Tell me more about this").
+
+ONLY respond with one of these three words: NEXT, BACK, or OTHER."""
             }, {
                 "role": "user", 
                 "content": f"Context: Codebase onboarding. Current file: {current_file}. User said: \"{user_text}\""
@@ -508,9 +514,9 @@ async def classify_and_handle_intent(agent, user_text: str):
         intent = response.choices[0].message.content.strip().upper()
         print(f"[Agent] Classified intent: {intent} for \"{user_text}\"")
         
-        if "NEXT" in intent:
+        if "NEXT" == intent:
             await agent._advance_to_next_file()
-        elif "BACK" in intent:
+        elif "BACK" == intent:
             await agent._go_to_previous_file()
     except Exception as e:
         print(f"[Agent] Intent error: {e}")
