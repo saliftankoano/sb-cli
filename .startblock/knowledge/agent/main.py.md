@@ -1,7 +1,7 @@
 ---
 filePath: agent/main.py
-fileVersion: 0a0a33de14031cf09ed44c4d8d337f7d57de3a49
-lastUpdated: '2026-01-12T22:13:27.190Z'
+fileVersion: 7c9a3631c50f6bcbccd932eb9df4c4efa103cae1
+lastUpdated: '2026-01-13T01:36:41.333Z'
 updatedBy: sb-cli
 tags:
   - agent
@@ -13,11 +13,13 @@ humanVerified: false
 feature: onboarding-agent
 featureRole: component
 userFlows:
-  - User can navigate through codebase files using voice commands
   - >-
-    User receives personalized onboarding instructions based on their current
-    context
-  - User can ask questions and receive guidance about specific files
+    User can receive personalized onboarding instructions while navigating the
+    codebase
+  - >-
+    User can seamlessly transition between different files in the onboarding
+    process
+  - User can interact with the agent using voice commands for navigation
 relatedFiles:
   - knowledge_loader/format_features_summary.py
   - knowledge_loader/get_feature_for_file.py
@@ -28,22 +30,21 @@ relatedFiles:
   - commands/ShowFileCommand.py
   - commands/serialize_command.py
 ---
-## Purpose
-This file implements a voice agent for onboarding users with a codebase, facilitating voice conversations and guiding users through their learning journey.
+# Purpose
+Handles voice conversations with users during codebase onboarding, providing dynamic and context-aware guidance.
 
-## Problem
-Before this file, onboarding users with complex codebases was challenging, often leading to confusion and frustration. Users lacked a structured way to navigate files and understand the context of their tasks, which hindered their learning and productivity.
+# Problem
+Before this file, onboarding users to a codebase was a static process, often leading to confusion and a lack of personalized guidance. Users struggled to understand the context of the files they were navigating, which hindered their learning experience and productivity. This prompted the need for a solution that could adapt instructions based on user progress and context.
 
-## Solution
-The `OnboardingAgent` class serves as a voice assistant that interacts with users in real-time. It requests file contents from a local server, updates its internal context based on user interactions, and generates personalized instructions. This dynamic approach ensures that users receive relevant guidance tailored to their current task and experience level.
+# Solution
+This file implements the `OnboardingAgent` class, which dynamically updates system instructions based on the user's current file and onboarding journey. By leveraging a chat context, it ensures that users receive relevant instructions tailored to their experience level and goals. The agent interrupts ongoing replies to avoid confusion and requests file content from a server to maintain an up-to-date context. It also handles the insertion of system messages directly into the chat context, ensuring that users always have the latest guidance.
 
-## Impact
-With this implementation, users can seamlessly navigate through codebases using voice commands, receive contextual information about files, and get personalized onboarding experiences. This not only enhances user engagement but also accelerates the learning curve for new developers.
+# Impact
+Users can now navigate the codebase more effectively with real-time, context-sensitive instructions. This leads to a more engaging onboarding experience, allowing users to feel supported as they learn. Developers benefit from a more structured onboarding process that can be easily adapted to different user needs, improving overall efficiency and satisfaction.
 
-## Architecture Context
-The agent operates within a local server environment, utilizing data channels to communicate with the server for context updates and file requests. It relies on various models for speech-to-text (STT), text-to-speech (TTS), and language processing (LLM) to facilitate interactive conversations.
+# Architecture Context
+The `OnboardingAgent` operates within a larger system that includes a voice interface, a chat context for real-time communication, and a server for fetching file content. It interacts with various components like the `ContextStore` for managing user context and the `AgentSession` for handling voice interactions. This integration allows for a fluid data flow between user inputs, system responses, and file content retrieval.
 
-## Gotchas (If Applicable)
-- The timeout for file requests has been reduced to 3 seconds; this may lead to more frequent timeouts in slower network conditions, affecting user experience.
-- Ensure that the context is fully initialized before interacting with the agent; otherwise, users may receive generic responses.
-- The agent's ability to classify user intent is dependent on the quality of the input; short or unclear commands may not trigger the expected navigation actions.
+# Gotchas (If Applicable)
+- Ensure that the system message in the chat context is updated immediately; failure to do so can lead to outdated instructions being presented to the user.
+- Be mindful of potential timeouts when requesting file content from the server, as this can disrupt the onboarding flow if not handled gracefully.

@@ -201,7 +201,21 @@ class OnboardingAgent(VoiceAgent):
             tasks_doc=None,
         )
         
+        # Update the instructions property (for future generate_reply calls)
         self._instructions = new_instructions
+        
+        # Update the system message in the chat context directly
+        # This is CRITICAL for the current session to pick up the changes
+        if self.chat_ctx and self.chat_ctx.messages:
+            for msg in self.chat_ctx.messages:
+                if msg.role == "system":
+                    msg.content = new_instructions
+                    print(f"[Agent] Updated system instructions in chat context for {current_file_path}")
+                    return
+            
+            # If no system message found, insert one at the beginning
+            self.chat_ctx.messages.insert(0, llm.ChatMessage(role="system", content=new_instructions))
+            print(f"[Agent] Inserted new system instructions for {current_file_path}")
 
     async def _advance_to_next_file(self):
         """Advance to the next file in the journey."""
@@ -218,15 +232,20 @@ class OnboardingAgent(VoiceAgent):
             
             print(f"[Agent] Advancing from {from_file} to {to_file}")
             
-            # Request full content for the new file
+            # 1. Interrupt current reply to avoid confusion
+            if self.session:
+                print("[Agent] Interrupting confused reply...")
+                self.session.interrupt()
+
+            # 2. Request full content for the new file
             file_data = await self._request_file_from_server(to_file)
             if file_data:
                 self.context.current_file = file_data
             
-            # Get feature context
+            # 3. Get feature context
             to_feature = get_feature_for_file(self.context.features, to_file)
             
-            # Update UI
+            # 4. Update UI
             await self._show_file_in_ui(
                 file=to_file,
                 title=to_file.split("/")[-1],
@@ -235,10 +254,10 @@ class OnboardingAgent(VoiceAgent):
                 end_line=50,
             )
             
-            # Update LLM instructions for the new file
+            # 5. Update LLM instructions for the new file (CRITICAL!)
             self._update_system_instructions()
             
-            # Generate transition message
+            # 6. Generate transition message with new context
             user_name = self.context.session.get("userName")
             transition_prompt = build_transition_prompt(
                 user_name=user_name,
@@ -247,6 +266,7 @@ class OnboardingAgent(VoiceAgent):
                 to_feature=to_feature,
             )
             
+            print(f"[Agent] Generating transition reply for {to_file}")
             await self.session.generate_reply(instructions=transition_prompt)
         else:
             # Reached end
