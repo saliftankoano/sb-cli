@@ -223,6 +223,11 @@ class OnboardingAgent(VoiceAgent):
         if not self.context.session:
             return
         
+        # 1. Interrupt IMMEDIATELY to stop generic talk
+        if self.session:
+            print("[Agent] Interrupting for NEXT command...")
+            self.session.interrupt()
+
         # Cooldown check: prevent double-navigation
         now = asyncio.get_event_loop().time()
         if now - self._last_nav_time < 3.0:
@@ -240,11 +245,6 @@ class OnboardingAgent(VoiceAgent):
             
             print(f"[Agent] Advancing from {from_file} to {to_file}")
             
-            # 1. Interrupt current reply to avoid confusion
-            if self.session:
-                print("[Agent] Interrupting confused reply...")
-                self.session.interrupt()
-
             # 2. Request full content for the new file
             file_data = await self._request_file_from_server(to_file)
             if file_data:
@@ -441,8 +441,9 @@ async def entrypoint(ctx: JobContext):
     def on_user_input(event: UserInputTranscribedEvent):
         if not event.is_final: return
         user_text = event.transcript.strip()
-        word_count = len(user_text.split())
+        print(f"[Conversation] USER: {user_text}")
         
+        word_count = len(user_text.split())
         if word_count >= 15: return
         
         # 1. Immediate keyword check for snappy feel
@@ -450,16 +451,23 @@ async def entrypoint(ctx: JobContext):
         
         # "next" commands
         if any(nav in text_lower for nav in ["next file", "move forward", "go forward", "proceed"]):
+            print(f"[Agent] Keyword NEXT detected in \"{user_text}\"")
             asyncio.create_task(agent._advance_to_next_file())
             return
             
         # "previous" commands
         if any(nav in text_lower for nav in ["previous file", "go back", "move back", "backtrack"]):
+            print(f"[Agent] Keyword BACK detected in \"{user_text}\"")
             asyncio.create_task(agent._go_to_previous_file())
             return
 
         # 2. Ambiguous short phrases -> classify
         asyncio.create_task(classify_and_handle_intent(agent, user_text))
+
+    # Log agent replies
+    @session.on("agent_speech_committed")
+    def on_agent_speech(msg: llm.ChatMessage):
+        print(f"[Conversation] AGENT: {msg.content}")
 
     await session.start(agent=agent, room=ctx.room)
 
