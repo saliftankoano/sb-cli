@@ -1,7 +1,7 @@
 ---
 filePath: agent/prompts.py
-fileVersion: 7c9a3631c50f6bcbccd932eb9df4c4efa103cae1
-lastUpdated: '2026-01-13T09:58:02.733Z'
+fileVersion: 3841cc3ec6316cac1aa3eae40dcb20eff32b855f
+lastUpdated: '2026-01-13T10:08:17.358Z'
 updatedBy: sb-cli
 tags:
   - agent
@@ -10,30 +10,34 @@ importance: low
 extractedBy: sb-cli@1.0.0
 model: gpt-4o-mini
 humanVerified: false
-feature: agent-prompts
+feature: onboarding-agent
 featureRole: helper
 userFlows:
-  - User can receive personalized onboarding guidance
-  - User can smoothly transition between files in the codebase
-  - User can understand the context and purpose of each file they encounter
+  - User can receive personalized onboarding prompts
+  - User can navigate the codebase with guided assistance
+  - >-
+    User can understand file contexts and their relevance to their learning
+    goals
 relatedFiles:
-  - agent/prompts.py
+  - agent/architecture.py
+  - agent/features.py
+  - agent/tasks.py
 ---
 ## Purpose
-This file defines system prompts for an onboarding agent designed to assist new developers in understanding a codebase through conversational interactions.
+This file defines system prompts for an onboarding agent, facilitating a conversational and supportive experience for new developers learning a codebase.
 
 ## Problem
-New developers often struggle to navigate complex codebases, leading to confusion and a steep learning curve. Before this file, there was no structured way to provide personalized guidance and context, which could leave users feeling lost and unsupported during their onboarding journey.
+New developers often struggle with understanding complex codebases, leading to frustration and slow onboarding processes. Before this file, there was no structured approach to guide new users through the learning journey, resulting in inconsistent experiences and knowledge gaps.
 
 ## Solution
-The file implements a series of functions that generate prompts for the onboarding agent, including greetings, transitions between files, and system prompts that provide context about the user's goals and the current learning journey. It emphasizes a conversational approach, ensuring the agent communicates in a warm and engaging manner while adhering to specific guidelines for natural language processing.
+This file solves the problem by creating structured prompts that the onboarding agent uses to interact with new developers. It leverages a conversational style and includes context about the user's goals, experience level, and current file being viewed. The prompts are designed to be warm and engaging, making the onboarding process feel more approachable and less intimidating.
 
 ## Impact
-With this file, users can expect a more tailored onboarding experience that feels like a natural conversation rather than a lecture. The onboarding agent can now effectively guide users through the codebase, automatically handling navigation and providing relevant context, which significantly enhances user engagement and retention.
+With this file, users can now receive personalized guidance as they navigate the codebase, enhancing their learning experience. Developers can onboard more quickly and effectively, reducing the time it takes to become productive members of the team. The structured prompts also ensure that the onboarding agent provides relevant information without overwhelming the user.
 
 ## Architecture Context
-This file integrates with the broader onboarding system by providing the necessary prompts that guide user interactions. It relies on user input regarding their goals and experience level, which informs the generated prompts and ensures that the onboarding process is personalized and relevant.
+This file is part of the onboarding system, which interacts with various components of the codebase. It integrates with user data to tailor prompts based on individual goals and experience levels, ensuring a customized onboarding journey.
 
 ## Gotchas (If Applicable)
-- The prompts must avoid asking users if they are ready to move on, as this could disrupt the flow of the conversation. Instead, the system is designed to handle transitions automatically. 
-- Care must be taken to ensure that file names are spoken naturally, as this is crucial for maintaining a conversational tone and preventing confusion.
+- The agent must avoid asking users if they are ready to move on, as the prompts are designed to flow naturally without such interruptions. 
+- Care should be taken to ensure that file names are pronounced correctly in a conversational manner, as this affects user comprehension and engagement.

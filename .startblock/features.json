@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-01-13T09:58:02.735Z",
+  "lastUpdated": "2026-01-13T10:08:17.361Z",
   "features": [
     {
       "id": "startblock-onboarding",
@@ -259,11 +259,13 @@
         "User can navigate to the next file in the onboarding process",
         "User can return to the previous file for review",
         "User receives personalized guidance based on their current context",
-        "User can interact with the agent using voice commands"
+        "User can interact with the agent using voice commands",
+        "User can navigate the codebase with guided assistance",
+        "User can understand file contexts and their relevance to their learning goals"
       ],
-      "mermaidDiagram": "flowchart TD\n  Start([Onboarding Agent])\n  onboarding_agent_1[User can navigate to the next file in the onboa...]\n  onboarding_agent_2[User can return to the previous file for review]\n  onboarding_agent_3[User receives personalized guidance based on th...]\n  onboarding_agent_4[User can interact with the agent using voice co...]\n  Start --> onboarding_agent_1\n  onboarding_agent_1 --> onboarding_agent_2\n  onboarding_agent_2 --> onboarding_agent_3\n  onboarding_agent_3 --> onboarding_agent_4\n  onboarding_agent_4 --> End([Complete])\n",
-      "mermaidJourney": "journey\n  title Onboarding Agent\n  section User Actions\n    User can navigate to the next file in...: 3: User\n    User can return to the previous file ...: 3: User\n    User receives personalized guidance b...: 3: User\n    User can interact with the agent usin...: 3: User\n",
-      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant agent/main.py as agent/main.py\n    participant knowledge_loader.py as knowledge_loader.py\n    participant prompts.py as prompts.py\n    participant commands.py as commands.py\n    User->>agent/main.py: User can navigate to the next file in the onboa...\n    agent/main.py->>knowledge_loader.py: process\n    knowledge_loader.py->>prompts.py: process\n    prompts.py->>commands.py: process\n    agent/main.py->>knowledge_loader.py: process\n    knowledge_loader.py->>prompts.py: process\n    prompts.py->>commands.py: process\n    agent/main.py->>knowledge_loader.py: process\n    knowledge_loader.py->>prompts.py: process\n    prompts.py->>commands.py: process\n    agent/main.py->>knowledge_loader.py: process\n    knowledge_loader.py->>prompts.py: process\n    prompts.py->>commands.py: process\n",
+      "mermaidDiagram": "flowchart TD\n  Start([Onboarding Agent])\n  onboarding_agent_1[User can receive personalized onboarding prompts]\n  onboarding_agent_2[User can navigate the codebase with guided assi...]\n  onboarding_agent_3[User can understand file contexts and their rel...]\n  Start --> onboarding_agent_1\n  onboarding_agent_1 --> onboarding_agent_2\n  onboarding_agent_2 --> onboarding_agent_3\n  onboarding_agent_3 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title Onboarding Agent\n  section User Actions\n    User can receive personalized onboard...: 3: User\n    User can navigate the codebase with g...: 3: User\n    User can understand file contexts and...: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant agent/prompts.py as agent/prompts.py\n    participant agent/architecture.py as agent/architecture.py\n    participant agent/features.py as agent/features.py\n    participant agent/tasks.py as agent/tasks.py\n    User->>agent/prompts.py: User can receive personalized onboarding prompts\n    agent/prompts.py->>agent/architecture.py: process\n    agent/architecture.py->>agent/features.py: process\n    agent/features.py->>agent/tasks.py: process\n    agent/prompts.py->>agent/architecture.py: process\n    agent/architecture.py->>agent/features.py: process\n    agent/features.py->>agent/tasks.py: process\n    agent/prompts.py->>agent/architecture.py: process\n    agent/architecture.py->>agent/features.py: process\n    agent/features.py->>agent/tasks.py: process\n",
       "files": [
         "agent/main.py",
         "knowledge_loader.py",
@@ -292,7 +294,10 @@
         "commands/NavigateCommand",
         "commands/ShowFileCommand",
         "commands/serialize_command",
-        "livekit/agents/__init__.py"
+        "livekit/agents/__init__.py",
+        "agent/architecture.py",
+        "agent/features.py",
+        "agent/tasks.py"
       ],
       "filesByAction": {
         "User can navigate through the codebase using voice commands": [
@@ -315,7 +320,10 @@
           "commands.py"
         ],
         "User can receive personalized onboarding prompts": [
-          "agent/prompts.py"
+          "agent/prompts.py",
+          "agent/architecture.py",
+          "agent/features.py",
+          "agent/tasks.py"
         ],
         "User can understand codebase structure through guided prompts": [
           "agent/prompts.py"
@@ -820,6 +828,18 @@
           "knowledge_loader.py",
           "prompts.py",
           "commands.py"
+        ],
+        "User can navigate the codebase with guided assistance": [
+          "agent/prompts.py",
+          "agent/architecture.py",
+          "agent/features.py",
+          "agent/tasks.py"
+        ],
+        "User can understand file contexts and their relevance to their learning goals": [
+          "agent/prompts.py",
+          "agent/architecture.py",
+          "agent/features.py",
+          "agent/tasks.py"
         ]
       },
       "dependencies": [],

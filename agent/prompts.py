@@ -67,7 +67,7 @@ def build_system_prompt(
     level = experience_level or "intermediate"
     user_goal = goal or "understand this codebase"
     
-    prompt += f"""You are an expert senior developer and mentor helping {name} onboard to this codebase.
+    prompt = f"""You are an expert senior developer and mentor helping {name} onboard to this codebase.
 
 ## About {name}
 - **Goal**: {user_goal}
@@ -234,6 +234,7 @@ Your transition should:
 IMPORTANT: 
 - DO NOT ask "Are you ready?" or "Shall we move on?" - we are ALREADY moving.
 - DO NOT ask for the file path; you already have it.
+- DO NOT list other files in the journey; just focus on the transition to {to_speakable}.
 - When speaking file names, say them naturally:
   - Say "route dot typescript" not "route.ts"
   - Say "features dot typescript" not "features.ts"  
