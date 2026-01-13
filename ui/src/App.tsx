@@ -63,11 +63,13 @@ function MainUI({
   showVoiceControls = false,
   isAgentActive = false,
   onToggleAgent,
+  isAgentReady = true,
 }: {
   guidedState: GuidedViewState | null;
   showVoiceControls?: boolean;
   isAgentActive?: boolean;
   onToggleAgent?: () => void;
+  isAgentReady?: boolean;
 }) {
   const state = useAppState();
   const {
@@ -232,7 +234,11 @@ function MainUI({
       />
 
       {showVoiceControls && onToggleAgent && (
-        <VoiceControlIsland isActive={isAgentActive} onToggle={onToggleAgent} />
+        <VoiceControlIsland
+          isActive={isAgentActive}
+          onToggle={onToggleAgent}
+          isReady={isAgentReady}
+        />
       )}
     </>
   );
@@ -247,7 +253,7 @@ function LiveKitContent({
   onToggleAgent: () => void;
 }) {
   // This hook uses useDataChannel which requires LiveKit context
-  const { guidedState } = useAgentCommands();
+  const { guidedState, isReady } = useAgentCommands();
 
   return (
     <MainUI
@@ -255,6 +261,7 @@ function LiveKitContent({
       showVoiceControls={true}
       isAgentActive={isAgentActive}
       onToggleAgent={onToggleAgent}
+      isAgentReady={isReady}
     />
   );
 }

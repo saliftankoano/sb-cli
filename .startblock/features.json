@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-01-13T10:49:43.478Z",
+  "lastUpdated": "2026-01-13T11:14:54.017Z",
   "features": [
     {
       "id": "startblock-onboarding",
@@ -968,11 +968,14 @@
         "Agent can execute commands to show files or request file content",
         "Agent can receive real-time updates about the session and features",
         "Agent can request specific file content from the application",
-        "Agent can view relevant features and knowledge files dynamically"
+        "Agent can view relevant features and knowledge files dynamically",
+        "Agent can receive commands to navigate or show files",
+        "Agent can request file content dynamically",
+        "Agent can be updated with context when joining a session"
       ],
-      "mermaidDiagram": "flowchart TD\n  Start([Agent Commands])\n  agent_commands_1[Agent can receive onboarding context when joini...]\n  agent_commands_2[Agent can request specific file content from th...]\n  agent_commands_3[Agent can view relevant features and knowledge ...]\n  Start --> agent_commands_1\n  agent_commands_1 --> agent_commands_2\n  agent_commands_2 --> agent_commands_3\n  agent_commands_3 --> End([Complete])\n",
-      "mermaidJourney": "journey\n  title Agent Commands\n  section User Actions\n    Agent can receive onboarding context ...: 3: User\n    Agent can request specific file conte...: 3: User\n    Agent can view relevant features and ...: 3: User\n",
-      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant ...ks/useAgentCommands.ts as ...ks/useAgentCommands.ts\n    participant lib/api.ts as lib/api.ts\n    participant components/GuidedView.ts as components/GuidedView.ts\n    User->>...ks/useAgentCommands.ts: Agent can receive onboarding context when joini...\n    ...ks/useAgentCommands.ts->>lib/api.ts: process\n    lib/api.ts->>components/GuidedView.ts: process\n    ...ks/useAgentCommands.ts->>lib/api.ts: process\n    lib/api.ts->>components/GuidedView.ts: process\n    ...ks/useAgentCommands.ts->>lib/api.ts: process\n    lib/api.ts->>components/GuidedView.ts: process\n",
+      "mermaidDiagram": "flowchart TD\n  Start([Agent Commands])\n  agent_commands_1[Agent can receive commands to navigate or show ...]\n  agent_commands_2[Agent can request file content dynamically]\n  agent_commands_3[Agent can be updated with context when joining ...]\n  Start --> agent_commands_1\n  agent_commands_1 --> agent_commands_2\n  agent_commands_2 --> agent_commands_3\n  agent_commands_3 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title Agent Commands\n  section User Actions\n    Agent can receive commands to navigat...: 3: User\n    Agent can request file content dynami...: 3: User\n    Agent can be updated with context whe...: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant ...ks/useAgentCommands.ts as ...ks/useAgentCommands.ts\n    participant ...mponents/GuidedView.ts as ...mponents/GuidedView.ts\n    participant ../lib/api.ts as ../lib/api.ts\n    User->>...ks/useAgentCommands.ts: Agent can receive commands to navigate or show ...\n    ...ks/useAgentCommands.ts->>...mponents/GuidedView.ts: process\n    ...mponents/GuidedView.ts->>../lib/api.ts: process\n    ...ks/useAgentCommands.ts->>...mponents/GuidedView.ts: process\n    ...mponents/GuidedView.ts->>../lib/api.ts: process\n    ...ks/useAgentCommands.ts->>...mponents/GuidedView.ts: process\n    ...mponents/GuidedView.ts->>../lib/api.ts: process\n",
       "files": [
         "agent/commands.py",
         "ui/src/hooks/useAgentCommands.ts",
@@ -982,7 +985,9 @@
         "lib/api.ts",
         "components/GuidedView.ts",
         "@/lib/api.ts",
-        "@/components/GuidedView.ts"
+        "@/components/GuidedView.ts",
+        "../components/GuidedView.ts",
+        "../lib/api.ts"
       ],
       "filesByAction": {
         "User can navigate between files or steps": [
@@ -1182,6 +1187,21 @@
           "ui/src/hooks/useAgentCommands.ts",
           "lib/api.ts",
           "components/GuidedView.ts"
+        ],
+        "Agent can receive commands to navigate or show files": [
+          "ui/src/hooks/useAgentCommands.ts",
+          "../components/GuidedView.ts",
+          "../lib/api.ts"
+        ],
+        "Agent can request file content dynamically": [
+          "ui/src/hooks/useAgentCommands.ts",
+          "../components/GuidedView.ts",
+          "../lib/api.ts"
+        ],
+        "Agent can be updated with context when joining a session": [
+          "ui/src/hooks/useAgentCommands.ts",
+          "../components/GuidedView.ts",
+          "../lib/api.ts"
         ]
       },
       "dependencies": [],
@@ -3020,11 +3040,14 @@
         "User can toggle the microphone on and off",
         "User can start and pause voice interactions",
         "User can view audio activity visualizations",
-        "User can expand and collapse the voice control interface"
+        "User can expand and collapse the voice control interface",
+        "User can toggle microphone settings",
+        "User can view voice transcripts",
+        "User can see the status of the voice assistant"
       ],
-      "mermaidDiagram": "flowchart TD\n  Start([Voice Control])\n  voice_control_1[User can toggle the microphone on and off]\n  voice_control_2[User can start and pause voice interactions]\n  voice_control_3[User can view audio activity visualizations]\n  voice_control_4[User can expand and collapse the voice control ...]\n  Start --> voice_control_1\n  voice_control_1 --> voice_control_2\n  voice_control_2 --> voice_control_3\n  voice_control_3 --> voice_control_4\n  voice_control_4 --> End([Complete])\n",
-      "mermaidJourney": "journey\n  title Voice Control\n  section User Actions\n    User can toggle the microphone on and...: 3: User\n    User can start and pause voice intera...: 3: User\n    User can view audio activity visualiz...: 3: User\n    User can expand and collapse the voic...: 3: User\n",
-      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant ...VoiceControlIsland.tsx as ...VoiceControlIsland.tsx\n    participant ./ui/morph-surface as ./ui/morph-surface\n    participant ./VoiceTranscript as ./VoiceTranscript\n    participant ../hooks/useVoiceChat as ../hooks/useVoiceChat\n    User->>...VoiceControlIsland.tsx: User can toggle the microphone on and off\n    ...VoiceControlIsland.tsx->>./ui/morph-surface: process\n    ./ui/morph-surface->>./VoiceTranscript: process\n    ./VoiceTranscript->>../hooks/useVoiceChat: process\n    ...VoiceControlIsland.tsx->>./ui/morph-surface: process\n    ./ui/morph-surface->>./VoiceTranscript: process\n    ./VoiceTranscript->>../hooks/useVoiceChat: process\n    ...VoiceControlIsland.tsx->>./ui/morph-surface: process\n    ./ui/morph-surface->>./VoiceTranscript: process\n    ./VoiceTranscript->>../hooks/useVoiceChat: process\n    ...VoiceControlIsland.tsx->>./ui/morph-surface: process\n    ./ui/morph-surface->>./VoiceTranscript: process\n    ./VoiceTranscript->>../hooks/useVoiceChat: process\n",
+      "mermaidDiagram": "flowchart TD\n  Start([Voice Control])\n  voice_control_1[User can toggle microphone settings]\n  voice_control_2[User can view voice transcripts]\n  voice_control_3[User can see the status of the voice assistant]\n  Start --> voice_control_1\n  voice_control_1 --> voice_control_2\n  voice_control_2 --> voice_control_3\n  voice_control_3 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title Voice Control\n  section User Actions\n    User can toggle microphone settings: 3: User\n    User can view voice transcripts: 3: User\n    User can see the status of the voice ...: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant ...VoiceControlIsland.tsx as ...VoiceControlIsland.tsx\n    participant ../hooks/useVoiceChat as ../hooks/useVoiceChat\n    participant ./ui/morph-surface as ./ui/morph-surface\n    participant ./VoiceTranscript as ./VoiceTranscript\n    User->>...VoiceControlIsland.tsx: User can toggle microphone settings\n    ...VoiceControlIsland.tsx->>../hooks/useVoiceChat: process\n    ../hooks/useVoiceChat->>./ui/morph-surface: process\n    ./ui/morph-surface->>./VoiceTranscript: process\n    ...VoiceControlIsland.tsx->>../hooks/useVoiceChat: process\n    ../hooks/useVoiceChat->>./ui/morph-surface: process\n    ./ui/morph-surface->>./VoiceTranscript: process\n    ...VoiceControlIsland.tsx->>../hooks/useVoiceChat: process\n    ../hooks/useVoiceChat->>./ui/morph-surface: process\n    ./ui/morph-surface->>./VoiceTranscript: process\n",
       "files": [
         "ui/src/components/VoiceControlIsland.tsx",
         "./ui/morph-surface",
@@ -3055,6 +3078,24 @@
           "./ui/morph-surface",
           "./VoiceTranscript",
           "../hooks/useVoiceChat"
+        ],
+        "User can toggle microphone settings": [
+          "ui/src/components/VoiceControlIsland.tsx",
+          "../hooks/useVoiceChat",
+          "./ui/morph-surface",
+          "./VoiceTranscript"
+        ],
+        "User can view voice transcripts": [
+          "ui/src/components/VoiceControlIsland.tsx",
+          "../hooks/useVoiceChat",
+          "./ui/morph-surface",
+          "./VoiceTranscript"
+        ],
+        "User can see the status of the voice assistant": [
+          "ui/src/components/VoiceControlIsland.tsx",
+          "../hooks/useVoiceChat",
+          "./ui/morph-surface",
+          "./VoiceTranscript"
         ]
       },
       "dependencies": [],
@@ -3664,6 +3705,89 @@
       "tags": [
         "src",
         "core",
+        "typescript"
+      ]
+    },
+    {
+      "id": "app-ui",
+      "name": "App Ui",
+      "description": "",
+      "category": "Services",
+      "entryPoint": "ui/src/App.tsx",
+      "userFlows": [
+        "User can navigate through different modes of the application",
+        "User can access voice controls when the agent is ready",
+        "User can view guided content tailored to their current context"
+      ],
+      "mermaidDiagram": "flowchart TD\n  Start([App Ui])\n  app_ui_1[User can navigate through different modes of th...]\n  app_ui_2[User can access voice controls when the agent i...]\n  app_ui_3[User can view guided content tailored to their ...]\n  Start --> app_ui_1\n  app_ui_1 --> app_ui_2\n  app_ui_2 --> app_ui_3\n  app_ui_3 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title App Ui\n  section User Actions\n    User can navigate through different m...: 3: User\n    User can access voice controls when t...: 3: User\n    User can view guided content tailored...: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant ui/src/App.tsx as ui/src/App.tsx\n    participant ./components/Layout as ./components/Layout\n    participant ./hooks/useSession as ./hooks/useSession\n    participant ./hooks/useJourney as ./hooks/useJourney\n    participant ./lib/api as ./lib/api\n    participant ...mponents/WelcomeScreen as ...mponents/WelcomeScreen\n    participant ...nts/VoiceControlIsland as ...nts/VoiceControlIsland\n    participant ./components/GuidedView as ./components/GuidedView\n    User->>ui/src/App.tsx: User can navigate through different modes of th...\n    ui/src/App.tsx->>./components/Layout: process\n    ./components/Layout->>./hooks/useSession: process\n    ./hooks/useSession->>./hooks/useJourney: process\n    ./hooks/useJourney->>./lib/api: process\n    ./lib/api->>...mponents/WelcomeScreen: process\n    ...mponents/WelcomeScreen->>...nts/VoiceControlIsland: process\n    ...nts/VoiceControlIsland->>./components/GuidedView: process\n    ./components/GuidedView->>...nents/SmartFileBrowser: process\n    ...nents/SmartFileBrowser->>...onents/JourneyProgress: process\n    ...onents/JourneyProgress->>...mponents/StepNavigator: process\n    ...mponents/StepNavigator->>./components/CommandBar: process\n    ./components/CommandBar->>./hooks/useAgentCommands: process\n    ui/src/App.tsx->>./components/Layout: process\n    ./components/Layout->>./hooks/useSession: process\n    ./hooks/useSession->>./hooks/useJourney: process\n    ./hooks/useJourney->>./lib/api: process\n    ./lib/api->>...mponents/WelcomeScreen: process\n    ...mponents/WelcomeScreen->>...nts/VoiceControlIsland: process\n    ...nts/VoiceControlIsland->>./components/GuidedView: process\n    ./components/GuidedView->>...nents/SmartFileBrowser: process\n    ...nents/SmartFileBrowser->>...onents/JourneyProgress: process\n    ...onents/JourneyProgress->>...mponents/StepNavigator: process\n    ...mponents/StepNavigator->>./components/CommandBar: process\n    ./components/CommandBar->>./hooks/useAgentCommands: process\n    ui/src/App.tsx->>./components/Layout: process\n    ./components/Layout->>./hooks/useSession: process\n    ./hooks/useSession->>./hooks/useJourney: process\n    ./hooks/useJourney->>./lib/api: process\n    ./lib/api->>...mponents/WelcomeScreen: process\n    ...mponents/WelcomeScreen->>...nts/VoiceControlIsland: process\n    ...nts/VoiceControlIsland->>./components/GuidedView: process\n    ./components/GuidedView->>...nents/SmartFileBrowser: process\n    ...nents/SmartFileBrowser->>...onents/JourneyProgress: process\n    ...onents/JourneyProgress->>...mponents/StepNavigator: process\n    ...mponents/StepNavigator->>./components/CommandBar: process\n    ./components/CommandBar->>./hooks/useAgentCommands: process\n",
+      "files": [
+        "ui/src/App.tsx",
+        "./components/Layout",
+        "./hooks/useSession",
+        "./hooks/useJourney",
+        "./lib/api",
+        "./components/WelcomeScreen",
+        "./components/VoiceControlIsland",
+        "./components/GuidedView",
+        "./components/SmartFileBrowser",
+        "./components/JourneyProgress",
+        "./components/StepNavigator",
+        "./components/CommandBar",
+        "./hooks/useAgentCommands"
+      ],
+      "filesByAction": {
+        "User can navigate through different modes of the application": [
+          "ui/src/App.tsx",
+          "./components/Layout",
+          "./hooks/useSession",
+          "./hooks/useJourney",
+          "./lib/api",
+          "./components/WelcomeScreen",
+          "./components/VoiceControlIsland",
+          "./components/GuidedView",
+          "./components/SmartFileBrowser",
+          "./components/JourneyProgress",
+          "./components/StepNavigator",
+          "./components/CommandBar",
+          "./hooks/useAgentCommands"
+        ],
+        "User can access voice controls when the agent is ready": [
+          "ui/src/App.tsx",
+          "./components/Layout",
+          "./hooks/useSession",
+          "./hooks/useJourney",
+          "./lib/api",
+          "./components/WelcomeScreen",
+          "./components/VoiceControlIsland",
+          "./components/GuidedView",
+          "./components/SmartFileBrowser",
+          "./components/JourneyProgress",
+          "./components/StepNavigator",
+          "./components/CommandBar",
+          "./hooks/useAgentCommands"
+        ],
+        "User can view guided content tailored to their current context": [
+          "ui/src/App.tsx",
+          "./components/Layout",
+          "./hooks/useSession",
+          "./hooks/useJourney",
+          "./lib/api",
+          "./components/WelcomeScreen",
+          "./components/VoiceControlIsland",
+          "./components/GuidedView",
+          "./components/SmartFileBrowser",
+          "./components/JourneyProgress",
+          "./components/StepNavigator",
+          "./components/CommandBar",
+          "./hooks/useAgentCommands"
+        ]
+      },
+      "dependencies": [],
+      "tags": [
+        "ui",
+        "src",
         "typescript"
       ]
     }

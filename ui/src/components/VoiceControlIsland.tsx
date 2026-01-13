@@ -19,11 +19,13 @@ import { useVoiceChat } from "../hooks/useVoiceChat";
 interface VoiceControlIslandProps {
   isActive: boolean;
   onToggle: () => void;
+  isReady?: boolean;
 }
 
 export default function VoiceControlIsland({
   isActive,
   onToggle,
+  isReady = true,
 }: VoiceControlIslandProps) {
   const { messages } = useVoiceChat();
   const [isExpanded, setIsExpanded] = useState(false);
@@ -44,6 +46,8 @@ export default function VoiceControlIsland({
 
   const currentStatus = !isActive
     ? "idle"
+    : !isReady
+    ? "thinking" // Reuse thinking state for syncing
     : agentState === "speaking"
     ? "speaking"
     : agentState === "thinking"
@@ -66,11 +70,20 @@ export default function VoiceControlIsland({
             <div className="flex items-center gap-3 min-w-fit">
               <div
                 className={`w-2 h-2 rounded-full ${
-                  isActive ? "bg-green-400 animate-pulse" : "bg-red-400"
+                  !isReady
+                    ? "bg-yellow-400 animate-bounce"
+                    : isActive
+                    ? "bg-green-400 animate-pulse"
+                    : "bg-red-400"
                 }`}
               />
-              <span className="text-white font-bold text-sm whitespace-nowrap tracking-tight">
+              <span className="text-white font-bold text-sm whitespace-nowrap tracking-tight flex items-center gap-2">
                 StartBlock
+                {!isReady && (
+                  <span className="text-[10px] text-yellow-400/80 font-medium animate-pulse uppercase tracking-widest">
+                    • Syncing
+                  </span>
+                )}
               </span>
             </div>
 
@@ -137,6 +150,11 @@ export default function VoiceControlIsland({
             <div className="flex items-center justify-between px-6 h-14 border-b border-white/10 shrink-0">
               <div className="flex items-center gap-4 min-w-fit">
                 <span className="text-white font-bold text-sm">StartBlock</span>
+                {!isReady && (
+                  <span className="px-2 py-0.5 rounded-full bg-yellow-400/10 text-yellow-400 text-[10px] font-bold uppercase tracking-wider animate-pulse">
+                    Syncing Context
+                  </span>
+                )}
 
                 {/* VISUALIZER IN EXPANDED HEADER */}
                 {isActive && agentAudioTrack && (

@@ -1,7 +1,7 @@
 ---
 filePath: ui/src/hooks/useAgentCommands.ts
-fileVersion: 03fe4ddce2f75c83267bce483ab0b1b19aa5ced5
-lastUpdated: '2026-01-12T21:47:51.675Z'
+fileVersion: b79c9dd83798f8eef0562d197c97bd965b391ee2
+lastUpdated: '2026-01-13T11:14:54.015Z'
 updatedBy: sb-cli
 tags:
   - ui
@@ -12,31 +12,42 @@ importance: low
 extractedBy: sb-cli@1.0.0
 model: gpt-4o-mini
 humanVerified: false
+rationale: >-
+  The use of React hooks allows for a more concise and manageable way to handle
+  state and side effects compared to class components. The context push
+  mechanism was implemented to ensure agents receive necessary data immediately
+  upon joining, which is critical for real-time collaboration.
+attemptsAndFailures: ''
 feature: agent-commands
 featureRole: helper
 userFlows:
-  - Agent can receive onboarding context when joining a session
-  - Agent can request specific file content from the application
-  - Agent can view relevant features and knowledge files dynamically
+  - Agent can receive commands to navigate or show files
+  - Agent can request file content dynamically
+  - Agent can be updated with context when joining a session
 relatedFiles:
-  - lib/api.ts
-  - components/GuidedView.ts
+  - ../components/GuidedView.ts
+  - ../lib/api.ts
 ---
-## Purpose
-This file defines a custom hook that manages agent commands and context within a collaborative environment, facilitating communication between agents and the application.
+# Purpose
+This file provides a custom React hook that manages agent commands and context synchronization in a collaborative environment.
 
 ## Problem
-Before this file, there was no structured way to manage interactions between agents and the application. Agents needed to receive context about the session, features, and files dynamically as they joined, which was not being handled efficiently. This led to confusion and potential miscommunication during collaborative sessions.
+Before this hook was implemented, there was no structured way to manage the context and commands for agents joining a collaborative session. Agents needed to receive relevant data immediately upon joining, but the existing architecture did not facilitate this efficiently, leading to potential delays and confusion.
+
+## What Was Tried (If Applicable)
+No specific failed attempts are documented for this implementation. The approach taken was a result of iterative development based on the need for real-time context sharing and command handling for agents.
 
 ## Solution
-The `useAgentCommands` hook solves this problem by leveraging React's state management and effects to send context to agents when they join a room. It listens for participant connections, fetches necessary data (session, features, knowledge files), and sends this information as payloads to the agents. The hook also handles commands from agents, allowing them to request specific files or show content dynamically.
+The `useAgentCommands` hook utilizes React's state and effect hooks to manage the agent's context and commands. It listens for participant connections, sends context data when agents join, and handles incoming commands dynamically. This ensures that agents are always up-to-date with the necessary information to perform their tasks.
+
+## Design Rationale
+This approach was chosen to leverage React's functional programming paradigm, which simplifies state management and side effects through hooks. Alternatives such as class components were considered but rejected due to their complexity and verbosity. The decision to implement a context push mechanism allows for immediate data synchronization, which is essential for maintaining an interactive experience in real-time collaborative applications.
 
 ## Impact
-With this file, agents can now receive relevant context and commands in real-time, enhancing their ability to interact with the application effectively. This leads to a smoother onboarding experience and better collaboration, as agents can access the information they need without delays.
+With this implementation, agents can now receive context and commands in real-time, significantly improving their ability to interact with the application. This enhances user experience by ensuring that agents are equipped with the latest information as they join the session.
 
 ## Architecture Context
-This hook integrates with the LiveKit components for real-time communication and relies on API calls to fetch session data and files. It operates within a React component tree, making it easy to manage state and side effects related to agent interactions.
+This hook integrates with the LiveKit components for managing room contexts and data channels. It relies on external API calls to fetch session data, features, and knowledge files, ensuring that agents have the necessary context to operate effectively.
 
 ## Gotchas (If Applicable)
-- The agent detection logic is permissive, which could lead to false positives if participant identities are not carefully managed. Ensure that agent naming conventions are consistent to avoid misidentification.
-- The hook relies on the reliability of the data channel for message delivery; any issues in the network can affect the communication between agents and the application.
+Ensure that the `isReady` state is properly managed to avoid agents acting on incomplete data. Additionally, be cautious of the participant identity checks to ensure that only relevant participants are treated as agents.

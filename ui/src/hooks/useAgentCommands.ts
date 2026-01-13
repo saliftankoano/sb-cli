@@ -37,31 +37,23 @@ interface UseAgentCommandsReturn {
   guidedState: GuidedViewState | null;
   lastCommand: AgentCommand | null;
   clearGuidedState: () => void;
+  isReady: boolean;
 }
 
 export function useAgentCommands(): UseAgentCommandsReturn {
   const [guidedState, setGuidedState] = useState<GuidedViewState | null>(null);
   const [lastCommand, setLastCommand] = useState<AgentCommand | null>(null);
+  const [isReady, setIsReady] = useState(false);
   const room = useRoomContext();
 
   const { send } = useDataChannel("server-context");
 
   // Push initial context when agent joins
   useEffect(() => {
-    console.warn("[ContextBridge] HOOK MOUNTED", {
-      roomName: room.name,
-      state: room.state,
-      participantCount: room.remoteParticipants.size,
-    });
-
     const sentParticipants = new Set<string>();
 
     const sendContext = async (participant: any) => {
       if (sentParticipants.has(participant.identity)) return;
-
-      console.warn(
-        `[ContextBridge] Checking participant: ${participant.identity} | IsAgent?`
-      );
 
       // Be very permissive with agent detection for now
       const isAgent =
@@ -72,19 +64,13 @@ export function useAgentCommands(): UseAgentCommandsReturn {
 
       if (isAgent) {
         sentParticipants.add(participant.identity);
-        console.warn(
-          "[ContextBridge] TARGET AGENT DETECTED! Starting context push..."
-        );
+        setIsReady(false);
         try {
           const [session, features, knowledgeFiles] = await Promise.all([
             fetchSession(),
             fetchFeatures(),
             fetchKnowledge(),
           ]);
-
-          console.log("[ContextBridge] Local data fetched", {
-            hasSession: !!session,
-          });
 
           if (session) {
             const baseContext = {
@@ -162,39 +148,25 @@ export function useAgentCommands(): UseAgentCommandsReturn {
                 destinationIdentities: [participant.identity],
               });
             }
-
-            console.warn("[ContextBridge] PUSH SUCCESSFUL");
+            setIsReady(true);
           } else {
             sentParticipants.delete(participant.identity); // Try again later if no session
-            console.warn(
-              "[ContextBridge] No session found, skipping context push"
-            );
           }
         } catch (err) {
           sentParticipants.delete(participant.identity); // Try again later if failed
           console.error("[ContextBridge] PUSH FAILED:", err);
         }
-      } else {
-        console.log(
-          `[ContextBridge] Participant ${participant.identity} is not an agent, ignoring.`
-        );
       }
     };
 
     // 1. Sync already present participants
     const existing = Array.from(room.remoteParticipants.values());
-    console.log(
-      `[ContextBridge] Existing participants count: ${existing.length}`
-    );
     existing.forEach((p) => {
       sendContext(p);
     });
 
     // 2. Listen for future joins
     const onParticipantConnected = (participant: any) => {
-      console.warn(
-        `[ContextBridge] NEW PARTICIPANT JOINED: ${participant.identity}`
-      );
       sendContext(participant);
     };
 
@@ -209,10 +181,6 @@ export function useAgentCommands(): UseAgentCommandsReturn {
             p.identity.toLowerCase().includes("agent") ||
             p.identity.toLowerCase().includes("python");
           if (isAgent) {
-            console.log(
-              "[ContextBridge] Periodic check found agent",
-              p.identity
-            );
             sendContext(p);
           }
         }
@@ -220,7 +188,6 @@ export function useAgentCommands(): UseAgentCommandsReturn {
     }, 5000);
 
     return () => {
-      console.log("[ContextBridge] HOOK UNMOUNTED");
       room.off("participantConnected", onParticipantConnected);
       clearInterval(interval);
     };
@@ -288,5 +255,6 @@ export function useAgentCommands(): UseAgentCommandsReturn {
     guidedState,
     lastCommand,
     clearGuidedState,
+    isReady,
   };
 }
