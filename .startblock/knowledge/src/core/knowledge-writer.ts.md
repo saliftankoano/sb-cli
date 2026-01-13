@@ -1,7 +1,7 @@
 ---
 filePath: src/core/knowledge-writer.ts
-fileVersion: 3b416f26343e9cc1cfd6140ef640501273e1831e
-lastUpdated: '2026-01-13T10:20:26.972Z'
+fileVersion: f3d1f19051849c62abadd3659f559b94ffab6c94
+lastUpdated: '2026-01-13T10:49:43.468Z'
 updatedBy: sb-cli
 tags:
   - src
@@ -14,30 +14,29 @@ humanVerified: false
 feature: knowledge-management
 featureRole: service
 userFlows:
-  - Developers can generate structured knowledge documentation for source files
   - >-
-    Users can view and understand the rationale behind design decisions in the
-    codebase
-  - Team members can easily update existing documentation with new insights
+    User can document code knowledge including design rationale and failed
+    approaches
+  - User can retrieve existing knowledge documentation for reference
 relatedFiles:
   - ../utils/file-utils.js
   - ./openai-client.js
 ---
 ## Purpose
-This file facilitates the generation and management of knowledge documentation for source files, ensuring that relevant metadata is captured and organized systematically.
+This file manages the creation and retrieval of knowledge documentation for source code, ensuring that critical insights and metadata are captured and stored in a structured format.
 
 ## Problem
-Before this file existed, there was no standardized way to document the knowledge associated with source files, leading to inconsistent documentation practices and difficulty in understanding the rationale behind code decisions. This lack of structure hindered team collaboration and knowledge sharing.
+Before this file existed, there was no standardized way to document the rationale behind code decisions and the challenges faced during development. This lack of documentation often led to confusion for future developers and hindered the onboarding process. The need for a clear, organized method to capture and share knowledge became apparent as the codebase grew.
 
 ## Solution
-The `knowledge-writer.ts` file provides functions to create and update knowledge files that mirror the structure of the source files. It captures essential metadata, including tags, importance, and a new rationale field that explains the design choices made. By using the `gray-matter` library, it allows for easy reading and writing of markdown content along with its associated metadata.
+The `knowledge-writer.ts` file provides functions to write and read knowledge documentation, utilizing a structured metadata format. It generates knowledge file paths that mirror the source file structure, ensuring easy navigation. The recent addition of the `attemptsAndFailures` field allows developers to document what approaches were tried and did not succeed, enriching the knowledge base and providing context for future decisions.
 
 ## Impact
-With this file, developers can now generate comprehensive knowledge documentation that is consistently structured and easily accessible. This enhances the overall quality of documentation, aids in onboarding new team members, and fosters better communication regarding design decisions within the team.
+With this file, developers can now create and maintain comprehensive documentation that includes not only successful approaches but also insights into failed attempts. This fosters a culture of learning and transparency, enabling teams to avoid repeating mistakes and to build upon past experiences. The structured format also aids in the onboarding of new developers by providing them with clear insights into the codebase's history and rationale.
 
 ## Architecture Context
-This file is part of the core utilities for knowledge management in the application. It integrates with the file system to read and write documentation files and relies on utility functions to ensure the correct directory structure is maintained. The knowledge files generated are stored in a dedicated directory that mirrors the source file structure, facilitating easy navigation.
+This file is part of the core utilities for knowledge management within the application. It interacts with the file system to create and read markdown files, leveraging utility functions for file operations. The knowledge files are stored in a directory structure that reflects the source code, making it intuitive to find related documentation.
 
 ## Gotchas (If Applicable)
-- Ensure that the `knowledgeDir` provided exists; otherwise, the directory creation process will fail.
-- When updating existing knowledge files, be aware that the existing metadata will be preserved unless explicitly overwritten, which could lead to confusion if not managed properly.
+- Ensure that the directory structure is correctly mirrored; otherwise, knowledge files may not be found.
+- Be cautious when updating existing knowledge files, as incorrect handling of the metadata could lead to loss of important information. Incremental updates are supported, but existing data must be read and merged correctly to avoid overwriting valuable insights.

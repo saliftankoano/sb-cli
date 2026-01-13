@@ -270,9 +270,6 @@ export default function GuidedView({
                     AI Insight
                     <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
                   </h3>
-                  <p className="text-[13px] text-gray-300 leading-relaxed font-medium">
-                    {state.explanation}
-                  </p>
                 </div>
               </div>
             </div>

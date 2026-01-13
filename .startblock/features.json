@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-01-13T10:20:26.976Z",
+  "lastUpdated": "2026-01-13T10:49:43.478Z",
   "features": [
     {
       "id": "startblock-onboarding",
@@ -1844,13 +1844,16 @@
         "Users can understand the rationale behind code decisions",
         "Team members can onboard more effectively with clear documentation",
         "Developers can generate structured documentation for their code.",
-        "Team members can understand the rationale behind design decisions more clearly."
+        "Team members can understand the rationale behind design decisions more clearly.",
+        "Developer can generate documentation for code files",
+        "Developer can analyze code changes with context and rationale"
       ],
-      "mermaidDiagram": "flowchart TD\n  Start([Prompts Templates])\n  prompts_templates_1[Developers can generate structured documentatio...]\n  prompts_templates_2[Team members can understand the rationale behin...]\n  Start --> prompts_templates_1\n  prompts_templates_1 --> prompts_templates_2\n  prompts_templates_2 --> End([Complete])\n",
-      "mermaidJourney": "journey\n  title Prompts Templates\n  section User Actions\n    Developers can generate structured do...: 3: User\n    Team members can understand the ratio...: 3: User\n",
-      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant src/prompts/templates.ts as src/prompts/templates.ts\n    User->>src/prompts/templates.ts: Developers can generate structured documentatio...\n",
+      "mermaidDiagram": "flowchart TD\n  Start([Prompts Templates])\n  prompts_templates_1[Developer can generate documentation for code f...]\n  prompts_templates_2[Developer can analyze code changes with context...]\n  Start --> prompts_templates_1\n  prompts_templates_1 --> prompts_templates_2\n  prompts_templates_2 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title Prompts Templates\n  section User Actions\n    Developer can generate documentation ...: 3: User\n    Developer can analyze code changes wi...: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant src/prompts/templates.ts as src/prompts/templates.ts\n    participant src/prompts/index.ts as src/prompts/index.ts\n    User->>src/prompts/templates.ts: Developer can generate documentation for code f...\n    src/prompts/templates.ts->>src/prompts/index.ts: process\n    src/prompts/templates.ts->>src/prompts/index.ts: process\n",
       "files": [
-        "src/prompts/templates.ts"
+        "src/prompts/templates.ts",
+        "src/prompts/index.ts"
       ],
       "filesByAction": {
         "User can generate documentation for code files based on their context": [
@@ -1879,6 +1882,14 @@
         ],
         "Team members can understand the rationale behind design decisions more clearly.": [
           "src/prompts/templates.ts"
+        ],
+        "Developer can generate documentation for code files": [
+          "src/prompts/templates.ts",
+          "src/prompts/index.ts"
+        ],
+        "Developer can analyze code changes with context and rationale": [
+          "src/prompts/templates.ts",
+          "src/prompts/index.ts"
         ]
       },
       "dependencies": [],
@@ -2097,11 +2108,14 @@
         "User can expand or collapse the knowledge section for insights",
         "User can toggle between viewing source code and knowledge insights",
         "User can expand or collapse the insights pane for better navigation",
-        "User can view highlighted lines in the code for focused learning"
+        "User can view highlighted lines in the code for focused learning",
+        "User can toggle between viewing source code and AI-generated insights",
+        "User can load specific lines of code for detailed examination",
+        "User can view contextual information about the code, such as purpose and dependencies"
       ],
-      "mermaidDiagram": "flowchart TD\n  Start([Guided View])\n  guided_view_1[User can toggle between viewing source code and...]\n  guided_view_2[User can expand or collapse the insights pane f...]\n  guided_view_3[User can view highlighted lines in the code for...]\n  Start --> guided_view_1\n  guided_view_1 --> guided_view_2\n  guided_view_2 --> guided_view_3\n  guided_view_3 --> End([Complete])\n",
-      "mermaidJourney": "journey\n  title Guided View\n  section User Actions\n    User can toggle between viewing sourc...: 3: User\n    User can expand or collapse the insig...: 3: User\n    User can view highlighted lines in th...: 3: User\n",
-      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant ...ponents/GuidedView.tsx as ...ponents/GuidedView.tsx\n    participant _/hooks/useKnowledge as @/hooks/useKnowledge\n    participant _/lib/api as @/lib/api\n    participant ./MarkdownRenderer as ./MarkdownRenderer\n    User->>...ponents/GuidedView.tsx: User can toggle between viewing source code and...\n    ...ponents/GuidedView.tsx->>_/hooks/useKnowledge: process\n    _/hooks/useKnowledge->>_/lib/api: process\n    _/lib/api->>./MarkdownRenderer: process\n    ...ponents/GuidedView.tsx->>_/hooks/useKnowledge: process\n    _/hooks/useKnowledge->>_/lib/api: process\n    _/lib/api->>./MarkdownRenderer: process\n    ...ponents/GuidedView.tsx->>_/hooks/useKnowledge: process\n    _/hooks/useKnowledge->>_/lib/api: process\n    _/lib/api->>./MarkdownRenderer: process\n",
+      "mermaidDiagram": "flowchart TD\n  Start([Guided View])\n  guided_view_1[User can toggle between viewing source code and...]\n  guided_view_2[User can load specific lines of code for detail...]\n  guided_view_3[User can view contextual information about the ...]\n  Start --> guided_view_1\n  guided_view_1 --> guided_view_2\n  guided_view_2 --> guided_view_3\n  guided_view_3 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title Guided View\n  section User Actions\n    User can toggle between viewing sourc...: 3: User\n    User can load specific lines of code ...: 3: User\n    User can view contextual information ...: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant ...ponents/GuidedView.tsx as ...ponents/GuidedView.tsx\n    participant hooks/useKnowledge.ts as hooks/useKnowledge.ts\n    participant lib/api.ts as lib/api.ts\n    participant ...s/MarkdownRenderer.tsx as ...s/MarkdownRenderer.tsx\n    User->>...ponents/GuidedView.tsx: User can toggle between viewing source code and...\n    ...ponents/GuidedView.tsx->>hooks/useKnowledge.ts: process\n    hooks/useKnowledge.ts->>lib/api.ts: process\n    lib/api.ts->>...s/MarkdownRenderer.tsx: process\n    ...ponents/GuidedView.tsx->>hooks/useKnowledge.ts: process\n    hooks/useKnowledge.ts->>lib/api.ts: process\n    lib/api.ts->>...s/MarkdownRenderer.tsx: process\n    ...ponents/GuidedView.tsx->>hooks/useKnowledge.ts: process\n    hooks/useKnowledge.ts->>lib/api.ts: process\n    lib/api.ts->>...s/MarkdownRenderer.tsx: process\n",
       "files": [
         "ui/src/components/GuidedView.tsx",
         "hooks/useKnowledge.ts",
@@ -2111,7 +2125,8 @@
         "./MarkdownRenderer.tsx",
         "@/hooks/useKnowledge",
         "@/lib/api",
-        "./MarkdownRenderer"
+        "./MarkdownRenderer",
+        "components/MarkdownRenderer.tsx"
       ],
       "filesByAction": {
         "User can view code snippets with explanations": [
@@ -2153,6 +2168,24 @@
           "@/hooks/useKnowledge",
           "@/lib/api",
           "./MarkdownRenderer"
+        ],
+        "User can toggle between viewing source code and AI-generated insights": [
+          "ui/src/components/GuidedView.tsx",
+          "hooks/useKnowledge.ts",
+          "lib/api.ts",
+          "components/MarkdownRenderer.tsx"
+        ],
+        "User can load specific lines of code for detailed examination": [
+          "ui/src/components/GuidedView.tsx",
+          "hooks/useKnowledge.ts",
+          "lib/api.ts",
+          "components/MarkdownRenderer.tsx"
+        ],
+        "User can view contextual information about the code, such as purpose and dependencies": [
+          "ui/src/components/GuidedView.tsx",
+          "hooks/useKnowledge.ts",
+          "lib/api.ts",
+          "components/MarkdownRenderer.tsx"
         ]
       },
       "dependencies": [],
@@ -3542,11 +3575,13 @@
       "userFlows": [
         "Developers can generate structured knowledge documentation for source files",
         "Users can view and understand the rationale behind design decisions in the codebase",
-        "Team members can easily update existing documentation with new insights"
+        "Team members can easily update existing documentation with new insights",
+        "User can document code knowledge including design rationale and failed approaches",
+        "User can retrieve existing knowledge documentation for reference"
       ],
-      "mermaidDiagram": "flowchart TD\n  Start([Knowledge Management])\n  knowledge_management_1[Developers can generate structured knowledge do...]\n  knowledge_management_2[Users can view and understand the rationale beh...]\n  knowledge_management_3[Team members can easily update existing documen...]\n  Start --> knowledge_management_1\n  knowledge_management_1 --> knowledge_management_2\n  knowledge_management_2 --> knowledge_management_3\n  knowledge_management_3 --> End([Complete])\n",
-      "mermaidJourney": "journey\n  title Knowledge Management\n  section User Actions\n    Developers can generate structured kn...: 3: User\n    Users can view and understand the rat...: 3: User\n    Team members can easily update existi...: 3: User\n",
-      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant ...re/knowledge-writer.ts as ...re/knowledge-writer.ts\n    participant ../utils/file-utils.js as ../utils/file-utils.js\n    participant ./openai-client.js as ./openai-client.js\n    User->>...re/knowledge-writer.ts: Developers can generate structured knowledge do...\n    ...re/knowledge-writer.ts->>../utils/file-utils.js: process\n    ../utils/file-utils.js->>./openai-client.js: process\n    ...re/knowledge-writer.ts->>../utils/file-utils.js: process\n    ../utils/file-utils.js->>./openai-client.js: process\n    ...re/knowledge-writer.ts->>../utils/file-utils.js: process\n    ../utils/file-utils.js->>./openai-client.js: process\n",
+      "mermaidDiagram": "flowchart TD\n  Start([Knowledge Management])\n  knowledge_management_1[User can document code knowledge including desi...]\n  knowledge_management_2[User can retrieve existing knowledge documentat...]\n  Start --> knowledge_management_1\n  knowledge_management_1 --> knowledge_management_2\n  knowledge_management_2 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title Knowledge Management\n  section User Actions\n    User can document code knowledge incl...: 3: User\n    User can retrieve existing knowledge ...: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant ...re/knowledge-writer.ts as ...re/knowledge-writer.ts\n    participant ../utils/file-utils.js as ../utils/file-utils.js\n    participant ./openai-client.js as ./openai-client.js\n    User->>...re/knowledge-writer.ts: User can document code knowledge including desi...\n    ...re/knowledge-writer.ts->>../utils/file-utils.js: process\n    ../utils/file-utils.js->>./openai-client.js: process\n    ...re/knowledge-writer.ts->>../utils/file-utils.js: process\n    ../utils/file-utils.js->>./openai-client.js: process\n",
       "files": [
         "src/core/knowledge-writer.ts",
         "../utils/file-utils.js",
@@ -3567,6 +3602,62 @@
           "src/core/knowledge-writer.ts",
           "../utils/file-utils.js",
           "./openai-client.js"
+        ],
+        "User can document code knowledge including design rationale and failed approaches": [
+          "src/core/knowledge-writer.ts",
+          "../utils/file-utils.js",
+          "./openai-client.js"
+        ],
+        "User can retrieve existing knowledge documentation for reference": [
+          "src/core/knowledge-writer.ts",
+          "../utils/file-utils.js",
+          "./openai-client.js"
+        ]
+      },
+      "dependencies": [],
+      "tags": [
+        "src",
+        "core",
+        "typescript"
+      ]
+    },
+    {
+      "id": "core-openai-client",
+      "name": "Core Openai Client",
+      "description": "",
+      "category": "Services",
+      "userFlows": [
+        "User can analyze code files for insights",
+        "User can generate onboarding tasks tailored to their goals",
+        "User can document attempts and failures encountered during code analysis"
+      ],
+      "mermaidDiagram": "flowchart TD\n  Start([Core Openai Client])\n  core_openai_client_1[User can analyze code files for insights]\n  core_openai_client_2[User can generate onboarding tasks tailored to ...]\n  core_openai_client_3[User can document attempts and failures encount...]\n  Start --> core_openai_client_1\n  core_openai_client_1 --> core_openai_client_2\n  core_openai_client_2 --> core_openai_client_3\n  core_openai_client_3 --> End([Complete])\n",
+      "mermaidJourney": "journey\n  title Core Openai Client\n  section User Actions\n    User can analyze code files for insights: 3: User\n    User can generate onboarding tasks ta...: 3: User\n    User can document attempts and failur...: 3: User\n",
+      "mermaidSequence": "sequenceDiagram\n    participant User\n    participant src/core/openai-client.ts as src/core/openai-client.ts\n    participant ../config/defaults.js as ../config/defaults.js\n    participant ../prompts/templates.js as ../prompts/templates.js\n    participant ../utils/sleep.js as ../utils/sleep.js\n    User->>src/core/openai-client.ts: User can analyze code files for insights\n    src/core/openai-client.ts->>../config/defaults.js: process\n    ../config/defaults.js->>../prompts/templates.js: process\n    ../prompts/templates.js->>../utils/sleep.js: process\n    src/core/openai-client.ts->>../config/defaults.js: process\n    ../config/defaults.js->>../prompts/templates.js: process\n    ../prompts/templates.js->>../utils/sleep.js: process\n    src/core/openai-client.ts->>../config/defaults.js: process\n    ../config/defaults.js->>../prompts/templates.js: process\n    ../prompts/templates.js->>../utils/sleep.js: process\n",
+      "files": [
+        "src/core/openai-client.ts",
+        "../config/defaults.js",
+        "../prompts/templates.js",
+        "../utils/sleep.js"
+      ],
+      "filesByAction": {
+        "User can analyze code files for insights": [
+          "src/core/openai-client.ts",
+          "../config/defaults.js",
+          "../prompts/templates.js",
+          "../utils/sleep.js"
+        ],
+        "User can generate onboarding tasks tailored to their goals": [
+          "src/core/openai-client.ts",
+          "../config/defaults.js",
+          "../prompts/templates.js",
+          "../utils/sleep.js"
+        ],
+        "User can document attempts and failures encountered during code analysis": [
+          "src/core/openai-client.ts",
+          "../config/defaults.js",
+          "../prompts/templates.js",
+          "../utils/sleep.js"
         ]
       },
       "dependencies": [],

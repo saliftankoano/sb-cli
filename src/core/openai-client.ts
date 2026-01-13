@@ -11,6 +11,7 @@ export interface AnalysisResult {
   insights: string[]; // Key insights as numbered list for terminal display
   markdown: string;
   rationale?: string; // WHY this approach was chosen - design decisions summary
+  attemptsAndFailures?: string; // What was tried that didn't work - failed approaches, errors, dead ends
   metadata: {
     tags: string[];
     importance: "low" | "medium" | "high" | "critical";
@@ -78,6 +79,11 @@ export class OpenAIClient {
                   description:
                     "WHY this approach was chosen - concise summary of design decisions and alternatives rejected (2-3 sentences)",
                 },
+                attemptsAndFailures: {
+                  type: "string",
+                  description:
+                    "What was tried that didn't work - failed approaches, errors encountered, dead ends explored (empty string if nothing failed)",
+                },
                 feature: {
                   type: "string",
                   description:
@@ -118,6 +124,7 @@ export class OpenAIClient {
                 "insights",
                 "markdown",
                 "rationale",
+                "attemptsAndFailures",
                 "feature",
                 "featureRole",
                 "userFlows",
@@ -140,6 +147,7 @@ export class OpenAIClient {
         insights: parsed.insights || ["No insights available"],
         markdown: parsed.markdown || "",
         rationale: parsed.rationale || "",
+        attemptsAndFailures: parsed.attemptsAndFailures || "",
         metadata: { tags, importance },
         feature: parsed.feature,
         featureRole: parsed.featureRole,

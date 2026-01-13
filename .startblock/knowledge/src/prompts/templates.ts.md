@@ -1,7 +1,7 @@
 ---
 filePath: src/prompts/templates.ts
-fileVersion: 9674f2f871b9b2558c7acd2b813bcfa34f2cea42
-lastUpdated: '2026-01-13T10:20:26.975Z'
+fileVersion: f3d1f19051849c62abadd3659f559b94ffab6c94
+lastUpdated: '2026-01-13T10:49:43.475Z'
 updatedBy: sb-cli
 tags:
   - src
@@ -14,26 +14,25 @@ humanVerified: false
 feature: prompts-templates
 featureRole: helper
 userFlows:
-  - Developers can generate structured documentation for their code.
-  - >-
-    Team members can understand the rationale behind design decisions more
-    clearly.
-relatedFiles: []
+  - Developer can generate documentation for code files
+  - Developer can analyze code changes with context and rationale
+relatedFiles:
+  - src/prompts/index.ts
 ---
 ## Purpose
-This file provides a template for generating structured documentation for code analysis, focusing on the rationale behind design decisions and the impact of the code.
+This file provides a mechanism to generate structured prompts for analyzing code files, aimed at producing comprehensive documentation automatically.
 
 ## Problem
-Before this file existed, there was a lack of standardized documentation practices that captured not only what the code does but also why certain approaches were chosen. This often led to confusion among developers and a higher likelihood of repeating mistakes.
+Prior to this implementation, generating documentation for code files was a manual and inconsistent process, leading to gaps in knowledge sharing and understanding among team members. This inconsistency made it difficult for developers to grasp the context and rationale behind code changes, which could result in repeated mistakes or misunderstandings.
 
 ## Solution
-The file introduces a systematic prompt that guides developers in documenting their code. It emphasizes capturing the problem, attempts, solution, rationale, and impact, ensuring that future developers understand the context and reasoning behind design choices. This structured approach helps maintain clarity and consistency across documentation.
+This file defines a function that constructs a detailed prompt for OpenAI's analysis based on the context of the code file. It captures essential information such as the file path, language, git status, and existing documentation. The approach leverages a template system to ensure that all relevant aspects of the code are considered, including problems faced, solutions implemented, and design rationale. By doing so, it standardizes the documentation process and enhances clarity.
 
 ## Impact
-With this documentation template, developers can now produce comprehensive and insightful documentation that aids in onboarding new team members, facilitates code reviews, and enhances collaboration. It ultimately leads to a more informed development process and better software quality.
+With this file, developers can now automatically generate insightful documentation for their code changes, which improves onboarding for new team members and facilitates better collaboration. The inclusion of failed attempts and design rationale also fosters a culture of learning and continuous improvement, as it allows the team to reflect on past decisions and avoid repeating errors.
 
 ## Architecture Context
-This file fits into the larger system by serving as a foundational tool for generating documentation across various modules. It integrates with the codebase to ensure that all components are well-documented, enhancing overall maintainability and knowledge sharing.
+This file fits into the larger system by serving as a helper utility that interacts with the codebase to extract relevant information and format it for documentation. It relies on the context provided by the calling functions, which include details about dependencies and the overall structure of the project.
 
 ## Gotchas (If Applicable)
-Developers should be aware that while capturing failed attempts is encouraged, it is essential to focus on significant failures that provide valuable lessons, rather than trivial issues that do not contribute to the learning process.
+Developers should ensure that the context provided to the prompt generation function is complete and accurate, as missing information could lead to incomplete documentation. Additionally, care should be taken to maintain the template structure to avoid inconsistencies in generated outputs.

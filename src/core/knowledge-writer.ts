@@ -16,6 +16,8 @@ export interface KnowledgeMetadata {
   humanVerified: boolean;
   // Design rationale - WHY this approach was chosen
   rationale?: string;
+  // What was tried that didn't work - failed approaches, dead ends
+  attemptsAndFailures?: string;
   // Feature-aware fields
   feature?: string;
   featureRole?: "entry_point" | "helper" | "component" | "service" | "config";
@@ -79,6 +81,8 @@ export async function writeKnowledgeFile(
     humanVerified: existingData.data?.humanVerified || false,
     // Design rationale - WHY this approach was chosen
     rationale: analysis.rationale,
+    // What was tried that didn't work - failed approaches, dead ends
+    attemptsAndFailures: analysis.attemptsAndFailures,
     // Feature-aware fields
     feature: analysis.feature,
     featureRole: analysis.featureRole,

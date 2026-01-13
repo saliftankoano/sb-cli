@@ -136,6 +136,9 @@ Return a JSON response with these fields:
 ## Problem
 [What problem does this file solve? What was the situation before this existed? What issue prompted its creation?]
 
+## What Was Tried (If Applicable)
+[What approaches were attempted that didn't work? What errors were encountered? What dead ends were explored? This prevents future developers/agents from repeating the same mistakes. Include specific error messages if relevant.]
+
 ## Solution
 [How does this file solve the problem technically? What's the key approach or pattern used?]
 
@@ -152,20 +155,21 @@ Return a JSON response with these fields:
 [Non-obvious behaviors, edge cases, common mistakes, performance traps]
 
 3. "rationale": A concise summary of WHY this approach was chosen (2-3 sentences capturing the key design decision and alternatives rejected)
-4. "feature": Feature ID based on directory structure (kebab-case, e.g., "dashboard-analytics", "authentication", "mcp-integration")
-5. "featureRole": One of: "entry_point", "helper", "component", "service", "config"
+4. "attemptsAndFailures": What was tried that didn't work? Failed approaches, errors encountered, dead ends (empty string if nothing failed)
+6. "feature": Feature ID based on directory structure (kebab-case, e.g., "dashboard-analytics", "authentication", "mcp-integration")
+7. "featureRole": One of: "entry_point", "helper", "component", "service", "config"
    - entry_point: Main files like page.tsx, route.ts, index.ts
    - helper: Utility files in utils/, helpers/
    - component: React/Vue components
    - service: Business logic in services/
    - config: Configuration files
-6. "userFlows": Array of user-facing actions this file enables (think from end-user perspective)
+8. "userFlows": Array of user-facing actions this file enables (think from end-user perspective)
    - Examples: "User can view analytics dashboard", "User can authenticate via OAuth"
    - NOT developer actions like "Developer can import this function"
-7. "relatedFiles": Array of files imported by this file (convert relative imports to file paths)
+9. "relatedFiles": Array of files imported by this file (convert relative imports to file paths)
    - Example: import { X } from './helper' → ["helper.ts"]
    - Only include files from the same repository
-8. "suggestDiagramUpdate": boolean - true if this file changes the feature's architecture or user flow
+10. "suggestDiagramUpdate": boolean - true if this file changes the feature's architecture or user flow
 
 Keep it concise. Focus on non-obvious knowledge. PRIORITIZE the Design Rationale section.`;
 

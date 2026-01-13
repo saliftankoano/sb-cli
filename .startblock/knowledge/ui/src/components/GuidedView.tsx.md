@@ -1,7 +1,7 @@
 ---
 filePath: ui/src/components/GuidedView.tsx
-fileVersion: 9674f2f871b9b2558c7acd2b813bcfa34f2cea42
-lastUpdated: '2026-01-11T23:19:32.842Z'
+fileVersion: 726468ded823981992d840a94b6b4ecc92730b21
+lastUpdated: '2026-01-13T10:49:43.477Z'
 updatedBy: sb-cli
 tags:
   - ui
@@ -15,29 +15,30 @@ humanVerified: false
 feature: guided-view
 featureRole: component
 userFlows:
-  - User can toggle between viewing source code and knowledge insights
-  - User can expand or collapse the insights pane for better navigation
-  - User can view highlighted lines in the code for focused learning
+  - User can toggle between viewing source code and AI-generated insights
+  - User can load specific lines of code for detailed examination
+  - >-
+    User can view contextual information about the code, such as purpose and
+    dependencies
 relatedFiles:
-  - '@/hooks/useKnowledge'
-  - '@/lib/api'
-  - ./MarkdownRenderer
+  - hooks/useKnowledge.ts
+  - lib/api.ts
+  - components/MarkdownRenderer.tsx
 ---
 ## Purpose
-This file provides a guided view component that allows users to explore source code alongside contextual knowledge insights.
+This file serves as a React component that provides a guided view for exploring code files, integrating both the raw source code and contextual insights derived from AI analysis.
 
 ## Problem
-Before this file existed, users had difficulty understanding the context and purpose of specific code segments, leading to confusion and inefficiencies during code reviews or learning sessions. There was no integrated way to view both the source code and related documentation or insights, which hindered the learning process for new developers and made it challenging to maintain code quality.
+Before the implementation of this component, developers faced challenges in understanding complex code files without adequate context or explanations. This lack of insight could lead to misunderstandings and inefficiencies when navigating the codebase, especially for new team members or during code reviews.
 
 ## Solution
-The GuidedView component solves this problem by implementing a dual-pane layout that allows users to switch between viewing the source code and associated knowledge insights. It fetches code dynamically based on user actions and highlights specific lines for better visibility. The component also manages state for loading and collapsing sections, ensuring a responsive and interactive user experience.
+The GuidedView component addresses this problem by allowing users to switch between viewing the raw source code and AI-generated insights. It fetches file content dynamically and highlights specific lines based on user-defined parameters. The component also integrates a knowledge base that provides additional context, such as purpose, gotchas, and dependencies, enhancing the overall understanding of the code.
 
 ## Impact
-With this file, users can now easily toggle between source code and knowledge insights, enhancing their understanding of the codebase. This feature supports better onboarding for new developers and facilitates more effective code reviews, ultimately improving team productivity and code quality.
+With the GuidedView component, users can now easily explore and understand code files with contextual insights at their fingertips. This functionality significantly improves the onboarding process for new developers, aids in code reviews, and enhances overall productivity by reducing the time spent deciphering complex code.
 
 ## Architecture Context
-The GuidedView component is part of the UI layer, integrating with hooks for knowledge retrieval and API calls for fetching file content. It relies on state management for user interactions and employs libraries like `framer-motion` for animations, ensuring a smooth user experience. The component interacts with knowledge data to provide contextual insights, enhancing the overall functionality of the application.
+The GuidedView component is part of a larger system that includes hooks for knowledge retrieval and API calls for fetching file content. It integrates with the knowledge base to provide contextual information, ensuring a seamless flow of data between the code and its explanations. The component relies on React for rendering and Framer Motion for animations, enhancing user experience.
 
 ## Gotchas (If Applicable)
-- Ensure that the file paths used for fetching knowledge insights are correct to avoid missing data.
-- The component's performance may be impacted by the size of the code being fetched; consider optimizing the fetch logic for larger files.
+- The removal of the explanation paragraph in the latest commit may lead to less detailed insights being presented to users, which could affect their understanding of the code's functionality. Users should be aware of this change when relying on the component for guidance.
